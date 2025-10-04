@@ -1,12 +1,15 @@
-# policy-service/app/main.py (TCP Server Entry Point)
 import asyncio
+import os # NEW: Import os for environment variables
 from typing import Dict
-from .logic import make_policy_decision
+from .logic import make_policy_decision # Assuming 'logic' module exists and contains this function
 
-POLICY_SERVER_PORT = 10030
+# --- Configuration ---
+# UPDATED: Read port from environment variable, defaulting to 10030.
+# This allows overriding the port for debugging (e.g., using POLICY_SERVER_PORT=10031)
+POLICY_SERVER_PORT = int(os.getenv('POLICY_SERVER_PORT', 10030))
 
 def parse_postfix_data(raw_data: str) -> Dict[str, str]:
-    """Converts Postfix name=value\\n... format to a Python dictionary."""
+    """Converts Postfix name=value\n... format to a Python dictionary."""
     data = {}
     for line in raw_data.strip().split('\n'):
         if '=' in line:
@@ -62,8 +65,14 @@ async def main():
             
     except ConnectionRefusedError:
         print("Error: Postfix not able to connect to the policy service.")
+    except OSError as e:
+        # IMPROVED: Specifically handle the "address already in use" error (Errno 98)
+        if e.errno == 98:
+            print(f"An error occurred in the policy server: [Errno 98] error while attempting to bind on address ('0.0.0.0', {POLICY_SERVER_PORT}): address already in use")
+        else:
+            print(f"An OS error occurred in the policy server: {e}")
     except Exception as e:
-        print(f"An error occurred in the policy server: {e}")
+        print(f"An unexpected error occurred in the policy server: {e}")
 
 if __name__ == "__main__":
     # Ensure this script is the command executed by the Dockerfile CMD

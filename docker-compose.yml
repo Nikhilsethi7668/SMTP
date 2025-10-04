@@ -24,7 +24,10 @@ services:
     depends_on:
       - db
       - redis
+    ports:
+      - "10030:10030"
     restart: always
+
 
   # 4. WEB ADMIN BACKEND - Management API (FastAPI)
   web-admin-backend:

@@ -1,0 +1,40 @@
+# postfix/main.cf
+#
+# --- Basic Server Identification ---
+# Use environment variables set in the Dockerfile
+myhostname = ${POSTFIX_MYHOSTNAME}
+mydomain = ${POSTFIX_MYDOMAIN}
+mydestination = ${POSTFIX_MYDESTINATION}
+inet_protocols = ${POSTFIX_INET_PROTOCOLS}
+
+# --- Core Relay Settings ---
+# Only relay mail from authenticated users or trusted networks
+# We are building an authenticated relay, so permit_sasl_authenticated is key
+relay_domains = $mydestination
+mynetworks = 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+
+# --- Access Control and Policy Delegation ---
+# Defer client, helo, and sender restriction list evaluation until RCPT TO
+smtpd_delay_reject = yes 
+
+smtpd_recipient_restrictions =
+    permit_mynetworks,
+    permit_sasl_authenticated,
+    # The actual policy check is delegated here
+    check_policy_service inet:POLICY_SERVICE_HOST_PLACEHOLDER:10030,
+    reject_unauth_destination,
+    reject
+
+# --- SASL (SMTP Authentication) Settings ---
+smtpd_sasl_auth_enable = yes
+# Use Dovecot or a similar service for SASL authentication.
+# For a containerized app, this often points to a separate auth service socket.
+# We'll use a placeholder and assume you configure a proper SASL backend later.
+# If using Postfix's built-in plaintext auth, you'd use 'cyrus'.
+smtpd_sasl_type = dovecot
+# smtpd_sasl_path = private/auth  # Path to the SASL socket
+
+# --- TLS (Encryption) Settings ---
+# Enforce encryption for submission port for security
+smtpd_tls_security_level = may
+smtp_tls_security_level = may

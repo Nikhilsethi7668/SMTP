@@ -1,0 +1,10 @@
+# web-admin-backend/requirements.txt
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+sqlalchemy
+psycopg2-binary
+python-dotenv
+# passlib and bcrypt for secure password hashing
+passlib[bcrypt]

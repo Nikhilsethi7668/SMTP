@@ -1,0 +1,32 @@
+# .gitignore
+
+# Python/Virtual Environments
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+env/
+venv/
+pip-log.txt
+pip-delete-this-arg.txt
+.Python
+.tox/
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+
+# VS Code/IDE
+.vscode/
+
+# Docker
+# Ignore compiled images and volumes
+target/
+*.tar.gz
+*.zip
+!docker-compose.yml # Keep this one
+!Dockerfile         # Keep this one
+
+# Sensitive Files
+.env

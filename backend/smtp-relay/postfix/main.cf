@@ -1,0 +1,43 @@
+# -----------------------------
+# General settings
+# -----------------------------
+myhostname = smtp-relay.local
+mydomain = local
+myorigin = $mydomain
+inet_interfaces = all
+inet_protocols = ipv4
+
+# -----------------------------
+# Relay-only setup
+# -----------------------------
+relayhost =
+mynetworks = 127.0.0.0/8
+smtpd_recipient_restrictions =
+    check_policy_service inet:backend:10030   # Policy engine TCP server
+    permit_mynetworks
+    reject_unauth_destination
+
+# -----------------------------
+# TLS configuration
+# -----------------------------
+smtpd_tls_security_level = encrypt
+smtpd_tls_cert_file = /etc/ssl/certs/postfix.crt
+smtpd_tls_key_file = /etc/ssl/private/postfix.key
+smtpd_tls_session_cache_database = btree:${data_directory}/smtpd_scache
+smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
+
+# -----------------------------
+# Logging & performance
+# -----------------------------
+smtpd_banner = $myhostname ESMTP
+biff = no
+disable_vrfy_command = yes
+smtpd_client_connection_count_limit = 50
+smtpd_client_connection_rate_limit = 20
+
+# -----------------------------
+# IP rotation & policy support
+# -----------------------------
+# Use "sender_dependent_authentication" in policy engine to assign IPs
+# Postfix will bind to IPs dynamically if policy server returns a specific sender-dependent IP
+smtp_bind_address = 0.0.0.0   # default; policy engine can override per user

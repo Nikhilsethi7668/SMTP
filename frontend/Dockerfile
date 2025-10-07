@@ -1,7 +1,7 @@
 # -----------------------------
 # Base image
 # -----------------------------
-FROM node:20-alpine
+FROM node:20-bullseye
 
 # -----------------------------
 # Set working directory
@@ -9,14 +9,17 @@ FROM node:20-alpine
 WORKDIR /usr/src/app
 
 # -----------------------------
-# Copy package files & install dependencies
+# Copy package files only
 # -----------------------------
-COPY package.json package-lock.json ./
+COPY package.json ./
 
+# -----------------------------
+# Install all dependencies fresh
+# -----------------------------
 RUN npm ci
 
 # -----------------------------
-# Copy frontend source code
+# Copy the rest of the frontend source code
 # -----------------------------
 COPY . .
 
@@ -26,11 +29,11 @@ COPY . .
 EXPOSE 5173
 
 # -----------------------------
-# Environment variables for dev
+# Set environment variables
 # -----------------------------
 ENV NODE_ENV=development
 
 # -----------------------------
 # Start Vite dev server
 # -----------------------------
-CMD ["npm", "run", "dev", "--", "--host"]
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

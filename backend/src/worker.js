@@ -12,7 +12,7 @@ import { initBlacklistTable } from "./models/blacklistModel.js";
  * Initializes DB tables and starts background tasks
  */
 
-const startWorkers = async () => {
+export const startWorkers = async () => {
   try {
     console.log("Initializing database tables...");
     await initUserTable();
@@ -24,25 +24,6 @@ const startWorkers = async () => {
 
     console.log("Starting log worker...");
     startLogWorker();
-
-    console.log("Starting daily quota reset worker...");
-    // Run immediately and then every 24h
-    const dailyReset = async () => {
-      await resetDailyQuotas();
-      console.log("Daily quotas reset completed");
-    };
-    await dailyReset();
-    setInterval(dailyReset, 1000 * 60 * 60 * 24);
-
-    console.log("Starting monthly quota reset worker...");
-    // Run immediately and then every 30 days
-    const monthlyReset = async () => {
-      await resetMonthlyQuotas();
-      console.log("Monthly quotas reset completed");
-    };
-    await monthlyReset();
-    setInterval(monthlyReset, 1000 * 60 * 60 * 24 * 30);
-
     console.log("All workers started successfully ✅");
   } catch (err) {
     console.error("Error starting workers:", err);

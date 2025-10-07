@@ -1,11 +1,9 @@
-version: "3.9"
-
 services:
   # -----------------------------
   # Postgres Database
   # -----------------------------
   postgres:
-    image: postgres:15
+    image: postgres:16
     container_name: smtp_postgres
     restart: always
     environment:
@@ -59,7 +57,7 @@ services:
       dockerfile: Dockerfile
     container_name: smtp_postfix
     restart: always
-    env_file: ./backend/smtp-replay/.env
+    env_file: ./backend/smtp-relay/.env
     depends_on:
       - backend
     ports:

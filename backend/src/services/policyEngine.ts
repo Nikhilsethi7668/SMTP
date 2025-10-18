@@ -1,7 +1,6 @@
 import net from "net";
 import {
   getUserByUsername,
-  updateUsage,
 } from "../models/userModel.js";
 import {
   getQuotaByUserId,
@@ -17,9 +16,9 @@ import { addLog } from "../models/logModel.js";
  * Handles a single Postfix policy request
  * Postfix sends key=value pairs separated by \n, ending with \n\n
  */
-const handleRequest = async (data) => {
-  const lines = data.toString().trim().split("\n");
-  const request = {};
+const handleRequest = async (data: string) => {
+  const lines = data.trim().split("\n");
+  const request: any = {};
   lines.forEach((line) => {
     const [key, value] = line.split("=");
     if (key && value) request[key] = value;

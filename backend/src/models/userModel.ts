@@ -18,6 +18,8 @@ export const initUserTable = async () => {
       rate_limit INTEGER DEFAULT 5, -- emails per second
       dedicated_ip_id INTEGER,
       is_active BOOLEAN DEFAULT TRUE,
+      refresh_token TEXT,
+      refresh_token_expires_at TIMESTAMP,
       created_at TIMESTAMP DEFAULT NOW(),
       updated_at TIMESTAMP DEFAULT NOW()
     );
@@ -27,7 +29,7 @@ export const initUserTable = async () => {
 // ✅ CRUD OPERATIONS
 
 // Create user with hashed password
-export const createUser = async (userData) => {
+export const createUser = async (userData: any) => {
   const {
     org_id,
     username,
@@ -66,22 +68,30 @@ export const createUser = async (userData) => {
 };
 
 // Get user by username (used for SMTP auth & admin login)
-export const getUserByUsername = async (username) => {
+export const getUserByUsername = async (username: string) => {
   const { rows } = await pool.query(`SELECT * FROM users WHERE username=$1`, [
     username,
   ]);
   return rows[0];
 };
 
+// Get user by email (used for SMTP auth & admin login)
+export const getUserByEmail = async (email: string) => {
+  const { rows } = await pool.query(`SELECT * FROM users WHERE email=$1`, [
+    email,
+  ]);
+  return rows[0];
+};
+
 // Validate password
-export const validatePassword = async (username, password) => {
-  const user = await getUserByUsername(username);
+export const validatePassword = async (email: string, password: string) => {
+  const user = await getUserByEmail(email);
   if (!user) return false;
   return (await bcrypt.compare(password, user.password_hash)) ? user : false;
 };
 
 // Update usage quotas
-export const updateUsage = async (username, count = 1) => {
+export const updateUsage = async (username: string, count = 1) => {
   await pool.query(
     `
     UPDATE users
@@ -105,17 +115,60 @@ export const resetMonthlyUsage = async () => {
 };
 
 // Delete user
-export const deleteUser = async (id) => {
+export const deleteUser = async (id: number) => {
   await pool.query(`DELETE FROM users WHERE id=$1`, [id]);
+};
+
+export const markUserAsVerified = async (email: string) => {
+  const { rows } = await pool.query(
+    `UPDATE users 
+     SET is_verified = TRUE, updated_at = NOW() 
+     WHERE email = $1
+     RETURNING id, username, email, is_verified`,
+    [email]
+  );
+  return rows[0];
+};
+
+export const isUserVerified = async (email: string) => {
+  const { rows } = await pool.query(
+    'SELECT is_verified FROM users WHERE email = $1',
+    [email]
+  );
+  return rows[0]?.is_verified || false;
 };
 
 // List all users (admin panel)
 export const getAllUsers = async () => {
   const { rows } = await pool.query(`
     SELECT id, username, email, role, daily_quota, monthly_quota,
-           used_today, used_month, rate_limit, is_active, created_at
+           used_today, used_month, rate_limit, is_active, is_verified,
+           created_at, updated_at
     FROM users
-    ORDER BY id ASC;
   `);
   return rows;
+};
+
+export const updateRefreshToken = async (email: string, refreshToken: string, expiresAt: Date) => {
+  const { rows } = await pool.query(
+    `UPDATE users 
+     SET refresh_token = $1, 
+         refresh_token_expires_at = $2,
+         updated_at = NOW()
+     WHERE email = $3
+     RETURNING id, email, username, role`,
+    [refreshToken, expiresAt, email]
+  );
+  return rows[0];
+};
+
+// Find user by refresh token
+export const findByRefreshToken = async (token: string) => {
+  const { rows } = await pool.query(
+    `SELECT * FROM users 
+     WHERE refresh_token = $1 
+     AND refresh_token_expires_at > NOW()`,
+    [token]
+  );
+  return rows[0];
 };

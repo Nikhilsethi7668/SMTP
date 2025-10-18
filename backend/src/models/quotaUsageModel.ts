@@ -16,7 +16,7 @@ export const initQuotaUsageTable = async () => {
 };
 
 // ✅ Increment daily usage for a user
-export const incrementDailyUsage = async (user_id, count = 1) => {
+export const incrementDailyUsage = async (user_id: number, count: number = 1) => {
   // Use UPSERT to handle first-time usage
   await pool.query(`
     INSERT INTO quota_usages (user_id, emails_sent)
@@ -28,7 +28,7 @@ export const incrementDailyUsage = async (user_id, count = 1) => {
 };
 
 // ✅ Get usage for a specific user on a specific date
-export const getDailyUsage = async (user_id, date = null) => {
+export const getDailyUsage = async (user_id: number, date: string = "") => {
   const targetDate = date || new Date().toISOString().split('T')[0];
   const { rows } = await pool.query(
     `SELECT * FROM quota_usages WHERE user_id=$1 AND date=$2 LIMIT 1;`,
@@ -38,7 +38,7 @@ export const getDailyUsage = async (user_id, date = null) => {
 };
 
 // ✅ Fetch usage history for a user
-export const getUsageHistory = async (user_id, limit = 30) => {
+export const getUsageHistory = async (user_id: number, limit: number = 30) => {
   const { rows } = await pool.query(
     `SELECT * FROM quota_usages WHERE user_id=$1 ORDER BY date DESC LIMIT $2;`,
     [user_id, limit]
@@ -47,7 +47,7 @@ export const getUsageHistory = async (user_id, limit = 30) => {
 };
 
 // ✅ Reset old quota usage (optional cleanup)
-export const deleteOldUsage = async (days = 90) => {
+export const deleteOldUsage = async (days: number = 90) => {
   await pool.query(
     `DELETE FROM quota_usages WHERE date < NOW() - INTERVAL '${days} days';`
   );

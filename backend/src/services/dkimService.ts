@@ -1,14 +1,14 @@
 import crypto from "crypto";
 import fs from "fs";
 import path from "path";
-import { pool } from "../models/db.js";
+import { pool } from "../config/db.js";
 
 /**
  * Generate DKIM keypair for a domain
  * @param {string} selector - DKIM selector (e.g., 'default')
  * @param {string} domain - domain name
  */
-export const generateDKIMKeys = async (selector, domain) => {
+export const generateDKIMKeys = async (selector: string, domain: string) => {
   // Generate 2048-bit RSA key pair
   const { publicKey, privateKey } = crypto.generateKeyPairSync("rsa", {
     modulusLength: 2048,
@@ -23,7 +23,7 @@ export const generateDKIMKeys = async (selector, domain) => {
  * Save DKIM keys to database
  * Optionally save private key securely to file system
  */
-export const saveDKIMKeys = async (domain_id, publicKey, privateKey) => {
+export const saveDKIMKeys = async (domain_id: number, publicKey: string, privateKey: string) => {
   await pool.query(
     `UPDATE domains
      SET dkim_public_key=$1, dkim_private_key=$2, updated_at=NOW()
@@ -36,7 +36,7 @@ export const saveDKIMKeys = async (domain_id, publicKey, privateKey) => {
  * Generate DKIM DNS TXT record string
  * Example: "v=DKIM1; k=rsa; p=<publicKeyBase64>"
  */
-export const generateDKIMDNSRecord = (publicKey) => {
+export const generateDKIMDNSRecord = (publicKey: string   ) => {
   // Remove headers/footers and newlines
   const pubKeyClean = publicKey
     .replace(/-----BEGIN PUBLIC KEY-----/g, "")
@@ -50,7 +50,7 @@ export const generateDKIMDNSRecord = (publicKey) => {
  * Verify DKIM setup (optional: DNS lookup)
  * Can be extended to check TXT record via dns.resolveTxt()
  */
-export const verifyDKIM = async (domain, selector) => {
+export const verifyDKIM = async (domain: string, selector: string) => {
   // Placeholder: could implement DNS check using dns.promises
   return true;
 };
@@ -67,7 +67,7 @@ export const verifyDKIM = async (domain, selector) => {
  *   }
  * });
  */
-export const signEmailWithDKIM = async (emailOptions, privateKey, selector, domain) => {
+export const signEmailWithDKIM = async (emailOptions: any, privateKey: string, selector: string, domain: string) => {
   // Nodemailer handles DKIM signing automatically if you pass privateKey, selector, domain
   // This function is a wrapper for that usage
   return {

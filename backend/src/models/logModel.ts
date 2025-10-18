@@ -18,7 +18,7 @@ export const initLogTable = async () => {
 };
 
 // ✅ Add a log entry
-export const addLog = async (data) => {
+export const addLog = async (data: any) => {
   const { user_id, sender_email, recipient_email, subject, status, ip_address, reason } = data;
   const { rows } = await pool.query(
     `INSERT INTO logs (user_id, sender_email, recipient_email, subject, status, ip_address, reason)
@@ -30,7 +30,7 @@ export const addLog = async (data) => {
 };
 
 // ✅ Fetch logs (optionally by user)
-export const getLogs = async (user_id = null, limit = 100) => {
+export const getLogs = async (user_id: number | null = null, limit: number = 100) => {
   if (user_id) {
     const { rows } = await pool.query(
       `SELECT * FROM logs WHERE user_id=$1 ORDER BY created_at DESC LIMIT $2;`,
@@ -47,7 +47,7 @@ export const getLogs = async (user_id = null, limit = 100) => {
 };
 
 // ✅ Fetch logs by status (sent, rejected, deferred, failed)
-export const getLogsByStatus = async (status, limit = 100) => {
+export const getLogsByStatus = async (status: string, limit: number = 100) => {
   const { rows } = await pool.query(
     `SELECT * FROM logs WHERE status=$1 ORDER BY created_at DESC LIMIT $2;`,
     [status, limit]
@@ -56,7 +56,7 @@ export const getLogsByStatus = async (status, limit = 100) => {
 };
 
 // ✅ Delete old logs (cleanup)
-export const deleteOldLogs = async (days = 30) => {
+export const deleteOldLogs = async (days: number = 30) => {
   await pool.query(
     `DELETE FROM logs WHERE created_at < NOW() - INTERVAL '${days} days';`
   );

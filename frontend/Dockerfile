@@ -16,7 +16,7 @@ COPY package.json ./
 # -----------------------------
 # Install all dependencies fresh
 # -----------------------------
-RUN npm ci
+RUN npm i
 
 # -----------------------------
 # Copy the rest of the frontend source code

@@ -18,7 +18,7 @@ export const initIPPoolTable = async () => {
 };
 
 // ✅ Create a new IP record
-export const addIP = async (data) => {
+export const addIP = async (data: any) => {
   const { label, ip_address, status, warmup_stage, max_daily_send, assigned_user_id } = data;
   const { rows } = await pool.query(
     `INSERT INTO ip_pools (label, ip_address, status, warmup_stage, max_daily_send, assigned_user_id)
@@ -47,7 +47,7 @@ export const getNextAvailableIP = async () => {
 };
 
 // ✅ Assign IP to a user
-export const assignIPToUser = async (ip_id, user_id) => {
+export const assignIPToUser = async (ip_id: number, user_id: number) => {
   await pool.query(
     `UPDATE ip_pools SET assigned_user_id=$1, updated_at=NOW() WHERE id=$2;`,
     [user_id, ip_id]
@@ -55,7 +55,7 @@ export const assignIPToUser = async (ip_id, user_id) => {
 };
 
 // ✅ Rotate IP (used in warm-up schedule)
-export const rotateIPStatus = async (ip_id, newStatus) => {
+export const rotateIPStatus = async (ip_id: number, newStatus: string) => {
   await pool.query(
     `UPDATE ip_pools SET status=$1, updated_at=NOW() WHERE id=$2;`,
     [newStatus, ip_id]
@@ -63,7 +63,7 @@ export const rotateIPStatus = async (ip_id, newStatus) => {
 };
 
 // ✅ Update warm-up stage and cap
-export const updateWarmup = async (ip_id, stage, max_daily_send) => {
+export const updateWarmup = async (ip_id: number, stage: number, max_daily_send: number) => {
   await pool.query(
     `UPDATE ip_pools SET warmup_stage=$1, max_daily_send=$2, updated_at=NOW() WHERE id=$3;`,
     [stage, max_daily_send, ip_id]

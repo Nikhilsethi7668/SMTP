@@ -17,79 +17,80 @@ export const sendOtpEmail = async (email: string, purpose: string, userName: str
     const { otp, expiresAt } = await generateOtp(email, purpose);
     
     // Email subject based on purpose
-    const getSubject = () => {
-      switch (purpose) {
-        case 'registration':
-          return 'Verify Your Email Address';
-        case 'password_reset':
-          return 'Password Reset OTP';
-        case '2fa':
-          return 'Your Two-Factor Authentication Code';
-        default:
-          return 'Your One-Time Password (OTP)';
-      }
-    };
+//     const getSubject = () => {
+//       switch (purpose) {
+//         case 'registration':
+//           return 'Verify Your Email Address';
+//         case 'password_reset':
+//           return 'Password Reset OTP';
+//         case '2fa':
+//           return 'Your Two-Factor Authentication Code';
+//         default:
+//           return 'Your One-Time Password (OTP)';
+//       }
+//     };
 
-    // Email template
-    const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <div style="background-color: #4f46e5; padding: 20px; color: white; text-align: center;">
-          <h1>${getSubject()}</h1>
-        </div>
-        <div style="padding: 20px; background-color: #f9fafb;">
-          <p>Hello ${userName},</p>
-          <p>Your one-time verification code is:</p>
-          <div style="text-align: center; margin: 30px 0;">
-            <div style="
-              display: inline-block; 
-              padding: 15px 30px; 
-              background-color: #eef2ff; 
-              color: #4f46e5; 
-              font-size: 24px; 
-              font-weight: bold;
-              letter-spacing: 5px;
-              border-radius: 5px;
-            ">
-              ${otp}
-            </div>
-          </div>
-          <p>This code will expire at ${new Date(expiresAt).toLocaleString()}.</p>
-          <p>If you didn't request this code, please ignore this email.</p>
-          <p>Best regards,<br>Your Application Team</p>
-        </div>
-        <div style="background-color: #f3f4f6; padding: 15px; text-align: center; font-size: 12px; color: #6b7280;">
-          <p> ${new Date().getFullYear()} Your Application. All rights reserved.</p>
-        </div>
-      </div>
-    `;
+//     // Email template
+//     const html = `
+//       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+//         <div style="background-color: #4f46e5; padding: 20px; color: white; text-align: center;">
+//           <h1>${getSubject()}</h1>
+//         </div>
+//         <div style="padding: 20px; background-color: #f9fafb;">
+//           <p>Hello ${userName},</p>
+//           <p>Your one-time verification code is:</p>
+//           <div style="text-align: center; margin: 30px 0;">
+//             <div style="
+//               display: inline-block; 
+//               padding: 15px 30px; 
+//               background-color: #eef2ff; 
+//               color: #4f46e5; 
+//               font-size: 24px; 
+//               font-weight: bold;
+//               letter-spacing: 5px;
+//               border-radius: 5px;
+//             ">
+//               ${otp}
+//             </div>
+//           </div>
+//           <p>This code will expire at ${new Date(expiresAt).toLocaleString()}.</p>
+//           <p>If you didn't request this code, please ignore this email.</p>
+//           <p>Best regards,<br>Your Application Team</p>
+//         </div>
+//         <div style="background-color: #f3f4f6; padding: 15px; text-align: center; font-size: 12px; color: #6b7280;">
+//           <p> ${new Date().getFullYear()} Your Application. All rights reserved.</p>
+//         </div>
+//       </div>
+//     `;
 
-    // Plain text version
-    const text = `
-${getSubject()}
+//     // Plain text version
+//     const text = `
+// ${getSubject()}
 
-Hello ${userName},
+// Hello ${userName},
 
-Your one-time verification code is: ${otp}
+// Your one-time verification code is: ${otp}
 
-This code will expire at ${new Date(expiresAt).toLocaleString()}.
+// This code will expire at ${new Date(expiresAt).toLocaleString()}.
 
-If you didn't request this code, please ignore this email.
+// If you didn't request this code, please ignore this email.
 
-Best regards,
-Your Application Team
-    `;
+// Best regards,
+// Your Application Team
+//     `;
 
-    // Send email
-    const msg = {
-      to: email,
-      from: process.env.EMAIL_FROM || 'noreply@yourdomain.com',
-      subject: getSubject(),
-      text: text,
-      html: html,
-    };
+//     // Send email
+//     const msg = {
+//       to: email,
+//       from: process.env.EMAIL_FROM || 'noreply@yourdomain.com',
+//       subject: getSubject(),
+//       text: text,
+//       html: html,
+//     };
 
-    await sgMail.send(msg);
+//     await sgMail.send(msg);
     
+console.log("otp",otp)
     return { 
       success: true, 
       message: 'OTP sent successfully',

@@ -290,7 +290,7 @@ const Index = () => {
                 size="lg"
                 variant="outline"
                 onClick={() => navigate("/contact")}
-                className="font-semibold text-base border-white text-white hover:bg-white/10"
+                className="font-semibold text-base border-white bg-transparent text-white hover:bg-white hover:text-primary"
               >
                 Talk to Sales
               </Button>

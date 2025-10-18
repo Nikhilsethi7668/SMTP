@@ -12,7 +12,7 @@ export const pool = new Pool({
   host: process.env.DB_HOST || '127.0.0.1',
   database: process.env.DB_NAME,
   password: String(process.env.DB_PASSWORD), // ensure it's a string
-  port: parseInt(process.env.DB_PORT, 10) || 5432,
+  port: parseInt(process.env.DB_PORT!, 10) || 5432,
 });
 
 // Handle errors globally

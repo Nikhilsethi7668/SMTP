@@ -16,7 +16,7 @@ router.get("/users", async (req, res) => {
       { id: 2, name: "Bob" },
     ];
     res.json(users);
-  } catch (error) {
+  } catch (error: any ) {
     res.status(500).json({ error: error.message });
   }
 });
@@ -34,7 +34,7 @@ router.post("/send-email", async (req, res) => {
       success: true,
       message: `Email queued to ${to} with subject "${subject}"`,
     });
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
 });

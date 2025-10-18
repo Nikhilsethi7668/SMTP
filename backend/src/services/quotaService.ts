@@ -16,7 +16,7 @@ import {
  * Check if user can send an email
  * Returns { allowed: boolean, reason?: string }
  */
-export const checkUserQuota = async (user_id) => {
+export const checkUserQuota = async (user_id: number) => {
   // Step 1: Check if quota exceeded
   const quotaExceeded = await isQuotaExceeded(user_id);
   if (quotaExceeded) {
@@ -36,7 +36,7 @@ export const checkUserQuota = async (user_id) => {
  * Increment usage for a user after sending an email
  * Updates both quotas table and quota_usage table (historical)
  */
-export const recordEmailSent = async (user_id, count = 1) => {
+export const recordEmailSent = async (user_id: number, count = 1) => {
   await incrementUsage(user_id);             // Update current quota counters
   await incrementDailyUsage(user_id, count); // Update historical usage
 };
@@ -58,7 +58,7 @@ export const resetMonthlyQuotas = async () => {
 /**
  * Get current usage and limits for a user
  */
-export const getUserQuotaStatus = async (user_id) => {
+export const getUserQuotaStatus = async (user_id: number) => {
   const quota = await getQuotaByUserId(user_id);
   const usage = await getDailyUsage(user_id);
 

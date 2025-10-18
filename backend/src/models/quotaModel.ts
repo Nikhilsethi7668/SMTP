@@ -21,7 +21,7 @@ export const initQuotaTable = async () => {
 };
 
 // ✅ Create quota record for new user
-export const createQuota = async (user_id, daily_limit = 1000, monthly_limit = 30000, rate_limit_per_minute = 60) => {
+export const createQuota = async (user_id: number, daily_limit = 1000, monthly_limit = 30000, rate_limit_per_minute = 60) => {
   const { rows } = await pool.query(
     `INSERT INTO quotas (user_id, daily_limit, monthly_limit, rate_limit_per_minute)
      VALUES ($1,$2,$3,$4)
@@ -32,13 +32,13 @@ export const createQuota = async (user_id, daily_limit = 1000, monthly_limit = 3
 };
 
 // ✅ Get user quota
-export const getQuotaByUserId = async (user_id) => {
+export const getQuotaByUserId = async (user_id: number) => {
   const { rows } = await pool.query(`SELECT * FROM quotas WHERE user_id=$1 LIMIT 1;`, [user_id]);
   return rows[0];
 };
 
 // ✅ Update usage after each send
-export const incrementUsage = async (user_id) => {
+export const incrementUsage = async (user_id: number) => {
   await pool.query(`
     UPDATE quotas
     SET emails_sent_today = emails_sent_today + 1,
@@ -68,7 +68,7 @@ export const resetMonthlyQuota = async () => {
 };
 
 // ✅ Check if user exceeds daily or monthly quota
-export const isQuotaExceeded = async (user_id) => {
+export const isQuotaExceeded = async (user_id: number) => {
   const { rows } = await pool.query(
     `SELECT * FROM quotas WHERE user_id=$1;`,
     [user_id]
@@ -83,7 +83,7 @@ export const isQuotaExceeded = async (user_id) => {
 };
 
 // ✅ Check if user is sending too fast (rate limit)
-export const isRateLimitExceeded = async (user_id) => {
+export const isRateLimitExceeded = async (user_id: number) => {
   const { rows } = await pool.query(
     `SELECT last_sent_at, rate_limit_per_minute FROM quotas WHERE user_id=$1;`,
     [user_id]

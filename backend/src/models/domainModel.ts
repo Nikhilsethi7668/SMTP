@@ -22,7 +22,7 @@ export const initDomainTable = async () => {
 };
 
 // ✅ Add a new sending domain
-export const addDomain = async (data) => {
+export const addDomain = async (data: any) => {
   const {
     user_id,
     domain_name,
@@ -44,7 +44,7 @@ export const addDomain = async (data) => {
 };
 
 // ✅ Get all domains for an admin or a user
-export const getDomains = async (user_id = null) => {
+export const getDomains = async (user_id: number | null = null) => {
   if (user_id) {
     const { rows } = await pool.query(`SELECT * FROM domains WHERE user_id=$1 ORDER BY id ASC;`, [user_id]);
     return rows;
@@ -55,7 +55,7 @@ export const getDomains = async (user_id = null) => {
 };
 
 // ✅ Verify domain (used after DNS check via worker or API)
-export const markDomainVerified = async (domain_id) => {
+export const markDomainVerified = async (domain_id: number) => {
   await pool.query(
     `UPDATE domains
      SET verified=true, status='verified', last_verified_at=NOW(), updated_at=NOW()
@@ -65,7 +65,7 @@ export const markDomainVerified = async (domain_id) => {
 };
 
 // ✅ Disable or suspend a domain
-export const disableDomain = async (domain_id) => {
+export const disableDomain = async (domain_id: number) => {
   await pool.query(
     `UPDATE domains SET status='disabled', updated_at=NOW() WHERE id=$1;`,
     [domain_id]
@@ -73,7 +73,7 @@ export const disableDomain = async (domain_id) => {
 };
 
 // ✅ Update DKIM/SPF/DMARC records
-export const updateDomainRecords = async (domain_id, updates) => {
+export const updateDomainRecords = async (domain_id: number, updates: any) => {
   const { dkim_public_key, spf_record, dmarc_record } = updates;
   await pool.query(
     `UPDATE domains

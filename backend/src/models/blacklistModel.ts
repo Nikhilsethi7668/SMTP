@@ -14,7 +14,7 @@ export const initBlacklistTable = async () => {
 };
 
 // ✅ Add new blacklist entry
-export const addBlacklistEntry = async (type, value, reason = null) => {
+export const addBlacklistEntry = async (type: string, value: string, reason: string | null) => {
   const { rows } = await pool.query(
     `INSERT INTO blacklists (type, value, reason)
      VALUES ($1,$2,$3)
@@ -25,7 +25,7 @@ export const addBlacklistEntry = async (type, value, reason = null) => {
 };
 
 // ✅ Check if a value is blacklisted
-export const isBlacklisted = async (type, value) => {
+export const isBlacklisted = async (type: string, value: string) => {
   const { rows } = await pool.query(
     `SELECT * FROM blacklists WHERE type=$1 AND value=$2 LIMIT 1;`,
     [type, value]
@@ -34,7 +34,7 @@ export const isBlacklisted = async (type, value) => {
 };
 
 // ✅ Fetch all blacklist entries (optional filtering by type)
-export const getBlacklist = async (type = null) => {
+export const getBlacklist = async (type: string | null = null) => {
   if (type) {
     const { rows } = await pool.query(
       `SELECT * FROM blacklists WHERE type=$1 ORDER BY created_at DESC;`,
@@ -50,7 +50,7 @@ export const getBlacklist = async (type = null) => {
 };
 
 // ✅ Remove blacklist entry
-export const removeBlacklistEntry = async (id) => {
+export const removeBlacklistEntry = async (id: number) => {
   await pool.query(
     `DELETE FROM blacklists WHERE id=$1;`,
     [id]

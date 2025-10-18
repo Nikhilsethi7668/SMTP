@@ -1,5 +1,4 @@
 import { startLogWorker } from "./workers/logWorker.js";
-import { resetDailyQuotas, resetMonthlyQuotas } from "./services/quotaService.js";
 import { initUserTable } from "./models/userModel.js";
 import { initQuotaTable } from "./models/quotaModel.js";
 import { initQuotaUsageTable } from "./models/quotaUsageModel.js";

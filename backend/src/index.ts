@@ -6,7 +6,9 @@ dotenv.config();
 
 import apiRoutes from "./routes/apiRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+import campaignRoutes from "./routes/campaignRoutes.js"
 import { startPolicyServer } from "./services/policyEngine.js";
+import { initDatabase } from "./config/db.js";
 
 const PORT = process.env.PORT || 5000;
 
@@ -16,10 +18,13 @@ const startServer = async () => {
     const app = express();
     app.use(cors());
     app.use(bodyParser.json());
+    await initDatabase();
 
     app.get("/health", (req, res) => res.json({ status: "ok" }));
     app.use("/api", apiRoutes);
     app.use("/api/auth", authRoutes);
+    app.use("/api", campaignRoutes);
+    app
 
     app.listen(PORT, () => {
       console.log(`Admin API server running on port ${PORT}`);

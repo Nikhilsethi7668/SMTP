@@ -20,8 +20,7 @@ pool.on('error', (err) => {
   console.error('Unexpected Postgres error:', err);
 });
 
-// Optional: test the connection immediately
-export const testConnection = async () => {
+export const initDatabase = async () => {
   try {
     const client = await pool.connect();
     console.log('✅ Postgres connected successfully');

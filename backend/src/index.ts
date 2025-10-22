@@ -7,8 +7,11 @@ dotenv.config();
 import apiRoutes from "./routes/apiRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import campaignRoutes from "./routes/campaignRoutes.js"
+import paymentRoutes from "./routes/payment.routes.js";
+import adminRoutes from "./routes/admin.routes.js";
 import { startPolicyServer } from "./services/policyEngine.js";
 import { initDatabase } from "./config/db.js";
+import { initPricingTable } from "./models/pricingModel.js";
 
 const PORT = process.env.PORT || 5000;
 
@@ -18,12 +21,15 @@ const startServer = async () => {
     const app = express();
     app.use(cors());
     app.use(bodyParser.json());
-    await initDatabase();
+        await initDatabase();
+    await initPricingTable();
 
     app.get("/health", (req, res) => res.json({ status: "ok" }));
     app.use("/api", apiRoutes);
     app.use("/api/auth", authRoutes);
     app.use("/api", campaignRoutes);
+    app.use("/api/payment", paymentRoutes);
+    app.use("/api/admin", adminRoutes);
     app
 
     app.listen(PORT, () => {

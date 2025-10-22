@@ -8,6 +8,7 @@ export const initQuotaTable = async () => {
       user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
       daily_limit INTEGER DEFAULT 1000,                -- max per day
       monthly_limit INTEGER DEFAULT 30000,             -- max per month
+      credits INTEGER DEFAULT 0,                       -- purchased credits
       emails_sent_today INTEGER DEFAULT 0,
       emails_sent_this_month INTEGER DEFAULT 0,
       last_reset_date DATE DEFAULT CURRENT_DATE,
@@ -80,6 +81,19 @@ export const isQuotaExceeded = async (user_id: number) => {
     q.emails_sent_today >= q.daily_limit ||
     q.emails_sent_this_month >= q.monthly_limit
   );
+};
+
+// ✅ Check if user is sending too fast (rate limit)
+// ✅ Add credits to user's quota
+export const addCredits = async (user_id: number, newCredits: number) => {
+  const { rows } = await pool.query(
+    `UPDATE quotas
+     SET credits = credits + $2, updated_at = NOW()
+     WHERE user_id = $1
+     RETURNING *;`,
+    [user_id, newCredits]
+  );
+  return rows[0];
 };
 
 // ✅ Check if user is sending too fast (rate limit)

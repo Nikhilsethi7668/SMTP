@@ -9,6 +9,7 @@ import authRoutes from "./routes/authRoutes.js";
 import campaignRoutes from "./routes/campaignRoutes.js"
 import paymentRoutes from "./routes/payment.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
+import keyRoutes from "./routes/keyRoutes.js";
 import { startPolicyServer } from "./services/policyEngine.js";
 import { initDatabase } from "./config/db.js";
 import { initPricingTable } from "./models/pricingModel.js";
@@ -30,6 +31,7 @@ const startServer = async () => {
     app.use("/api", campaignRoutes);
     app.use("/api/payment", paymentRoutes);
     app.use("/api/admin", adminRoutes);
+    app.use("/api/keys", keyRoutes);
     app
 
     app.listen(PORT, () => {

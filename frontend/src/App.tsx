@@ -8,6 +8,7 @@ import Auth from "./pages/Auth";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import EmailVerify from "./pages/EmailVerify";
+import ApiKeysPage from "./pages/KeyPage";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
           <Route path="/verify-email" element={<EmailVerify/>} />
+          <Route path="/keys" element={<ApiKeysPage/>} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

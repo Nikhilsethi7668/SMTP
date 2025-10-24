@@ -1,5 +1,6 @@
 import { startLogWorker } from "./workers/logWorker.js";
-import { initUserTable } from "./models/userModel.js";
+import { initUserTable, resetDailyUsage, resetMonthlyUsage } from "./models/userModel.js";
+import { initKeyTable } from "./models/keyModel.js";
 import { initQuotaTable } from "./models/quotaModel.js";
 import { initQuotaUsageTable } from "./models/quotaUsageModel.js";
 import { initIPPoolTable } from "./models/ipPoolModel.js";
@@ -15,6 +16,7 @@ export const startWorkers = async () => {
   try {
     console.log("Initializing database tables...");
     await initUserTable();
+    await initKeyTable();
     await initQuotaTable();
     await initQuotaUsageTable();
     await initIPPoolTable();

@@ -1,5 +1,5 @@
 import sgMail from '@sendgrid/mail';
-import { generateOtp } from '../models/otpModel.js';
+import { generateOtp } from './otpService.js';
 
 // Initialize SendGrid with API key from environment variables
 sgMail.setApiKey(process.env.SENDGRID_API_KEY!);

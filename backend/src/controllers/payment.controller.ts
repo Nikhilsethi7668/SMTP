@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import Stripe from 'stripe';
 import dotenv from 'dotenv';
-import { getPricing } from '../models/pricingModel.js';
-import { addCredits } from '../models/quotaModel.js';
+import { getPricing } from '../services/pricingService.js';
+import { addCredits } from '../services/quotaService.js';
 
 dotenv.config();
 
@@ -76,7 +76,7 @@ export const handleSuccessfulPayment = async (req: Request, res: Response) => {
       const credits = parseInt(session.metadata!.credits, 10);
 
       if (userId && credits) {
-        await addCredits(userId, credits);
+        await addCredits(userId as any, credits);
         // Redirect to a frontend success page
         return res.redirect(`${process.env.CLIENT_URL}/payment-success`);
       }

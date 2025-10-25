@@ -1,15 +1,10 @@
+// src/services/dkimService.ts
 import crypto from "crypto";
-import fs from "fs";
-import path from "path";
-import { pool } from "../config/db.js";
+import { Domain, IDomain } from "../models/domainModel.js";
+import mongoose from "mongoose";
 
-/**
- * Generate DKIM keypair for a domain
- * @param {string} selector - DKIM selector (e.g., 'default')
- * @param {string} domain - domain name
- */
+/** ✅ Generate DKIM keypair for a domain */
 export const generateDKIMKeys = async (selector: string, domain: string) => {
-  // Generate 2048-bit RSA key pair
   const { publicKey, privateKey } = crypto.generateKeyPairSync("rsa", {
     modulusLength: 2048,
     publicKeyEncoding: { type: "pkcs1", format: "pem" },
@@ -19,25 +14,27 @@ export const generateDKIMKeys = async (selector: string, domain: string) => {
   return { selector, domain, publicKey, privateKey };
 };
 
-/**
- * Save DKIM keys to database
- * Optionally save private key securely to file system
- */
-export const saveDKIMKeys = async (domain_id: number, publicKey: string, privateKey: string) => {
-  await pool.query(
-    `UPDATE domains
-     SET dkim_public_key=$1, dkim_private_key=$2, updated_at=NOW()
-     WHERE id=$3;`,
-    [publicKey, privateKey, domain_id]
+/** ✅ Save DKIM keys to MongoDB */
+export const saveDKIMKeys = async (
+  domain_id: string | mongoose.Types.ObjectId,
+  publicKey: string,
+  privateKey: string,
+  selector?: string
+): Promise<IDomain | null> => {
+  const updatedDomain = await Domain.findByIdAndUpdate(
+    domain_id,
+    {
+      dkim_public_key: publicKey,
+      dkim_private_key: privateKey,
+      ...(selector ? { dkim_selector: selector } : {}),
+    },
+    { new: true } // return updated document
   );
+  return updatedDomain;
 };
 
-/**
- * Generate DKIM DNS TXT record string
- * Example: "v=DKIM1; k=rsa; p=<publicKeyBase64>"
- */
-export const generateDKIMDNSRecord = (publicKey: string   ) => {
-  // Remove headers/footers and newlines
+/** ✅ Generate DKIM DNS TXT record string */
+export const generateDKIMDNSRecord = (publicKey: string) => {
   const pubKeyClean = publicKey
     .replace(/-----BEGIN PUBLIC KEY-----/g, "")
     .replace(/-----END PUBLIC KEY-----/g, "")
@@ -46,30 +43,19 @@ export const generateDKIMDNSRecord = (publicKey: string   ) => {
   return `v=DKIM1; k=rsa; p=${pubKeyClean}`;
 };
 
-/**
- * Verify DKIM setup (optional: DNS lookup)
- * Can be extended to check TXT record via dns.resolveTxt()
- */
-export const verifyDKIM = async (domain: string, selector: string) => {
-  // Placeholder: could implement DNS check using dns.promises
+/** ✅ Verify DKIM setup (placeholder: can use dns.promises) */
+export const verifyDKIM = async (domain: string, selector: string): Promise<boolean> => {
+  // Example: implement DNS TXT lookup using dns.promises.resolveTxt(domain)
   return true;
 };
 
-/**
- * Sign email headers with DKIM (for Nodemailer)
- * Example usage with Nodemailer:
- * const transporter = nodemailer.createTransport({
- *   sendmail: true,
- *   dkim: {
- *     domainName: 'example.com',
- *     keySelector: 'default',
- *     privateKey: privateKey
- *   }
- * });
- */
-export const signEmailWithDKIM = async (emailOptions: any, privateKey: string, selector: string, domain: string) => {
-  // Nodemailer handles DKIM signing automatically if you pass privateKey, selector, domain
-  // This function is a wrapper for that usage
+/** ✅ Sign email headers with DKIM for Nodemailer */
+export const signEmailWithDKIM = (
+  emailOptions: any,
+  privateKey: string,
+  selector: string,
+  domain: string
+) => {
   return {
     ...emailOptions,
     dkim: {

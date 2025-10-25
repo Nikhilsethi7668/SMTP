@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 dotenv.config(); // Load environment variables
 
 // Build MongoDB connection URI
-const mongoURI: string = process.env.MONGO_URI || "mongodb+srv://smtp:smtp1234@cluster0.jdpxszs.mongodb.net/smtpdb"
+const mongoURI: string = process.env.MONGO_URI!
 /**
  * Connects to MongoDB using Mongoose.
  */

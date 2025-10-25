@@ -9,9 +9,12 @@ import authRoutes from "./routes/authRoutes.js";
 import campaignRoutes from "./routes/campaignRoutes.js"
 import paymentRoutes from "./routes/payment.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
+import keyRoutes from "./routes/keyRoutes.js";
 import { startPolicyServer } from "./services/policyEngine.js";
-import { initDatabase } from "./config/db.js";
-import { initPricingTable } from "./models/pricingModel.js";
+import { connectDB } from "./config/db.js";
+import { initPricingTable } from "./services/pricingService.js";
+import leadsRoutes from "./routes/leadsRoutes.js";
+import usersEmailRoutes from "./routes/usersEmailRoutes.js";
 
 const PORT = process.env.PORT || 5000;
 
@@ -21,7 +24,7 @@ const startServer = async () => {
     const app = express();
     app.use(cors());
     app.use(bodyParser.json());
-        await initDatabase();
+        await connectDB();
     await initPricingTable();
 
     app.get("/health", (req, res) => res.json({ status: "ok" }));
@@ -30,6 +33,10 @@ const startServer = async () => {
     app.use("/api", campaignRoutes);
     app.use("/api/payment", paymentRoutes);
     app.use("/api/admin", adminRoutes);
+    app.use("/api/keys", keyRoutes);
+    app.use('/api/leads', leadsRoutes);
+    app.use('/api/emails', usersEmailRoutes);
+
     app
 
     app.listen(PORT, () => {

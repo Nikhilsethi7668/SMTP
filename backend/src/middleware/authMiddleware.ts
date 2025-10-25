@@ -11,13 +11,13 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
 
     jwt.verify(token, JWT_SECRET, (err, user) => {
       if (err) {
-        return res.sendStatus(403); // Forbidden
+        return res.sendStatus(403); 
       }
 
       req.user = user;
       next();
     });
   } else {
-    res.sendStatus(401); // Unauthorized
+    res.sendStatus(401);
   }
 };

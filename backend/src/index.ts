@@ -13,6 +13,8 @@ import keyRoutes from "./routes/keyRoutes.js";
 import { startPolicyServer } from "./services/policyEngine.js";
 import { connectDB } from "./config/db.js";
 import { initPricingTable } from "./services/pricingService.js";
+import leadsRoutes from "./routes/leadsRoutes.js";
+import usersEmailRoutes from "./routes/usersEmailRoutes.js";
 
 const PORT = process.env.PORT || 5000;
 
@@ -32,6 +34,9 @@ const startServer = async () => {
     app.use("/api/payment", paymentRoutes);
     app.use("/api/admin", adminRoutes);
     app.use("/api/keys", keyRoutes);
+    app.use('/api/leads', leadsRoutes);
+    app.use('/api/emails', usersEmailRoutes);
+
     app
 
     app.listen(PORT, () => {

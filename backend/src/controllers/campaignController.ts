@@ -1,4 +1,4 @@
-import * as campaignModel from "../models/campaignModel.js";
+import * as campaignModel from "../services/campaignService.js";
 
 // Create a new campaign
 export const createCampaign = async (req: any, res: any) => {
@@ -19,7 +19,7 @@ export const createCampaign = async (req: any, res: any) => {
 export const listCampaigns = async (req: any, res: any) => {
   try {
     const user_id = req.query.user_id ? Number(req.query.user_id) : null;
-    const campaigns = await campaignModel.getCampaigns(user_id);
+    const campaigns = await campaignModel.getCampaigns(user_id?.toString());
     return res.status(200).json({ success: true, campaigns });
   } catch (error: any) {
     console.error('Error fetching campaigns:', error);
@@ -32,7 +32,7 @@ export const getCampaign = async (req: any, res: any) => {
   try {
     const id = Number(req.params.id);
     if (!id) return res.status(400).json({ success: false, message: 'Invalid campaign id' });
-    const campaign = await campaignModel.getCampaignById(id);
+    const campaign = await campaignModel.getCampaignById(id?.toString());
     if (!campaign) return res.status(404).json({ success: false, message: 'Campaign not found' });
     return res.status(200).json({ success: true, campaign });
   } catch (error: any) {
@@ -47,7 +47,7 @@ export const updateCampaignHandler = async (req: any, res: any) => {
     const id = Number(req.params.id);
     const updates = req.body;
     if (!id) return res.status(400).json({ success: false, message: 'Invalid campaign id' });
-    const updated = await campaignModel.updateCampaign(id, updates);
+    const updated = await campaignModel.updateCampaign(id?.toString(), updates);
     return res.status(200).json({ success: true, campaign: updated });
   } catch (error: any) {
     console.error('Error updating campaign:', error);
@@ -61,7 +61,7 @@ export const setCampaignStatus = async (req: any, res: any) => {
     const id = Number(req.params.id);
     const { status } = req.body;
     if (!id || !status) return res.status(400).json({ success: false, message: 'Invalid id or status' });
-    await campaignModel.markCampaignStatus(id, status);
+    await campaignModel.markCampaignStatus(id?.toString(), status);
     return res.status(200).json({ success: true, message: 'Status updated' });
   } catch (error: any) {
     console.error('Error updating status:', error);
@@ -75,7 +75,7 @@ export const incrementCampaignMetric = async (req: any, res: any) => {
     const id = Number(req.params.id);
     const { metric, by } = req.body;
     if (!id || !metric) return res.status(400).json({ success: false, message: 'Invalid id or metric' });
-    const result = await campaignModel.incrementMetric(id, metric, by || 1);
+    const result = await campaignModel.incrementMetric(id?.toString(), metric, by || 1);
     return res.status(200).json({ success: true, result });
   } catch (error: any) {
     console.error('Error incrementing metric:', error);
@@ -89,7 +89,7 @@ export const archiveCampaignHandler = async (req: any, res: any) => {
     const id = Number(req.params.id);
     const { archived } = req.body;
     if (!id) return res.status(400).json({ success: false, message: 'Invalid id' });
-    await campaignModel.archiveCampaign(id, archived === undefined ? true : Boolean(archived));
+    await campaignModel.archiveCampaign(id?.toString(), archived === undefined ? true : Boolean(archived));
     return res.status(200).json({ success: true, message: 'Campaign archived state updated' });
   } catch (error: any) {
     console.error('Error archiving campaign:', error);
@@ -102,7 +102,7 @@ export const deleteCampaignHandler = async (req: any, res: any) => {
   try {
     const id = Number(req.params.id);
     if (!id) return res.status(400).json({ success: false, message: 'Invalid id' });
-    await campaignModel.deleteCampaign(id);
+    await campaignModel.deleteCampaign(id?.toString());
     return res.status(200).json({ success: true, message: 'Campaign deleted' });
   } catch (error: any) {
     console.error('Error deleting campaign:', error);

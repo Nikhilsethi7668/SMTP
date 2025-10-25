@@ -1,35 +1,18 @@
-import { pool } from "../config/db.js";
+import mongoose, { Schema, Document } from 'mongoose';
 
-// Initialize the pricing table
-export const initPricingTable = async () => {
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS pricing (
-      id SERIAL PRIMARY KEY,
-      rupees INTEGER NOT NULL,
-      credits INTEGER NOT NULL,
-      created_at TIMESTAMP DEFAULT NOW(),
-      updated_at TIMESTAMP DEFAULT NOW()
-    );
-  `);
+export interface IPricing extends Document {
+  rupees: number;
+  credits: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
-  // Seed with a default value if the table is empty
-  const { rows } = await pool.query('SELECT COUNT(*) FROM pricing');
-  if (rows[0].count === '0') {
-    await pool.query('INSERT INTO pricing (rupees, credits) VALUES (1, 10)');
-  }
-};
+const PricingSchema = new Schema<IPricing>(
+  {
+    rupees: { type: Number, required: true },
+    credits: { type: Number, required: true },
+  },
+  { timestamps: true }
+);
 
-// Get the current pricing
-export const getPricing = async () => {
-  const { rows } = await pool.query('SELECT * FROM pricing ORDER BY id DESC LIMIT 1');
-  return rows[0];
-};
-
-// Set the pricing (for admin)
-export const setPricing = async (rupees: number, credits: number) => {
-  const { rows } = await pool.query(
-    'INSERT INTO pricing (rupees, credits) VALUES ($1, $2) RETURNING *',
-    [rupees, credits]
-  );
-  return rows[0];
-};
+export const Pricing = mongoose.model<IPricing>('Pricing', PricingSchema);

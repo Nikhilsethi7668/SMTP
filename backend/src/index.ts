@@ -11,7 +11,6 @@ import paymentRoutes from "./routes/payment.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import { startPolicyServer } from "./services/policyEngine.js";
 import { connectDB } from "./config/db.js";
-import { initPricingTable } from "./services/pricingService.js";
 
 const PORT = process.env.PORT || 5000;
 
@@ -22,7 +21,6 @@ const startServer = async () => {
     app.use(cors());
     app.use(bodyParser.json());
         await connectDB();
-    await initPricingTable();
 
     app.get("/health", (req, res) => res.json({ status: "ok" }));
     app.use("/api", apiRoutes);

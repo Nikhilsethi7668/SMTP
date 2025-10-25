@@ -1,7 +1,9 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface IUser extends Document {
-  org_id?: mongoose.Types.ObjectId;
+  org_id: mongoose.Types.ObjectId; // required now
+  full_name: string;
+  company_name?: string;
   username: string;
   password_hash: string;
   role: "admin" | "user";
@@ -22,7 +24,9 @@ export interface IUser extends Document {
 
 const UserSchema = new Schema<IUser>(
   {
-    org_id: { type: Schema.Types.ObjectId, ref: "Org" },
+    org_id: { type: Schema.Types.ObjectId, ref: "Org", required: true },
+    full_name: { type: String, required: true },
+    company_name: { type: String },
     username: { type: String, required: true, unique: true },
     password_hash: { type: String, required: true },
     role: { type: String, enum: ["admin", "user"], default: "user" },

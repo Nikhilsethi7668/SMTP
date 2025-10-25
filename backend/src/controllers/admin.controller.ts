@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { setPricing } from '../models/pricingModel.js';
+import { setPricing } from '../services/pricingService.js';
 
 export const updatePricing = async (req: Request, res: Response) => {
   const { rupees, credits } = req.body;

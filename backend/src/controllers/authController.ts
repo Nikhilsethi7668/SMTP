@@ -1,9 +1,9 @@
-import { hasActiveOtp, verifyOtpService } from "../models/otpModel.js";
-import { createUser, isUserVerified, markUserAsVerified, validatePassword } from "../models/userModel.js";
+import { hasActiveOtp, verifyOtpService } from "../services/otpService.js";
+import { createUser, isUserVerified, markUserAsVerified, validatePassword } from "../services/userService.js";
 import { sendOtpEmail } from "../services/otpEmailService.js";
 import jwt from 'jsonwebtoken';
 import { config } from 'dotenv';
-import { updateRefreshToken } from '../models/userModel.js';
+import { updateRefreshToken } from '../services/userService.js';
 
 config();
 

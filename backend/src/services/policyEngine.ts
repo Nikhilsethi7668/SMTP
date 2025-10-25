@@ -1,16 +1,16 @@
 import net from "net";
 import {
   getUserByUsername,
-} from "../models/userModel.js";
+} from "../services/userService.js";
 import {
   getQuotaByUserId,
   isQuotaExceeded,
   isRateLimitExceeded,
   incrementUsage,
-} from "../models/quotaModel.js";
-import { isBlacklisted } from "../models/blacklistModel.js";
-import { getNextAvailableIP, assignIPToUser } from "../models/ipPoolModel.js";
-import { addLog } from "../models/logModel.js";
+} from "../services/quotaService.js";
+import { isBlacklisted } from "../services/blacklistService.js";
+import { getNextAvailableIP, assignIPToUser } from "../services/ipPoolService.js";
+import { addLog } from "../services/logService.js";
 
 /**
  * Handles a single Postfix policy request

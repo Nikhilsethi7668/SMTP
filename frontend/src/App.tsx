@@ -14,6 +14,8 @@ import { Campaigns } from "./pages/Campaigns";
 import { CreateCampaignForm } from "./pages/campaigns/CreateCampaign";
 import { CampaignDetails } from "./pages/campaigns/CampaignDetails";
 import Analytics from "./pages/Analytics";
+import ApiKeysPage from "./pages/KeyPage";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -35,6 +37,7 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
           <Route path="/verify-email" element={<EmailVerify/>} />
+          <Route path="/keys" element={<ApiKeysPage/>} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

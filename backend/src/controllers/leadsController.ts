@@ -1,15 +1,31 @@
 // src/controllers/leadsController.ts
-import { Request, Response } from 'express';
-import  Leads  from '../models/leadModel.js';
+import { Response } from 'express';
+import { TypedRequestBody, TypedRequestQuery, TypedRequest } from '../types/express/index.js';
+import Leads from '../models/leadModel.js';
 import { Readable } from 'stream';
 import csv from 'csv-parser';
 
-type LeadRequest = Request & { 
-    user: { id: string } 
-};
+// Types for request bodies and queries
+interface LeadBody {
+    email: string;
+    email_secure_gateway?: string;
+    status?: string;
+}
+
+interface LeadQuery {
+    status?: string;
+    provider?: string;
+}
+
+interface CSVRequestBody {
+    file: Express.Multer.File;
+}
 
 // Add a single lead
-export const addLead = async (req: LeadRequest, res: Response) => {
+export const addLead = async (
+    req: TypedRequestBody<LeadBody>, 
+    res: Response
+) => {
     try {
         const { email, email_secure_gateway, status } = req.body;
         
@@ -32,13 +48,10 @@ export const addLead = async (req: LeadRequest, res: Response) => {
     }
 };
 
-type CSVRequest = LeadRequest & { 
-    file: { 
-        buffer: Buffer 
-    } 
-};
-
-export const uploadLeadsCSV = async (req: CSVRequest, res: Response) => {
+export const uploadLeadsCSV = async (
+    req: TypedRequest<CSVRequestBody, {}> & { file: Express.Multer.File },
+    res: Response
+) => {
     try {
         if (!req.file) {
             return res.status(400).json({
@@ -108,7 +121,10 @@ export const uploadLeadsCSV = async (req: CSVRequest, res: Response) => {
 };
 
 // Get all leads
-export const getLeads = async (req: LeadRequest, res: Response) => {
+export const getLeads = async (
+    req: TypedRequestQuery<LeadQuery>,
+    res: Response
+) => {
     try {
         const { status, provider } = req.query;
         const filter: any = {};

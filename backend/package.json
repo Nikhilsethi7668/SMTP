@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "type": "module",
+  "types": "src/types/express/index.d.ts",
   "scripts": {
     "build": "tsc",
     "start": "tsx src/index.ts",

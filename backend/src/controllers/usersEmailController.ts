@@ -3,14 +3,13 @@ import crypto from 'crypto';
 import { Types } from 'mongoose';
 import UsersEmail from '../models/usersEmailModel.js';
 
-type AuthRequest = Request & { user: { id: string } };
 
 const generateVerificationToken = (): string => {
   return crypto.randomBytes(32).toString('hex');
 };
 
 // Add a new email for user
-export const addUserEmail = async (req: AuthRequest, res: Response) => {
+export const addUserEmail = async (req: Request, res: Response) => {
   try {
     const userId = req.user.id;
     const { email, isPrimary = false } = req.body;
@@ -103,7 +102,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
 };
 
 // Set primary email
-export const setPrimaryEmail = async (req: AuthRequest, res: Response) => {
+export const setPrimaryEmail = async (req:Request, res: Response) => {
   try {
     const userId = req.user.id;
     const { emailId } = req.params;
@@ -142,7 +141,7 @@ export const setPrimaryEmail = async (req: AuthRequest, res: Response) => {
 };
 
 // Get user's emails
-export const getUserEmails = async (req: AuthRequest, res: Response) => {
+export const getUserEmails = async (req: Request, res: Response) => {
   try {
     const userId = req.user.id;
     
@@ -166,7 +165,7 @@ export const getUserEmails = async (req: AuthRequest, res: Response) => {
 };
 
 // Delete user email
-export const deleteUserEmail = async (req: AuthRequest, res: Response) => {
+export const deleteUserEmail = async (req:Request, res: Response) => {
   try {
     const userId = req.user.id;
     const { emailId } = req.params;
@@ -200,7 +199,7 @@ export const deleteUserEmail = async (req: AuthRequest, res: Response) => {
 };
 
 // Resend verification email
-export const resendVerification = async (req: AuthRequest, res: Response) => {
+export const resendVerification = async (req:Request, res: Response) => {
   try {
     const userId = req.user.id;
     const { emailId } = req.params;

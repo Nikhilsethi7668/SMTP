@@ -114,15 +114,16 @@ export const login = async (req: any, res: any) => {
 
 export const signup = async (req: any, res: any) => {
   try {
-    const { email, password, username, full_name, org_name } = req.body;
+    const { email, password, username, fullName, companyName } = req.body;
     if (!email || !password) {
       return res.status(400).json({
         success: false,
         message: "Email and password are required",
       });
     }
+    console.log("User signup initiated:", { email, username, fullName, companyName });
 
-    const user = await createOrgAndAdmin(org_name, full_name, username, password, email);
+    const user = await createOrgAndAdmin(companyName, fullName, username, password, email);
     await sendOtpEmail(email, "registration", username);
 
     return res.status(201).json({

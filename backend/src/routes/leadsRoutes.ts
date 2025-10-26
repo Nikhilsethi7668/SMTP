@@ -1,5 +1,5 @@
 // src/routes/leadsRoutes.ts
-import express from 'express';
+import express, { Router } from 'express';
 import multer from 'multer';
 import { 
     addLead, 
@@ -8,7 +8,7 @@ import {
 } from '../controllers/leadsController.js';
 import { authenticate } from '../middleware/authMiddleware.js';
 
-const router = express.Router();
+const router: Router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
 // Protected routes (require authentication)

@@ -3,15 +3,13 @@ import crypto from 'crypto';
 import { Types } from 'mongoose';
 import Key, { IKey } from '../models/keyModel.js';
 
-type AuthRequest = Request & { user: { id: string } };
-
 // Generate a secure random API key
 const generateApiKey = (): string => {
   return `pk_${crypto.randomBytes(24).toString('hex')}`;
 };
 
 // Create a new API key for the authenticated user
-export const createApiKey = async (req: AuthRequest, res: Response) => {
+export const createApiKey = async (req:Request, res: Response) => {
   try {
     const userId = req.user.id;
     const { permissions, rate_limit, expires_at } = req.body;
@@ -53,7 +51,7 @@ export const createApiKey = async (req: AuthRequest, res: Response) => {
 };
 
 // Get all API keys for the authenticated user
-export const getUserApiKeys = async (req: AuthRequest, res: Response) => {
+export const getUserApiKeys = async (req:Request, res: Response) => {
   try {
     const userId = req.user.id;
     
@@ -79,7 +77,7 @@ export const getUserApiKeys = async (req: AuthRequest, res: Response) => {
 };
 
 // Delete an API key
-export const deleteApiKey = async (req: AuthRequest, res: Response) => {
+export const deleteApiKey = async (req:Request, res: Response) => {
   try {
     const userId = req.user.id;
     const { id } = req.params;
@@ -119,7 +117,7 @@ export const deleteApiKey = async (req: AuthRequest, res: Response) => {
 };
 
 // Deactivate an API key
-export const deactivateApiKey = async (req: AuthRequest, res: Response) => {
+export const deactivateApiKey = async (req:Request, res: Response) => {
   try {
     const userId = req.user.id;
     const { id } = req.params;

@@ -23,7 +23,8 @@ const startServer = async () => {
 
     const app = express();
     app.use(cors({
-      origin:"http://localhost:8080"
+      origin:"http://localhost:8080",
+      credentials: true
     }))
     app.use(bodyParser.json());
         await connectDB();

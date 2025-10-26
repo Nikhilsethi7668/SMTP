@@ -15,6 +15,9 @@ import { connectDB } from "./config/db.js";
 import { initPricingTable } from "./services/pricingService.js";
 import leadsRoutes from "./routes/leadsRoutes.js";
 import usersEmailRoutes from "./routes/usersEmailRoutes.js";
+import emailTemplateRoutes from "./routes/emailTemplateRoutes.js";
+import cookieParser from "cookie-parser";
+import incomingEmailRoutes from "./routes/incomingEmailRoutes.js";
 
 const PORT = process.env.PORT || 5000;
 
@@ -28,20 +31,20 @@ const startServer = async () => {
     }))
     app.use(cookieParser()); 
     app.use(bodyParser.json());
+    app.use(cookieParser());
         await connectDB();
 
     app.get("/health", (req, res) => res.json({ status: "ok" }));
     app.use("/api", apiRoutes);
     app.use("/api/auth", authRoutes);
-    app.use("/api", campaignRoutes);
+    app.use("/api/", campaignRoutes);
     app.use("/api/payment", paymentRoutes);
     app.use("/api/admin", adminRoutes);
     app.use("/api/keys", keyRoutes);
     app.use('/api/leads', leadsRoutes);
     app.use('/api/emails', usersEmailRoutes);
-
-    app
-
+    app.use('/api/email-templates', emailTemplateRoutes);
+    app.use('/api/incoming-emails', incomingEmailRoutes);
     app.listen(PORT, () => {
       console.log(`Admin API server running on port ${PORT}`);
     });

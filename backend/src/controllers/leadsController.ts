@@ -10,11 +10,13 @@ interface LeadBody {
     email: string;
     email_secure_gateway?: string;
     status?: string;
+    campaign:string;
 }
 
 interface LeadQuery {
     status?: string;
     provider?: string;
+    campaign?: string;
 }
 
 interface CSVRequestBody {
@@ -27,10 +29,12 @@ export const addLead = async (
     res: Response
 ) => {
     try {
-        const { email, email_secure_gateway, status } = req.body;
-        
+        const { email, email_secure_gateway, campaign, status } = req.body;
+        const user = req.user._id;
         const lead = await Leads.create({
             email,
+            user,
+            campaign,
             email_secure_gateway: email_secure_gateway || 'default_gateway',
             status: status || 'pending'
         });
@@ -59,6 +63,8 @@ export const uploadLeadsCSV = async (
                 message: 'No CSV file uploaded'
             });
         }
+        const user = req.user._id;
+        const campaign = (req as any).query.campaign as string;
 
         const results: { email: string }[] = [];
         const errors: { email: string; error: string }[] = [];
@@ -88,7 +94,9 @@ export const uploadLeadsCSV = async (
                     const lead = await Leads.create({
                         email,
                         email_secure_gateway: 'default_gateway',
-                        status: 'pending'
+                        status: 'pending',
+                        user,
+                        campaign
                     });
                     savedLeads.push(lead);
                 }
@@ -127,11 +135,14 @@ export const getLeads = async (
 ) => {
     try {
         const { status, provider } = req.query;
+        const user = req.user._id;
+        const campaign = req.query.campaign as string;
         const filter: any = {};
 
         if (status) filter.status = status;
         if (provider) filter.provider = provider;
-
+        if (campaign) filter.campaign = campaign;
+        if (user) filter.user = user;
         const leads = await Leads.find(filter)
             .sort({ createdAt: -1 });
 

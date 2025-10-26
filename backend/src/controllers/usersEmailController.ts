@@ -30,7 +30,7 @@ export const addUserEmail = async (req: Request, res: Response) => {
 
     const userEmail = await UsersEmail.create({
       email,
-      user: new Types.ObjectId(userId),
+      user: userId,
       isPrimary,
       verificationToken,
       verificationTokenExpires,

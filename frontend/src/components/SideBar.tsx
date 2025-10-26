@@ -3,11 +3,11 @@ import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 const navigationItems = [
-  { name: "Dashboard", icon: Home, path: "/app/dashboard/accounts" },
+  { name: "Accounts", icon: Home, path: "/app/dashboard/accounts" },
   { name: "Campaigns", icon: Mail, path: "/app/dashboard/campaigns" },
   { name: "Contacts", icon: Users, path: "/app/dashboard/contacts" },
   { name: "Templates", icon: FileText, path: "/app/dashboard/templates" },
-  { name: "Analytics", icon: BarChart3, path: "/app/dashboard/analytics" },
+  { name: "Analytics", icon: BarChart3, path: "/app/analytics" },
   { name: "Settings", icon: Settings, path: "/app/dashboard/settings" },
 ];
 

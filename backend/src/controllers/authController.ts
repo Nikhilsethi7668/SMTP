@@ -1,7 +1,7 @@
 import { hasActiveOtp, verifyOtpService } from "../services/otpService.js";
 import { sendOtpEmail } from "../services/otpEmailService.js";
-import jwt from "jsonwebtoken";
-import { config } from "dotenv";
+import jwt from 'jsonwebtoken';
+import { config } from 'dotenv';
 
 // import functional user service functions
 import {

@@ -25,7 +25,6 @@ const startServer = async () => {
     app.use(cors());
     app.use(bodyParser.json());
         await connectDB();
-    await initPricingTable();
 
     app.get("/health", (req, res) => res.json({ status: "ok" }));
     app.use("/api", apiRoutes);

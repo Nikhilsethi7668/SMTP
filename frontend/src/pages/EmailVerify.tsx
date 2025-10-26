@@ -4,19 +4,32 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Mail, ArrowRight, CheckCircle2, ArrowLeft } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
-
+import api from "@/axiosInstance";
 export default function EmailVerify() {
   const navigate = useNavigate();
   const query = new URLSearchParams(useLocation().search);
   const prefilledEmail = query.get("email") || "";
-
+  const prefilledUsername = query.get("username") || "";  
   const [step, setStep] = useState<"email" | "otp">("email");
+  const [username, setUsername] = useState(prefilledUsername)
   const [email, setEmail] = useState(prefilledEmail);
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
 
-  const handleEmailSubmit = (e: React.FormEvent) => {
+  const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) setStep("otp");
+    if (email) {
+      try {
+        await api.post("/auth/send-otp", {
+          email,
+          purpose: "email_verification",
+          username
+        });
+        setStep("otp");
+      } catch (error) {
+        console.error("Error sending OTP:", error);
+        alert("Failed to send OTP. Please try again.");
+      }
+    }
   };
 
   const handleOtpChange = (value: string, index: number) => {
@@ -28,8 +41,23 @@ export default function EmailVerify() {
     if (value && nextInput) nextInput.focus();
   };
 
-  const handleVerify = (e: React.FormEvent) => {
+  const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
+    try {
+      const response = await api.post("/auth/verify-otp", {
+        email,
+        otp: otp.join(""),
+        purpose: "email_verification"}
+      );
+      if (response.data.success) {
+        alert("Email verified successfully! You can now log in.");
+        navigate("/dashboard");
+      } else {
+        alert(`Verification failed: ${response.data.message}`);
+      }
+    } catch (error) {
+      
+    }
     alert(`Verifying OTP: ${otp.join("")} for ${email}`);
   };
 

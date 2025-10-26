@@ -1,9 +1,8 @@
 import { hasActiveOtp, verifyOtpService } from "../services/otpService.js";
-import { createUser, isUserVerified, markUserAsVerified, validatePassword } from "../services/userService.js";
 import { sendOtpEmail } from "../services/otpEmailService.js";
 import jwt from 'jsonwebtoken';
 import { config } from 'dotenv';
-import { updateRefreshToken } from '../services/userService.js';
+import { UserService } from '../services/userService.js';
 
 config();
 
@@ -40,7 +39,7 @@ export const verifyToken = (token: any) => {
 export const saveRefreshToken = async (email: any, refreshToken: any) => {
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 7); // 7 days from now
-  return updateRefreshToken(email, refreshToken, expiresAt);
+  return UserService.updateRefreshToken(email, refreshToken, expiresAt);
 };
 
 
@@ -54,14 +53,14 @@ export const login = async (req: any, res: any) => {
         message: 'Email and password are required'
       });
     }
-    const isVerified = await isUserVerified(email);
+    const isVerified = await UserService.isUserVerified(email);
     if (!isVerified) {
       return res.status(401).json({
         success: false,
         message: 'Email is not verified'
       });
     }
-    const user = await validatePassword(email, password);
+    const user = await UserService.validatePassword(email, password);
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -107,14 +106,14 @@ export const login = async (req: any, res: any) => {
 
 export const signup = async (req: any, res: any) => {
   try {
-    const { email, password, username, role} = req.body;
+    const { email, password, username,full_name, org_name } = req.body;
     if (!email || !password) {
       return res.status(400).json({
         success: false,
         message: 'Email and password are required'
       });
     }
-    const user = await createUser({ email, password, role, username });
+    const user = await UserService.createOrgAndAdmin(org_name,full_name,username,password,email);
     await sendOtpEmail(email, 'registration', username);
     return res.status(201).json({
       success: true,
@@ -166,7 +165,7 @@ export const sendOtp = async (req: any, res: any) => {
 
     // Check if user is already verified (for registration purpose)
     if (purpose === 'registration') {
-      const verified = await isUserVerified(email);
+      const verified = await UserService.isUserVerified(email);
       if (verified) {
         return res.status(400).json({
           success: false,
@@ -220,7 +219,7 @@ export const verifyOtp = async (req: any, res: any) => {
     // Verify OTP
     const { isValid, message } = await verifyOtpService(email, otp, purpose);
     if (!isValid) {
-    const user = await markUserAsVerified(email);
+    const user = await UserService.markUserAsVerified(email);
     if(user){
       return res.status(200).json({
         success: true,

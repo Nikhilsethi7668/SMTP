@@ -2,9 +2,6 @@ import { hasActiveOtp, verifyOtpService } from "../services/otpService.js";
 import { sendOtpEmail } from "../services/otpEmailService.js";
 import jwt from 'jsonwebtoken';
 import { config } from 'dotenv';
-import { UserService } from '../services/userService.js';
-import jwt from "jsonwebtoken";
-import { config } from "dotenv";
 
 // import functional user service functions
 import {
@@ -50,7 +47,7 @@ export const verifyToken = (token: any) => {
 export const saveRefreshToken = async (email: any, refreshToken: any) => {
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 7); // 7 days from now
-  return UserService.updateRefreshToken(email, refreshToken, expiresAt);
+  return updateRefreshToken(email, refreshToken, expiresAt);
 };
 
 export const login = async (req: any, res: any) => {

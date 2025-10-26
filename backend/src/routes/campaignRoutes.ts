@@ -9,19 +9,20 @@ import {
   archiveCampaignHandler,
   deleteCampaignHandler,
 } from "../controllers/campaignController.js";
+import { authenticate } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
 // Campaign CRUD operations
-router.post("/campaigns", createCampaign);
-router.get("/campaigns", listCampaigns);
-router.get("/campaigns/:id", getCampaign);
-router.put("/campaigns/:id", updateCampaignHandler);
-router.delete("/campaigns/:id", deleteCampaignHandler);
+router.post("/campaigns",authenticate, createCampaign);
+router.get("/campaigns",authenticate, listCampaigns);
+router.get("/campaigns/:id",authenticate, getCampaign);
+router.put("/campaigns/:id",authenticate, updateCampaignHandler);
+router.delete("/campaigns/:id",authenticate, deleteCampaignHandler);
 
 // Campaign-specific operations
-router.post("/campaigns/:id/status", setCampaignStatus);
-router.post("/campaigns/:id/metrics", incrementCampaignMetric);
-router.post("/campaigns/:id/archive", archiveCampaignHandler);
+router.post("/campaigns/:id/status",authenticate, setCampaignStatus);
+router.post("/campaigns/:id/metrics",authenticate, incrementCampaignMetric);
+router.post("/campaigns/:id/archive",authenticate, archiveCampaignHandler);
 
 export default router;

@@ -1,13 +1,15 @@
+import { Request } from "express";
 import * as campaignModel from "../services/campaignService.js";
 
 // Create a new campaign
-export const createCampaign = async (req: any, res: any) => {
+export const createCampaign = async (req: Request, res: any) => {
   try {
     const data = req.body;
-    if (!data || !data.user_id || !data.name || !data.from_email || !data.subject) {
+    const user_id = req.user._id
+    if (!data || !data.name || !data.from_email || !data.subject) {
       return res.status(400).json({ success: false, message: 'Missing required campaign fields' });
     }
-    const campaign = await campaignModel.addCampaign(data);
+    const campaign = await campaignModel.addCampaign({...data,user_id});
     return res.status(201).json({ success: true, campaign });
   } catch (error: any) {
     console.error('Error creating campaign:', error);
@@ -16,10 +18,10 @@ export const createCampaign = async (req: any, res: any) => {
 };
 
 // Get campaigns (optionally by user)
-export const listCampaigns = async (req: any, res: any) => {
+export const listCampaigns = async (req: Request, res: any) => {
   try {
-    const user_id = req.query.user_id ? Number(req.query.user_id) : null;
-    const campaigns = await campaignModel.getCampaigns(user_id?.toString());
+    const user = req.user._id;
+    const campaigns = await campaignModel.getCampaigns(user?.toString());
     return res.status(200).json({ success: true, campaigns });
   } catch (error: any) {
     console.error('Error fetching campaigns:', error);
@@ -28,7 +30,7 @@ export const listCampaigns = async (req: any, res: any) => {
 };
 
 // Get a single campaign
-export const getCampaign = async (req: any, res: any) => {
+export const getCampaign = async (req: Request, res: any) => {
   try {
     const id = Number(req.params.id);
     if (!id) return res.status(400).json({ success: false, message: 'Invalid campaign id' });
@@ -42,7 +44,7 @@ export const getCampaign = async (req: any, res: any) => {
 };
 
 // Update campaign
-export const updateCampaignHandler = async (req: any, res: any) => {
+export const updateCampaignHandler = async (req: Request, res: any) => {
   try {
     const id = Number(req.params.id);
     const updates = req.body;
@@ -56,7 +58,7 @@ export const updateCampaignHandler = async (req: any, res: any) => {
 };
 
 // Change campaign status
-export const setCampaignStatus = async (req: any, res: any) => {
+export const setCampaignStatus = async (req: Request, res: any) => {
   try {
     const id = Number(req.params.id);
     const { status } = req.body;
@@ -70,7 +72,7 @@ export const setCampaignStatus = async (req: any, res: any) => {
 };
 
 // Increment a metric
-export const incrementCampaignMetric = async (req: any, res: any) => {
+export const incrementCampaignMetric = async (req: Request, res: any) => {
   try {
     const id = Number(req.params.id);
     const { metric, by } = req.body;
@@ -84,7 +86,7 @@ export const incrementCampaignMetric = async (req: any, res: any) => {
 };
 
 // Archive or unarchive campaign
-export const archiveCampaignHandler = async (req: any, res: any) => {
+export const archiveCampaignHandler = async (req: Request, res: any) => {
   try {
     const id = Number(req.params.id);
     const { archived } = req.body;
@@ -98,7 +100,7 @@ export const archiveCampaignHandler = async (req: any, res: any) => {
 };
 
 // Delete campaign
-export const deleteCampaignHandler = async (req: any, res: any) => {
+export const deleteCampaignHandler = async (req: Request, res: any) => {
   try {
     const id = Number(req.params.id);
     if (!id) return res.status(400).json({ success: false, message: 'Invalid id' });

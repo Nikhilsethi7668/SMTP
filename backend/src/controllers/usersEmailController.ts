@@ -11,7 +11,7 @@ const generateVerificationToken = (): string => {
 // Add a new email for user
 export const addUserEmail = async (req: Request, res: Response) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user._id;
     const { email, isPrimary = false } = req.body;
 
     // Check if email already exists
@@ -104,7 +104,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
 // Set primary email
 export const setPrimaryEmail = async (req:Request, res: Response) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user._id;
     const { emailId } = req.params;
 
     const userEmail = await UsersEmail.findOneAndUpdate(
@@ -143,7 +143,7 @@ export const setPrimaryEmail = async (req:Request, res: Response) => {
 // Get user's emails
 export const getUserEmails = async (req: Request, res: Response) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user._id;
     
     const emails = await UsersEmail.find({ user: userId })
       .select('-verificationToken -verificationTokenExpires -__v')
@@ -167,7 +167,7 @@ export const getUserEmails = async (req: Request, res: Response) => {
 // Delete user email
 export const deleteUserEmail = async (req:Request, res: Response) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user._id;
     const { emailId } = req.params;
 
     const email = await UsersEmail.findOneAndDelete({
@@ -201,7 +201,7 @@ export const deleteUserEmail = async (req:Request, res: Response) => {
 // Resend verification email
 export const resendVerification = async (req:Request, res: Response) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user._id;
     const { emailId } = req.params;
 
     const verificationToken = generateVerificationToken();

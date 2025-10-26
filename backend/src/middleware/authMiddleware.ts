@@ -14,7 +14,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
         return res.sendStatus(403); 
       }
 
-      req.user = user;
+      req.user = user as { _id: string, email: string, role: string };
       next();
     });
   } else {

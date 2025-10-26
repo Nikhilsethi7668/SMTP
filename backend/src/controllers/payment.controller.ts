@@ -65,16 +65,16 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
 
 export const handleSuccessfulPayment = async (req: Request, res: Response) => {
   const { session_id } = req.query;
+  const user = req.user._id;
 
   try {
     const session = await stripe.checkout.sessions.retrieve(session_id as string);
 
     if (session.payment_status === 'paid') {
-      const userId = session.metadata!.userId;
       const credits = parseInt(session.metadata!.credits, 10);
 
-      if (userId && credits) {
-        await addCredits(new mongoose.Types.ObjectId(userId), credits);
+      if (user && credits) {
+        await addCredits(user, credits);
         // Redirect to a frontend success page
         return res.redirect(`${process.env.CLIENT_URL}/payment-success`);
       }

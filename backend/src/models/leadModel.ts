@@ -1,9 +1,11 @@
-import { model, Schema, Document } from "mongoose";
+import mongoose, { model, Schema, Document } from "mongoose";
 
 type EmailProvider = 'gmail' | 'yahoo' | 'outlook' | 'icloud' | 'aol' | 'protonmail' | 'zoho' | 'yandex' | 'other';
 
 interface ILead extends Document {
     email: string;
+    user: mongoose.Types.ObjectId;
+    campaign: mongoose.Types.ObjectId;
     provider: EmailProvider;
     email_secure_gateway: string;
     status: string;
@@ -12,6 +14,16 @@ interface ILead extends Document {
 }
 
 const LeadSchema = new Schema<ILead>({
+    user: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    campaign: {
+        type: Schema.Types.ObjectId,
+        ref: 'Campaign',
+        required: true
+    },
     email: {
         type: String,
         required: true,

@@ -8,7 +8,9 @@ const navigationItems = [
   { name: "Contacts", icon: Users, path: "/app/dashboard/contacts" },
   { name: "Templates", icon: FileText, path: "/app/dashboard/templates" },
   { name: "Analytics", icon: BarChart3, path: "/app/analytics" },
+  { name: "UniBox", icon: Mail, path: "/app/dashboard/unibox" },
   { name: "Settings", icon: Settings, path: "/app/dashboard/settings" },
+  
 ];
 
 interface SideBarProps {

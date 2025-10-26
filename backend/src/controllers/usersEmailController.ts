@@ -1,17 +1,17 @@
-import { Request, Response } from 'express';
-import crypto from 'crypto';
-import { Types } from 'mongoose';
-import UsersEmail from '../models/usersEmailModel.js';
-
+import { Request, Response } from "express";
+import crypto from "crypto";
+import { Types } from "mongoose";
+import UsersEmail from "../models/usersEmailModel.js";
+import mongoose from "mongoose";
 
 const generateVerificationToken = (): string => {
-  return crypto.randomBytes(32).toString('hex');
+  return crypto.randomBytes(32).toString("hex");
 };
 
 // Add a new email for user
 export const addUserEmail = async (req: Request, res: Response) => {
   try {
-    const userId = req.user._id;
+    const userId = req.user.id;
     const { email, isPrimary = false } = req.body;
 
     // Check if email already exists
@@ -19,7 +19,7 @@ export const addUserEmail = async (req: Request, res: Response) => {
     if (existingEmail) {
       res.status(400).json({
         success: false,
-        message: 'Email already exists in the system'
+        message: "Email already exists in the system",
       });
       return;
     }
@@ -34,7 +34,7 @@ export const addUserEmail = async (req: Request, res: Response) => {
       isPrimary,
       verificationToken,
       verificationTokenExpires,
-      isVerified: false
+      isVerified: false,
     });
 
     // TODO: Send verification email here
@@ -46,15 +46,16 @@ export const addUserEmail = async (req: Request, res: Response) => {
         id: userEmail._id,
         email: userEmail.email,
         isPrimary: userEmail.isPrimary,
-        isVerified: userEmail.isVerified
-      }
+        isVerified: userEmail.isVerified,
+        verificationToken,
+      },
     });
   } catch (error: any) {
-    console.error('Error adding user email:', error);
+    console.error("Error adding user email:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to add email',
-      error: error.message
+      message: "Failed to add email",
+      error: error.message,
     });
   }
 };
@@ -66,13 +67,13 @@ export const verifyEmail = async (req: Request, res: Response) => {
 
     const userEmail = await UsersEmail.findOne({
       verificationToken: token,
-      verificationTokenExpires: { $gt: new Date() }
+      verificationTokenExpires: { $gt: new Date() },
     });
 
     if (!userEmail) {
       res.status(400).json({
         success: false,
-        message: 'Invalid or expired verification token'
+        message: "Invalid or expired verification token",
       });
       return;
     }
@@ -85,28 +86,28 @@ export const verifyEmail = async (req: Request, res: Response) => {
 
     res.status(200).json({
       success: true,
-      message: 'Email verified successfully',
+      message: "Email verified successfully",
       data: {
         email: userEmail.email,
-        isVerified: userEmail.isVerified
-      }
+        isVerified: userEmail.isVerified,
+      },
     });
   } catch (error: any) {
-    console.error('Error verifying email:', error);
+    console.error("Error verifying email:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to verify email',
-      error: error.message
+      message: "Failed to verify email",
+      error: error.message,
     });
   }
 };
 
 // Set primary email
-export const setPrimaryEmail = async (req:Request, res: Response) => {
+export const setPrimaryEmail = async (req: Request, res: Response) => {
   try {
-    const userId = req.user._id;
+    const userId = req.user.id;
     const { emailId } = req.params;
-
+    console.log(emailId, userId)
     const userEmail = await UsersEmail.findOneAndUpdate(
       { _id: emailId, user: userId },
       { isPrimary: true },
@@ -116,26 +117,26 @@ export const setPrimaryEmail = async (req:Request, res: Response) => {
     if (!userEmail) {
       res.status(404).json({
         success: false,
-        message: 'Email not found or you do not have permission'
+        message: "Email not found or you do not have permission",
       });
       return;
     }
 
     res.status(200).json({
       success: true,
-      message: 'Primary email updated successfully',
+      message: "Primary email updated successfully",
       data: {
         id: userEmail._id,
         email: userEmail.email,
-        isPrimary: userEmail.isPrimary
-      }
+        isPrimary: userEmail.isPrimary,
+      },
     });
   } catch (error: any) {
-    console.error('Error setting primary email:', error);
+    console.error("Error setting primary email:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to set primary email',
-      error: error.message
+      message: "Failed to set primary email",
+      error: error.message,
     });
   }
 };
@@ -143,65 +144,69 @@ export const setPrimaryEmail = async (req:Request, res: Response) => {
 // Get user's emails
 export const getUserEmails = async (req: Request, res: Response) => {
   try {
-    const userId = req.user._id;
-    
-    const emails = await UsersEmail.find({ user: userId })
-      .select('-verificationToken -verificationTokenExpires -__v')
-      .sort({ isPrimary: -1, email: 1 });
+    const userId = req.user.id;
+    console.log(req.user.id);
+    const emails = await UsersEmail.find({
+      user: new mongoose.Types.ObjectId(userId),
+    })
+      .select("-verificationToken -verificationTokenExpires -__v")
+      .sort({ isPrimary: -1, email: 1 })
+      .lean();
 
     res.status(200).json({
       success: true,
       count: emails.length,
-      data: emails
+      data: emails,
     });
   } catch (error: any) {
-    console.error('Error fetching user emails:', error);
+    console.error("Error fetching user emails:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch emails',
-      error: error.message
+      message: "Failed to fetch emails",
+      error: error.message,
     });
   }
 };
 
 // Delete user email
-export const deleteUserEmail = async (req:Request, res: Response) => {
+export const deleteUserEmail = async (req: Request, res: Response) => {
   try {
-    const userId = req.user._id;
+    const userId = req.user.id;
     const { emailId } = req.params;
-
+    console.log(emailId, userId);
     const email = await UsersEmail.findOneAndDelete({
       _id: emailId,
       user: userId,
-      isPrimary: false // Prevent deleting primary email
+      isPrimary: false,
     });
 
     if (!email) {
       return res.status(404).json({
         success: false,
-        message: 'Email not found, already deleted, or cannot delete primary email'
+        message:
+          "Email not found, already deleted, or cannot delete primary email",
       });
     }
 
     res.status(200).json({
       success: true,
-      message: 'Email deleted successfully',
-      data: { id: email._id, email: email.email }
+      message: "Email deleted successfully",
+      data: { id: email._id, email: email.email },
     });
   } catch (error: any) {
-    console.error('Error deleting email:', error);
+    console.error("Error deleting email:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to delete email',
-      error: error.message
+      message: "Failed to delete email",
+      error: error.message,
     });
   }
 };
 
 // Resend verification email
-export const resendVerification = async (req:Request, res: Response) => {
+export const resendVerification = async (req: Request, res: Response) => {
   try {
-    const userId = req.user._id;
+    const userId = req.user.id;
     const { emailId } = req.params;
 
     const verificationToken = generateVerificationToken();
@@ -212,7 +217,7 @@ export const resendVerification = async (req:Request, res: Response) => {
       { _id: emailId, user: userId, isVerified: false },
       {
         verificationToken,
-        verificationTokenExpires
+        verificationTokenExpires,
       },
       { new: true }
     );
@@ -220,27 +225,29 @@ export const resendVerification = async (req:Request, res: Response) => {
     if (!userEmail) {
       return res.status(404).json({
         success: false,
-        message: 'Email not found or already verified'
+        message: "Email not found or already verified",
       });
     }
 
     // TODO: Send verification email here
-    console.log(`New verification token for ${userEmail.email}: ${verificationToken}`);
+    console.log(
+      `New verification token for ${userEmail.email}: ${verificationToken}`
+    );
 
     res.status(200).json({
       success: true,
-      message: 'Verification email resent successfully',
+      message: "Verification email resent successfully",
       data: {
         id: userEmail._id,
-        email: userEmail.email
-      }
+        email: userEmail.email,
+      },
     });
   } catch (error: any) {
-    console.error('Error resending verification:', error);
+    console.error("Error resending verification:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to resend verification email',
-      error: error.message
+      message: "Failed to resend verification email",
+      error: error.message,
     });
   }
 };

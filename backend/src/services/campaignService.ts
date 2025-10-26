@@ -66,7 +66,7 @@ export const incrementMetric = async (
     { new: true }
   );
 
-  return updated ? updated[metric] : null;
+  return updated ? (updated[metric] ?? null) : null;
 };
 
 /** ✅ Archive/unarchive campaign */

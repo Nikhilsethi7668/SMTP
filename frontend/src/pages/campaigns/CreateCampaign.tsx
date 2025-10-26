@@ -1,3 +1,4 @@
+import api from '@/axiosInstance'
 import { AppHeader } from '@/components/AppHeader'
 import { Button } from '@/components/ui/button'
 import React, { useState } from 'react'
@@ -7,9 +8,15 @@ export const CreateCampaignForm: React.FC = () => {
     const navigate = useNavigate();
   const [campaignName, setCampaignName] = useState<string>('')
 
-  const handleContinue = () => {
-    // Handle form submission
-    alert(`Campaign Created: ${campaignName}`)
+  const handleContinue = async () => {
+    try {
+      const response = await api.post("/campaigns",{ name: campaignName});
+      if(response.data.success){
+        alert(`Campaign Created: ${campaignName}`)
+      }
+    } catch (error) {
+      alert("Error occured")
+    }
     navigate(`/app/dashboard/campaigns/details?campaignName=${encodeURIComponent(campaignName)}`) // Navigate to campaign details page;
   }
 

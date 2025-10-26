@@ -5,8 +5,8 @@ import * as campaignModel from "../services/campaignService.js";
 export const createCampaign = async (req: Request, res: any) => {
   try {
     const data = req.body;
-    const user_id = req.user._id
-    if (!data || !data.name || !data.from_email || !data.subject) {
+    const user_id = req.user.id
+    if (!data || !data.name) {
       return res.status(400).json({ success: false, message: 'Missing required campaign fields' });
     }
     const campaign = await campaignModel.addCampaign({...data,user_id});
@@ -32,7 +32,7 @@ export const listCampaigns = async (req: Request, res: any) => {
 // Get a single campaign
 export const getCampaign = async (req: Request, res: any) => {
   try {
-    const id = Number(req.params.id);
+    const id = req.params.id;
     if (!id) return res.status(400).json({ success: false, message: 'Invalid campaign id' });
     const campaign = await campaignModel.getCampaignById(id?.toString());
     if (!campaign) return res.status(404).json({ success: false, message: 'Campaign not found' });

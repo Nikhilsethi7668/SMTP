@@ -3,7 +3,7 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 dotenv.config();
-
+import cookieParser from "cookie-parser";
 import apiRoutes from "./routes/apiRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import campaignRoutes from "./routes/campaignRoutes.js"
@@ -26,6 +26,7 @@ const startServer = async () => {
       origin:"http://localhost:8080",
       credentials: true
     }))
+    app.use(cookieParser()); 
     app.use(bodyParser.json());
         await connectDB();
 

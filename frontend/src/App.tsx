@@ -15,6 +15,11 @@ import { CreateCampaignForm } from "./pages/campaigns/CreateCampaign";
 import { CampaignDetails } from "./pages/campaigns/CampaignDetails";
 import Analytics from "./pages/Analytics";
 import ApiKeysPage from "./pages/KeyPage";
+import { VerifyUserEmail } from "./pages/account/VerifyUserEmail";
+import { ContactsPage } from "./pages/ConatctsPage";
+import { Template } from "./pages/Templates";
+import { Settings } from "./pages/Settings";
+import UniBox from "./pages/UniBox";
 
 const queryClient = new QueryClient();
 
@@ -25,8 +30,13 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          <Route path="/app/dashboard/accounts/verify" element={<VerifyUserEmail/>} />
           <Route path="/app/dashboard/accounts/connect" element={<AccountConnect/>} />
           <Route path="/app/dashboard/accounts" element={<Dashboard/>} />
+          <Route path="/app/dashboard/contacts" element={<ContactsPage/>} />
+          <Route path="/app/dashboard/templates" element={<Template/>} />
+          <Route path="/app/dashboard/settings" element={<Settings/>} />
+          <Route path="/app/dashboard/unibox" element={<UniBox/>} />
           <Route path="/app/dashboard/campaigns" element={<Campaigns/>} />
           <Route path="/app/dashboard/campaigns/details" element={<CampaignDetails/>} />
           <Route path="/app/dashboard/campaigns/create" element={<CreateCampaignForm/>} />

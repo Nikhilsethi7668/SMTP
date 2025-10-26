@@ -15,12 +15,12 @@ import {
 config();
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
-const JWT_EXPIRES_IN = "15m";
+const JWT_EXPIRES_IN = "7d";
 const REFRESH_TOKEN_EXPIRES_IN = "7d";
 
 export const generateTokens = (user: any) => {
   const payload = {
-    id: user.id,
+    id: user._id,
     email: user.email,
     role: user.role,
   };

@@ -45,7 +45,7 @@ const startServer = async () => {
       console.log(`Admin API server running on port ${PORT}`);
     });
 
-    const POLICY_PORT = Number(process.env.POLICY_PORT) || 10030;
+    const POLICY_PORT = Number(process.env.POLICY_PORT) || 10031;
     startPolicyServer(POLICY_PORT);
     console.log(`Policy Engine running on TCP port ${POLICY_PORT}`);
   } catch (err) {

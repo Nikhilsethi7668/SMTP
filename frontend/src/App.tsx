@@ -13,6 +13,7 @@ import AccountConnect from "./pages/account/AccountConnect";
 import { Campaigns } from "./pages/Campaigns";
 import { CreateCampaignForm } from "./pages/campaigns/CreateCampaign";
 import { CampaignDetails } from "./pages/campaigns/CampaignDetails";
+import Analytics from "./pages/Analytics";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/app/analytics" element={<Analytics />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
           <Route path="/verify-email" element={<EmailVerify/>} />

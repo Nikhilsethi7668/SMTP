@@ -2,7 +2,8 @@ import React, { useState } from 'react'
 import { Button } from './ui/button'
 import { Dropdown } from './Dropdown'
 import { useNavigate } from 'react-router-dom'
-
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { CampaignTable } from './Campaigntable'
 export const CampaignsLayout: React.FC = () => {
     const navigate = useNavigate();
   const [search, setSearch] = useState<string>('')
@@ -60,7 +61,15 @@ export const CampaignsLayout: React.FC = () => {
 
       {/* Campaigns Table Placeholder */}
       <div className="p-4 text-center text-gray-500 rounded">
-        No campaigns yet. Add a new campaign to get started.
+        <Card>
+            <CardHeader>
+              <CardTitle>Campaign Overview</CardTitle>
+              <CardDescription>Manage and monitor all your email campaigns</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <CampaignTable />
+            </CardContent>
+          </Card>
       </div>
     </div>
   )

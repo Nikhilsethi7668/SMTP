@@ -1,5 +1,5 @@
-import { deleteOldLogs, getLogs } from "../models/logModel.js";
-import { deleteOldUsage } from "../models/quotaUsageModel.js";
+import { deleteOldLogs, getLogs } from "../services/logService.js";
+import { deleteOldUsage } from "../services/quotaUsageService.js";
 
 /**
  * Log Worker

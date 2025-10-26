@@ -106,7 +106,7 @@ export const login = async (req: any, res: any) => {
 
 export const signup = async (req: any, res: any) => {
   try {
-    const { email, password, username,full_name, org_name } = req.body;
+    const { email, password, username,fullName: full_name,companyName: org_name  } = req.body;
     if (!email || !password) {
       return res.status(400).json({
         success: false,
@@ -114,7 +114,6 @@ export const signup = async (req: any, res: any) => {
       });
     }
     const user = await UserService.createOrgAndAdmin(org_name,full_name,username,password,email);
-    await sendOtpEmail(email, 'registration', username);
     return res.status(201).json({
       success: true,
       message: 'User created successfully',

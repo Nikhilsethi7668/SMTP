@@ -1,7 +1,7 @@
 import net from "net";
 import {
-  getUserByUsername,
-} from "../services/userService.js";
+  getUserByUsername
+} from "./userService.js";
 import {
   getQuotaByUserId,
   isQuotaExceeded,
@@ -102,7 +102,7 @@ const handleRequest = async (data: string) => {
 };
 
 // --- Start TCP server for Postfix policy delegation ---
-export const startPolicyServer = (port = 10030) => {
+export const startPolicyServer = (port = 10031) => {
   const server = net.createServer((socket) => {
     let buffer = "";
     socket.on("data", async (data) => {

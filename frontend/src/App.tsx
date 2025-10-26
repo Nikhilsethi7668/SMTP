@@ -13,6 +13,8 @@ import AccountConnect from "./pages/account/AccountConnect";
 import { Campaigns } from "./pages/Campaigns";
 import { CreateCampaignForm } from "./pages/campaigns/CreateCampaign";
 import { CampaignDetails } from "./pages/campaigns/CampaignDetails";
+import ApiKeysPage from "./pages/KeyPage";
+
 const queryClient = new QueryClient();
 
 const App = () => (

@@ -2,11 +2,11 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 interface EmailInputProps extends React.ComponentProps<"input"> {
-  onEmailChange?: (email: string) => void; // Optional callback to notify parent
+  onChangeEvent?: (email: string) => void; // Optional callback to notify parent
 }
 
 const Input = React.forwardRef<HTMLInputElement, EmailInputProps>(
-  ({ className, type = "text", onEmailChange, value, ...props }, ref) => {
+  ({ className, type = "text", onChangeEvent, value, ...props }, ref) => {
     const [email, setEmail] = React.useState<string>(
       typeof value === "string" ? value : ""
     );
@@ -14,7 +14,7 @@ const Input = React.forwardRef<HTMLInputElement, EmailInputProps>(
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = e.target.value;
       setEmail(newValue);
-      if (onEmailChange) onEmailChange(newValue); // notify parent
+      if (onChangeEvent) onChangeEvent(newValue); // notify parent
     };
 
     return (

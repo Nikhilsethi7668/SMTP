@@ -8,7 +8,11 @@ import Auth from "./pages/Auth";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import EmailVerify from "./pages/EmailVerify";
-
+import { Dashboard } from "./pages/Dashboard";
+import AccountConnect from "./pages/account/AccountConnect";
+import { Campaigns } from "./pages/Campaigns";
+import { CreateCampaignForm } from "./pages/campaigns/CreateCampaign";
+import { CampaignDetails } from "./pages/campaigns/CampaignDetails";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -18,6 +22,11 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          <Route path="/app/dashboard/accounts/connect" element={<AccountConnect/>} />
+          <Route path="/app/dashboard/accounts" element={<Dashboard/>} />
+          <Route path="/app/dashboard/campaigns" element={<Campaigns/>} />
+          <Route path="/app/dashboard/campaigns/details" element={<CampaignDetails/>} />
+          <Route path="/app/dashboard/campaigns/create" element={<CreateCampaignForm/>} />
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/contact" element={<Contact />} />

@@ -15,6 +15,7 @@ import { connectDB } from "./config/db.js";
 import { initPricingTable } from "./services/pricingService.js";
 import leadsRoutes from "./routes/leadsRoutes.js";
 import usersEmailRoutes from "./routes/usersEmailRoutes.js";
+import cookieParser from "cookie-parser";
 
 const PORT = process.env.PORT || 5000;
 
@@ -27,6 +28,7 @@ const startServer = async () => {
       credentials: true
     }))
     app.use(bodyParser.json());
+    app.use(cookieParser());
         await connectDB();
 
     app.get("/health", (req, res) => res.json({ status: "ok" }));

@@ -8,6 +8,7 @@ import {
   incrementCampaignMetric,
   archiveCampaignHandler,
   deleteCampaignHandler,
+  getCampaignMetrics,
 } from "../controllers/campaignController.js";
 import { authenticate } from "../middleware/authMiddleware.js";
 
@@ -24,5 +25,8 @@ router.delete("/campaigns/:id",authenticate, deleteCampaignHandler);
 router.post("/campaigns/:id/status",authenticate, setCampaignStatus);
 router.post("/campaigns/:id/metrics",authenticate, incrementCampaignMetric);
 router.post("/campaigns/:id/archive",authenticate, archiveCampaignHandler);
+
+// Campaign metrics endpoint (aggregate or specific campaign)
+router.get("/campaigns/metrics/all",authenticate, getCampaignMetrics);
 
 export default router;

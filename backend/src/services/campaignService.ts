@@ -78,3 +78,53 @@ export const archiveCampaign = async (campaign_id: string, archived: boolean = t
 export const deleteCampaign = async (campaign_id: string): Promise<void> => {
   await Campaign.findByIdAndDelete(campaign_id);
 };
+
+/** ✅ Get campaign metrics (aggregated or specific campaign) */
+export const getCampaignMetrics = async (
+  user_id: string,
+  campaign_id?: string
+): Promise<{
+  metrics_sent: number;
+  metrics_delivered: number;
+  metrics_opened: number;
+  metrics_clicked: number;
+  metrics_bounced: number;
+  metrics_complaints: number;
+  total_campaigns: number;
+} | null> => {
+  const filter: any = { user_id: new mongoose.Types.ObjectId(user_id) };
+  
+  if (campaign_id) {
+    filter._id = new mongoose.Types.ObjectId(campaign_id);
+  }
+
+  const campaigns = await Campaign.find(filter);
+  
+  if (campaigns.length === 0) {
+    return null;
+  }
+
+  // Aggregate metrics from all campaigns
+  const aggregatedMetrics = campaigns.reduce(
+    (acc, campaign) => ({
+      metrics_sent: acc.metrics_sent + campaign.metrics_sent,
+      metrics_delivered: acc.metrics_delivered + campaign.metrics_delivered,
+      metrics_opened: acc.metrics_opened + campaign.metrics_opened,
+      metrics_clicked: acc.metrics_clicked + campaign.metrics_clicked,
+      metrics_bounced: acc.metrics_bounced + campaign.metrics_bounced,
+      metrics_complaints: acc.metrics_complaints + campaign.metrics_complaints,
+      total_campaigns: campaigns.length,
+    }),
+    {
+      metrics_sent: 0,
+      metrics_delivered: 0,
+      metrics_opened: 0,
+      metrics_clicked: 0,
+      metrics_bounced: 0,
+      metrics_complaints: 0,
+      total_campaigns: 0,
+    }
+  );
+
+  return aggregatedMetrics;
+};

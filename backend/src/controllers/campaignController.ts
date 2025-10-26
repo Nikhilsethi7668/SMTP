@@ -112,6 +112,34 @@ export const deleteCampaignHandler = async (req: Request, res: any) => {
   }
 };
 
+// Get campaign metrics (aggregated or specific campaign)
+export const getCampaignMetrics = async (req: Request, res: any) => {
+  try {
+    const user_id = req.user._id;
+    const campaign_id = req.query.campaignId as string | undefined;
+    
+    const metrics = await campaignModel.getCampaignMetrics(user_id?.toString(), campaign_id);
+    
+    if (!metrics) {
+      return res.status(404).json({ 
+        success: false, 
+        message: campaign_id ? 'Campaign not found' : 'No campaigns found for user' 
+      });
+    }
+    
+    return res.status(200).json({ 
+      success: true, 
+      data: metrics 
+    });
+  } catch (error: any) {
+    console.error('Error fetching campaign metrics:', error);
+    return res.status(500).json({ 
+      success: false, 
+      message: error.message || 'Failed to fetch campaign metrics' 
+    });
+  }
+};
+
 export default {
   createCampaign,
   listCampaigns,
@@ -121,4 +149,5 @@ export default {
   incrementCampaignMetric,
   archiveCampaignHandler,
   deleteCampaignHandler,
+  getCampaignMetrics,
 };

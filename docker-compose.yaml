@@ -46,7 +46,7 @@ services:
       - "10030:10030"      # Policy Engine TCP server
     volumes:
       - ./backend:/usr/src/app
-    command: ["node", "src/index.js"]
+    command: sh -c "npm install && node src/index.js"
 
   # -----------------------------
   # Postfix SMTP Relay
@@ -79,6 +79,7 @@ services:
       - "5173:5173"       # Vite default dev server
     volumes:
       - ./frontend:/usr/src/app
+    command: sh -c "npm install && npm run dev"
     depends_on:
       - backend
 

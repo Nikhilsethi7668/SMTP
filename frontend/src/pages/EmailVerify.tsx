@@ -51,7 +51,7 @@ export default function EmailVerify() {
       );
       if (response.data.success) {
         alert("Email verified successfully! You can now log in.");
-        navigate("/dashboard");
+        navigate("/app/dashboard/accounts");
       } else {
         alert(`Verification failed: ${response.data.message}`);
       }

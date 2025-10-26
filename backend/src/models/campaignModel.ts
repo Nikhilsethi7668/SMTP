@@ -67,7 +67,7 @@ const CampaignSchema = new Schema<ICampaign>(
 
     delivery_log_collection: { type: String },
   },
-  { timestamps: true } // automatically adds createdAt and updatedAt
+  { timestamps: true }
 );
 
 export const Campaign = mongoose.model<ICampaign>('Campaign', CampaignSchema);

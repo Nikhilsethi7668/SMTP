@@ -9,7 +9,7 @@ export const addCampaign = async (data: Partial<ICampaign>): Promise<ICampaign> 
 
 /** ✅ Get campaigns (all or by user) */
 export const getCampaigns = async (user_id?: string): Promise<ICampaign[]> => {
-  const filter = user_id ? { user_id: new mongoose.Types.ObjectId(user_id) } : {};
+  const filter ={ user_id: new mongoose.Types.ObjectId(user_id) };
   return await Campaign.find(filter).sort({ _id: 1 });
 };
 

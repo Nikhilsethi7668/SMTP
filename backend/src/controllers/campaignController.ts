@@ -22,7 +22,7 @@ export const createCampaign = async (req: Request, res: any) => {
 // Get campaigns (optionally by user)
 export const listCampaigns = async (req: Request, res: any) => {
   try {
-    const user = req.user._id;
+    const user = req.user.id;
     const campaigns = await campaignModel.getCampaigns(user?.toString());
     return res.status(200).json({ success: true, campaigns });
   } catch (error: any) {
@@ -146,10 +146,7 @@ export const getCampaignMetrics = async (req: Request, res: any) => {
 export const getCampaignNames = async (req: Request, res: any) => {
   try {
     const user_id = req.user.id;
-   const campaigns = await Campaign.find(
-      { user_id: new mongoose.Types.ObjectId(user_id) },
-      { _id: 1, name: 1 }
-    ).lean();
+    const campaigns = await campaignModel.getCampaignNames(user_id?.toString());
     return res.status(200).json({ success: true, campaigns });
   } catch (error: any) {
     console.error('Error fetching campaign names:', error);

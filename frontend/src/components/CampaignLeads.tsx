@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import CsvUploader from "./CsvUploader";
 
 interface LeadEmail {
   _id: string;
@@ -93,8 +94,9 @@ export const CampaignLeads = ({ campaignId, campaignName }: { campaignId: string
   return (
     <div className="p-6 space-y-4">
       {leadsData.length < 0 && (
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-4">
           <Button onClick={() => setShowDialog(true)}>+ Add Leads</Button>
+          <CsvUploader campaignId={campaignId} />
         </div>
       )}
 

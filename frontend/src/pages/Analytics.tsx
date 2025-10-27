@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -36,16 +36,13 @@ import {
 } from "lucide-react";
 import { Header } from "@/components/Header";
 import { SideBar } from "@/components/SideBar";
-// Sample data for the chart
-const activityData = [
-  { date: "Jan 1", sent: 4000, opens: 2400, clicks: 1200, replies: 400 },
-  { date: "Jan 8", sent: 3000, opens: 1398, clicks: 800, replies: 300 },
-  { date: "Jan 15", sent: 2000, opens: 9800, clicks: 1500, replies: 600 },
-  { date: "Jan 22", sent: 2780, opens: 3908, clicks: 1800, replies: 700 },
-  { date: "Jan 29", sent: 1890, opens: 4800, clicks: 2000, replies: 850 },
-  { date: "Feb 5", sent: 2390, opens: 3800, clicks: 1900, replies: 900 },
-  { date: "Feb 12", sent: 3490, opens: 4300, clicks: 2200, replies: 1000 },
-];
+import api from "@/axiosInstance";
+import { toast } from "sonner";
+
+interface Campaign {
+  _id: string;
+  name: string;
+}
 
 interface StatCardProps {
   title: string;
@@ -112,56 +109,123 @@ const StatCard = ({
 };
 
 export default function Analytics() {
-  const [timeRange, setTimeRange] = useState("7d");
+  const [selectedCampaign, setSelectedCampaign] = useState("all");
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [metrics, setMetrics] = useState<any>(null);
 
+  // 🔹 Fetch campaigns dynamically from API
+  useEffect(() => {
+    const fetchCampaigns = async () => {
+      try {
+        const res = await api.get("/campaigns/names");
+        const allOption = { _id: "all", name: "All Campaigns" };
+        setCampaigns([allOption, ...res.data.campaigns]);
+      } catch (err) {
+        console.error("Failed to fetch campaigns:", err);
+      }
+    };
+    fetchCampaigns();
+  }, []);
+
+  // 🔹 Fetch metrics dynamically based on selected campaign
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        let res;
+        if (selectedCampaign === "all") {
+          res = await api.get("/campaigns/metrics/all");
+        } else {
+          res = await api.get("/campaigns/metrics", {
+            params: { campaignId: selectedCampaign },
+          });
+        }
+        setMetrics(res.data.data);
+      } catch (error) {
+        console.error("Error fetching metrics:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [selectedCampaign]);
+
+  // 🔹 Prepare dynamic stats (fallback to 0 if metrics not loaded)
   const stats = [
     {
       title: "Total Sent",
-      value: "24,589",
+      value: metrics?.sent?.toLocaleString() ?? "0",
       icon: Mail,
-      trend: "+12.5%",
-      trendUp: true,
+      trend: metrics?.sentChange ? `${metrics.sentChange}%` : "+0%",
+      trendUp: metrics?.sentChange >= 0,
       accentColor: "bg-info/10",
       tooltip: "Total number of emails sent across all campaigns",
     },
     {
       title: "Open Rate",
-      value: "68.4%",
+      value: metrics?.openRate
+        ? `${metrics.openRate.toFixed(1)}%`
+        : "0%",
       icon: MousePointer,
-      trend: "+4.2%",
-      trendUp: true,
+      trend: metrics?.openRateChange
+        ? `${metrics.openRateChange}%`
+        : "+0%",
+      trendUp: metrics?.openRateChange >= 0,
       accentColor: "bg-success/10",
       tooltip: "Percentage of recipients who opened your emails",
     },
     {
       title: "Click Rate",
-      value: "42.1%",
+      value: metrics?.clickRate
+        ? `${metrics.clickRate.toFixed(1)}%`
+        : "0%",
       icon: Target,
-      trend: "+2.8%",
-      trendUp: true,
+      trend: metrics?.clickRateChange
+        ? `${metrics.clickRateChange}%`
+        : "+0%",
+      trendUp: metrics?.clickRateChange >= 0,
       accentColor: "bg-warning/10",
       tooltip: "Percentage of recipients who clicked links in your emails",
     },
     {
       title: "Reply Rate",
-      value: "18.3%",
+      value: metrics?.replyRate
+        ? `${metrics.replyRate.toFixed(1)}%`
+        : "0%",
       icon: Reply,
-      trend: "-1.2%",
-      trendUp: false,
+      trend: metrics?.replyRateChange
+        ? `${metrics.replyRateChange}%`
+        : "-0%",
+      trendUp: metrics?.replyRateChange >= 0,
       accentColor: "bg-accent/10",
       tooltip: "Percentage of recipients who replied to your emails",
     },
     {
       title: "Opportunities",
-      value: "1,247",
+      value: metrics?.opportunities?.toLocaleString() ?? "0",
       icon: TrendingUp,
-      trend: "+8.7%",
-      trendUp: true,
+      trend: metrics?.opportunitiesChange
+        ? `${metrics.opportunitiesChange}%`
+        : "+0%",
+      trendUp: metrics?.opportunitiesChange >= 0,
       accentColor: "bg-primary/10",
-      tooltip: "Number of qualified opportunities generated from campaigns",
+      tooltip:
+        "Number of qualified opportunities generated from campaigns",
     },
   ];
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
+  // 🔹 Dynamic activity data (for chart)
+  const activityData =
+    metrics?.activity?.map((a: any) => ({
+      date: a.date,
+      sent: a.sent,
+      opens: a.opens,
+      clicks: a.clicks,
+      replies: a.replies,
+    })) ?? [];
+
   return (
     <div className="max-h-screen overflow-hidden">
       <Header
@@ -170,16 +234,20 @@ export default function Analytics() {
       <div className="flex flex-1 overflow-hidden">
         <SideBar collapsed={isSidebarCollapsed} />
 
-        {/* Sidebar component */}
-
-        {/* Content area: Contains EmailAccounts */}
         <div className="flex-1 overflow-scroll p-6 h-screen">
           <div className="flex-1 h-[120vh]">
-            {/* Header with filters */}
+            {/* Header with Campaign Filter */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
               <div>
                 <h1 className="text-3xl font-bold tracking-tight">
-                  Analytics Dashboard
+                  Analytics Dashboard {" "} {selectedCampaign !== "all" && (
+    <span>
+      {" - "}
+      {
+        campaigns.find((c) => c._id === selectedCampaign)?.name || ""
+      }
+    </span>
+  )}
                 </h1>
                 <p className="text-muted-foreground mt-1">
                   Track your email campaign performance
@@ -187,23 +255,27 @@ export default function Analytics() {
               </div>
 
               <div className="flex items-center gap-3">
-                <Select value={timeRange} onValueChange={setTimeRange}>
-                  <SelectTrigger className="w-[140px]">
-                    <SelectValue placeholder="Time range" />
+                <Select
+                  value={selectedCampaign}
+                  onValueChange={setSelectedCampaign}
+                >
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue placeholder="Select Campaign" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="7d">Last 7 days</SelectItem>
-                    <SelectItem value="30d">Last 30 days</SelectItem>
-                    <SelectItem value="90d">Last 90 days</SelectItem>
-                    <SelectItem value="1y">Last year</SelectItem>
+                    {campaigns.map((c) => (
+                      <SelectItem key={c._id} value={c._id}>
+                        {c.name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
 
-                <Button variant="outline" size="icon">
+                <Button onClick={()=> toast.info("Feature coming soon")} variant="outline" size="icon">
                   <Share2 className="h-4 w-4" />
                 </Button>
 
-                <Button variant="outline" size="icon">
+                <Button  onClick={()=> toast.info("Feature coming soon")} variant="outline" size="icon">
                   <Settings className="h-4 w-4" />
                 </Button>
               </div>
@@ -253,14 +325,11 @@ export default function Analytics() {
                         backgroundColor: "hsl(var(--card))",
                         border: "1px solid hsl(var(--border))",
                         borderRadius: "8px",
-                        boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                        boxShadow:
+                          "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
                       }}
                     />
-                    <Legend
-                      wrapperStyle={{
-                        paddingTop: "20px",
-                      }}
-                    />
+                    <Legend wrapperStyle={{ paddingTop: "20px" }} />
                     <Line
                       type="monotone"
                       dataKey="sent"

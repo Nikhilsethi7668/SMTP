@@ -18,7 +18,7 @@ export default function CsvUploader({ campaignId}) {
       const formData = new FormData();
       formData.append("file", file);
 
-      const res = await api.post(`/upload?campaign=${campaignId}`, formData, {
+      const res = await api.post(`/leads/upload?campaign=${campaignId}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

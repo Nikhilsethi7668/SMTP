@@ -107,12 +107,12 @@ export const getCampaignMetrics = async (
   // Aggregate metrics from all campaigns
   const aggregatedMetrics = campaigns.reduce(
     (acc, campaign) => ({
-      metrics_sent: acc.metrics_sent + campaign.metrics_sent,
-      metrics_delivered: acc.metrics_delivered + campaign.metrics_delivered,
-      metrics_opened: acc.metrics_opened + campaign.metrics_opened,
-      metrics_clicked: acc.metrics_clicked + campaign.metrics_clicked,
-      metrics_bounced: acc.metrics_bounced + campaign.metrics_bounced,
-      metrics_complaints: acc.metrics_complaints + campaign.metrics_complaints,
+      metrics_sent: acc.metrics_sent + (campaign.metrics_sent ?? 0),
+      metrics_delivered: acc.metrics_delivered + (campaign.metrics_delivered ?? 0),
+      metrics_opened: acc.metrics_opened + (campaign.metrics_opened ?? 0),
+      metrics_clicked: acc.metrics_clicked + (campaign.metrics_clicked ?? 0),
+      metrics_bounced: acc.metrics_bounced + (campaign.metrics_bounced ?? 0),
+      metrics_complaints: acc.metrics_complaints + (campaign.metrics_complaints ?? 0),
       total_campaigns: campaigns.length,
     }),
     {
@@ -127,4 +127,14 @@ export const getCampaignMetrics = async (
   );
 
   return aggregatedMetrics;
+};
+
+/** ✅ Get campaign names and IDs only */
+export const getCampaignNames = async (user_id?: string): Promise<Array<{ name: string; _id: string }>> => {
+  const filter = { user_id: new mongoose.Types.ObjectId(user_id) };
+  const campaigns = await Campaign.find(filter).select('name').sort({ _id: 1 });
+  return campaigns.map(campaign => ({
+    name: campaign.name,
+    _id: (campaign as any)._id.toString()
+  }));
 };

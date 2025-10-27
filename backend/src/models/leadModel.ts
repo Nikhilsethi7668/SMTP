@@ -50,7 +50,6 @@ LeadSchema.pre('save', function(next) {
     if (this.isModified('email')) {
         const email = this.email;
         const domain = email.split('@')[1]?.toLowerCase() || '';
-        
         const providerMap: {[key: string]: EmailProvider} = {
             'gmail.com': 'gmail',
             'googlemail.com': 'gmail',

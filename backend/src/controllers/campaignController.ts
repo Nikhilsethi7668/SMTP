@@ -1,5 +1,7 @@
 import { Request } from "express";
 import * as campaignModel from "../services/campaignService.js";
+import mongoose from "mongoose";
+import { Campaign } from "../models/campaignModel.js";
 
 // Create a new campaign
 export const createCampaign = async (req: Request, res: any) => {
@@ -115,6 +117,7 @@ export const deleteCampaignHandler = async (req: Request, res: any) => {
 // Get campaign metrics (aggregated or specific campaign)
 export const getCampaignMetrics = async (req: Request, res: any) => {
   try {
+    const user_id = req.user.id;
     const user_id = req.user.id;
     const campaign_id = req.query.campaignId as string | undefined;
     

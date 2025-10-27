@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import CsvUploader from "./CsvUploader";
 
 interface LeadEmail {
   _id: string;
@@ -27,7 +28,7 @@ interface LeadEmail {
   status: "Not yet contacted" | "Contacted" | "Bounced" | "Replied";
 }
 
-export const CampaignLeads = () => {
+export const CampaignLeads = ({ campaignId, campaignName }: { campaignId: string; campaignName: string }) => {
   const [leadsData, setLeadsData] = useState<LeadEmail[]>([]);
   const [showDialog, setShowDialog] = useState(false);
 
@@ -70,7 +71,7 @@ export const CampaignLeads = () => {
     try {
       const response = await api.post("/leads", {
         email,
-        provider,
+        campaign: campaignId,
         securityGateway: "None",
         status: "Not yet contacted",
       });
@@ -93,8 +94,9 @@ export const CampaignLeads = () => {
   return (
     <div className="p-6 space-y-4">
       {leadsData.length < 0 && (
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-4">
           <Button onClick={() => setShowDialog(true)}>+ Add Leads</Button>
+          <CsvUploader campaignId={campaignId} />
         </div>
       )}
 
@@ -102,6 +104,7 @@ export const CampaignLeads = () => {
         <EmailLeadsTable
           onAddLead={() => setShowDialog(true)}
           data={leadsData}
+          campaignId={campaignId}
         />
       ) : (
         <p>No Leads added yet</p>

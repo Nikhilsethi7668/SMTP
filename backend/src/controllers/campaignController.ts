@@ -118,7 +118,6 @@ export const deleteCampaignHandler = async (req: Request, res: any) => {
 export const getCampaignMetrics = async (req: Request, res: any) => {
   try {
     const user_id = req.user.id;
-    const user_id = req.user.id;
     const campaign_id = req.query.campaignId as string | undefined;
     
     const metrics = await campaignModel.getCampaignMetrics(user_id?.toString(), campaign_id);

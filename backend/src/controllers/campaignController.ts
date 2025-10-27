@@ -20,7 +20,7 @@ export const createCampaign = async (req: Request, res: any) => {
 // Get campaigns (optionally by user)
 export const listCampaigns = async (req: Request, res: any) => {
   try {
-    const user = req.user._id;
+    const user = req.user.id;
     const campaigns = await campaignModel.getCampaigns(user?.toString());
     return res.status(200).json({ success: true, campaigns });
   } catch (error: any) {
@@ -115,7 +115,7 @@ export const deleteCampaignHandler = async (req: Request, res: any) => {
 // Get campaign metrics (aggregated or specific campaign)
 export const getCampaignMetrics = async (req: Request, res: any) => {
   try {
-    const user_id = req.user._id;
+    const user_id = req.user.id;
     const campaign_id = req.query.campaignId as string | undefined;
     
     const metrics = await campaignModel.getCampaignMetrics(user_id?.toString(), campaign_id);
@@ -143,7 +143,7 @@ export const getCampaignMetrics = async (req: Request, res: any) => {
 // Get campaign names and IDs only
 export const getCampaignNames = async (req: Request, res: any) => {
   try {
-    const user_id = req.user._id;
+    const user_id = req.user.id;
     const campaigns = await campaignModel.getCampaignNames(user_id?.toString());
     return res.status(200).json({ success: true, campaigns });
   } catch (error: any) {

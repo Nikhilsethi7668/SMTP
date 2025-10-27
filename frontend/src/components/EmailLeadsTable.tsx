@@ -25,9 +25,11 @@ interface EmailLeadsTableProps {
   data: LeadEmail[];
   onAddLead?: () => void;
   campaignId?: string;
+  refetchData?: ()=> void
+  
 }
 
-export const EmailLeadsTable: React.FC<EmailLeadsTableProps> = ({ data, onAddLead, campaignId  }) => {
+export const EmailLeadsTable: React.FC<EmailLeadsTableProps> = ({ data, onAddLead, campaignId, refetchData }) => {
   const [searchQuery, setSearchQuery] = useState("");
 
   // Filter leads by email
@@ -51,7 +53,7 @@ export const EmailLeadsTable: React.FC<EmailLeadsTableProps> = ({ data, onAddLea
             <Plus className="h-4 w-4" /> Add Lead
           </Button>
 
-       <CsvUploader campaignId={campaignId}/>
+       <CsvUploader onSuccess={refetchData} campaignId={campaignId}/>
         </div>
       </div>
 

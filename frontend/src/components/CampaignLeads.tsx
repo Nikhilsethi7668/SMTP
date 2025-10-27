@@ -96,13 +96,14 @@ export const CampaignLeads = ({ campaignId, campaignName }: { campaignId: string
       {leadsData.length < 0 && (
         <div className="flex justify-end gap-4">
           <Button onClick={() => setShowDialog(true)}>+ Add Leads</Button>
-          <CsvUploader campaignId={campaignId} />
+          <CsvUploader campaignId={campaignId} onSuccess={()=> handleGetData()} />
         </div>
       )}
 
       {leadsData.length > 0 ? (
         <EmailLeadsTable
           onAddLead={() => setShowDialog(true)}
+          refetchData={handleGetData}
           data={leadsData}
           campaignId={campaignId}
         />

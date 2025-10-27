@@ -1,5 +1,5 @@
 // src/controllers/leadsController.ts
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { TypedRequestBody, TypedRequestQuery, TypedRequest } from '../types/express/index.js';
 import Leads from '../models/leadModel.js';
 import { Readable } from 'stream';

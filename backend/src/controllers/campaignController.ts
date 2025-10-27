@@ -140,6 +140,18 @@ export const getCampaignMetrics = async (req: Request, res: any) => {
   }
 };
 
+// Get campaign names and IDs only
+export const getCampaignNames = async (req: Request, res: any) => {
+  try {
+    const user_id = req.user._id;
+    const campaigns = await campaignModel.getCampaignNames(user_id?.toString());
+    return res.status(200).json({ success: true, campaigns });
+  } catch (error: any) {
+    console.error('Error fetching campaign names:', error);
+    return res.status(500).json({ success: false, message: error.message || 'Failed to fetch campaign names' });
+  }
+};
+
 export default {
   createCampaign,
   listCampaigns,
@@ -150,4 +162,5 @@ export default {
   archiveCampaignHandler,
   deleteCampaignHandler,
   getCampaignMetrics,
+  getCampaignNames,
 };

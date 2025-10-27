@@ -16,7 +16,6 @@ import { initPricingTable } from "./services/pricingService.js";
 import leadsRoutes from "./routes/leadsRoutes.js";
 import usersEmailRoutes from "./routes/usersEmailRoutes.js";
 import emailTemplateRoutes from "./routes/emailTemplateRoutes.js";
-import cookieParser from "cookie-parser";
 import incomingEmailRoutes from "./routes/incomingEmailRoutes.js";
 
 const PORT = process.env.PORT || 5000;
@@ -31,7 +30,6 @@ const startServer = async () => {
     }))
     app.use(cookieParser()); 
     app.use(bodyParser.json());
-    app.use(cookieParser());
         await connectDB();
 
     app.get("/health", (req, res) => res.json({ status: "ok" }));

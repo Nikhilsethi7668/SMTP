@@ -60,7 +60,7 @@ export const uploadLeadsCSV = async (
     if (!req.file) {
       return res.status(400).json({
         success: false,
-        message: 'No CSV file uploaded'
+        message: "No CSV file uploaded",
       });
     }
 
@@ -72,15 +72,27 @@ export const uploadLeadsCSV = async (
     const buffer = req.file.buffer;
     const stream = Readable.from(buffer.toString());
 
+    // Parse CSV
     await new Promise((resolve, reject) => {
       stream
         .pipe(csv())
         .on("data", (data) => {
-          if (data.email) results.push({ email: data.email });
+          if (data.email && data.email.trim() !== "") {
+            results.push({ email: data.email.trim() });
+          }
         })
         .on("end", resolve)
         .on("error", reject);
     });
+
+    // 🛑 If no emails found, return friendly message
+    if (results.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message:
+          "CSV uploaded but no emails found. Please upload a CSV with a column named 'email'.",
+      });
+    }
 
     const savedLeads = [];
     for (const { email } of results) {
@@ -97,7 +109,10 @@ export const uploadLeadsCSV = async (
           savedLeads.push(lead);
         }
       } catch (error: any) {
-        errors.push({ email, error: error.message || "Failed to process email" });
+        errors.push({
+          email,
+          error: error.message || "Failed to process email",
+        });
       }
     }
 
@@ -119,6 +134,7 @@ export const uploadLeadsCSV = async (
     });
   }
 };
+
 
 
 // Get all leads

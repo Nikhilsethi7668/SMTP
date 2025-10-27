@@ -1,5 +1,7 @@
 import { Request } from "express";
 import * as campaignModel from "../services/campaignService.js";
+import mongoose from "mongoose";
+import { Campaign } from "../models/campaignModel.js";
 
 // Create a new campaign
 export const createCampaign = async (req: Request, res: any) => {
@@ -115,7 +117,7 @@ export const deleteCampaignHandler = async (req: Request, res: any) => {
 // Get campaign metrics (aggregated or specific campaign)
 export const getCampaignMetrics = async (req: Request, res: any) => {
   try {
-    const user_id = req.user._id;
+    const user_id = req.user.id;
     const campaign_id = req.query.campaignId as string | undefined;
     
     const metrics = await campaignModel.getCampaignMetrics(user_id?.toString(), campaign_id);
@@ -143,8 +145,11 @@ export const getCampaignMetrics = async (req: Request, res: any) => {
 // Get campaign names and IDs only
 export const getCampaignNames = async (req: Request, res: any) => {
   try {
-    const user_id = req.user._id;
-    const campaigns = await campaignModel.getCampaignNames(user_id?.toString());
+    const user_id = req.user.id;
+   const campaigns = await Campaign.find(
+      { user_id: new mongoose.Types.ObjectId(user_id) },
+      { _id: 1, name: 1 }
+    ).lean();
     return res.status(200).json({ success: true, campaigns });
   } catch (error: any) {
     console.error('Error fetching campaign names:', error);

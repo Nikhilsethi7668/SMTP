@@ -30,7 +30,7 @@ export const addLead = async (
 ) => {
     try {
         const { email, email_secure_gateway, campaign, status } = req.body;
-        const user = req.user._id;
+        const user = req.user.id;
         const lead = await Leads.create({
             email,
             user,
@@ -53,80 +53,73 @@ export const addLead = async (
 };
 
 export const uploadLeadsCSV = async (
-    req: TypedRequest<CSVRequestBody, {}> & { file: Express.Multer.File },
-    res: Response
+  req: TypedRequest<CSVRequestBody, {}> & { file?: Express.Multer.File },
+  res: Response
 ) => {
-    try {
-        if (!req.file) {
-            return res.status(400).json({
-                success: false,
-                message: 'No CSV file uploaded'
-            });
-        }
-        const user = req.user._id;
-        const campaign = (req as any).query.campaign as string;
-
-        const results: { email: string }[] = [];
-        const errors: { email: string; error: string }[] = [];
-        const buffer = req.file.buffer;
-        const stream = Readable.from(buffer.toString());
-
-        // Process CSV
-        await new Promise((resolve, reject) => {
-            stream
-                .pipe(csv())
-                .on('data', (data) => {
-                    if (data.email) {
-                        results.push({ email: data.email });
-                    }
-                })
-                .on('end', resolve)
-                .on('error', reject);
-        });
-
-        // Process each email
-        const savedLeads = [];
-        for (const { email } of results) {
-            try {
-                // Check if email already exists
-                const existingLead = await Leads.findOne({ email });
-                if (!existingLead) {
-                    const lead = await Leads.create({
-                        email,
-                        email_secure_gateway: 'default_gateway',
-                        status: 'pending',
-                        user,
-                        campaign
-                    });
-                    savedLeads.push(lead);
-                }
-            } catch (error: any) {
-                errors.push({ 
-                    email, 
-                    error: error.message || 'Failed to process email' 
-                });
-            }
-        }
-
-        res.status(200).json({
-            success: true,
-            message: 'CSV processed successfully',
-            data: {
-                processed: results.length,
-                saved: savedLeads.length,
-                duplicates: results.length - savedLeads.length - errors.length,
-                errors
-            }
-        });
-
-    } catch (error: any) {
-        res.status(500).json({
-            success: false,
-            message: 'Failed to process CSV',
-            error: error.message
-        });
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'No CSV file uploaded'
+      });
     }
+
+    const user = req.user._id;
+    const campaign = (req as any).query.campaign as string;
+
+    const results: { email: string }[] = [];
+    const errors: { email: string; error: string }[] = [];
+    const buffer = req.file.buffer;
+    const stream = Readable.from(buffer.toString());
+
+    await new Promise((resolve, reject) => {
+      stream
+        .pipe(csv())
+        .on("data", (data) => {
+          if (data.email) results.push({ email: data.email });
+        })
+        .on("end", resolve)
+        .on("error", reject);
+    });
+
+    const savedLeads = [];
+    for (const { email } of results) {
+      try {
+        const existingLead = await Leads.findOne({ email });
+        if (!existingLead) {
+          const lead = await Leads.create({
+            email,
+            email_secure_gateway: "default_gateway",
+            status: "pending",
+            user,
+            campaign,
+          });
+          savedLeads.push(lead);
+        }
+      } catch (error: any) {
+        errors.push({ email, error: error.message || "Failed to process email" });
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "CSV processed successfully",
+      data: {
+        processed: results.length,
+        saved: savedLeads.length,
+        duplicates: results.length - savedLeads.length - errors.length,
+        errors,
+      },
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to process CSV",
+      error: error.message,
+    });
+  }
 };
+
 
 // Get all leads
 export const getLeads = async (
@@ -135,7 +128,7 @@ export const getLeads = async (
 ) => {
     try {
         const { status, provider } = req.query;
-        const user = req.user._id;
+        const user = req.user.id;
         const campaign = req.query.campaign as string;
         const filter: any = {};
 

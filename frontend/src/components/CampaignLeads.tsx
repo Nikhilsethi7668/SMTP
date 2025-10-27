@@ -27,7 +27,7 @@ interface LeadEmail {
   status: "Not yet contacted" | "Contacted" | "Bounced" | "Replied";
 }
 
-export const CampaignLeads = () => {
+export const CampaignLeads = ({ campaignId, campaignName }: { campaignId: string; campaignName: string }) => {
   const [leadsData, setLeadsData] = useState<LeadEmail[]>([]);
   const [showDialog, setShowDialog] = useState(false);
 
@@ -70,7 +70,7 @@ export const CampaignLeads = () => {
     try {
       const response = await api.post("/leads", {
         email,
-        provider,
+        campaign: campaignId,
         securityGateway: "None",
         status: "Not yet contacted",
       });
@@ -102,6 +102,7 @@ export const CampaignLeads = () => {
         <EmailLeadsTable
           onAddLead={() => setShowDialog(true)}
           data={leadsData}
+          campaignId={campaignId}
         />
       ) : (
         <p>No Leads added yet</p>

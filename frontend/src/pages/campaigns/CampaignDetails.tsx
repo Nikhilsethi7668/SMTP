@@ -78,7 +78,7 @@ export const CampaignDetails = () => {
     updatedAt: new Date().toISOString(),
   }} onPause={()=> console.log("pause")} onResume={()=> console.log("RESUME")}  />;
       case "leads":
-        return <CampaignLeads />;
+        return <CampaignLeads campaignId={prefilledCampaignId} campaignName={prefilledCampaignName} />;
       case "sequences":
         return <CampaignSequences />;
       default:

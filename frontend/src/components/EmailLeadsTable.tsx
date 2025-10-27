@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Info, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import CsvUploader from "./CsvUploader";
 
 interface LeadEmail {
   _id: string;
@@ -23,9 +24,10 @@ interface LeadEmail {
 interface EmailLeadsTableProps {
   data: LeadEmail[];
   onAddLead?: () => void;
+  campaignId?: string;
 }
 
-export const EmailLeadsTable: React.FC<EmailLeadsTableProps> = ({ data, onAddLead }) => {
+export const EmailLeadsTable: React.FC<EmailLeadsTableProps> = ({ data, onAddLead, campaignId  }) => {
   const [searchQuery, setSearchQuery] = useState("");
 
   // Filter leads by email
@@ -44,9 +46,13 @@ export const EmailLeadsTable: React.FC<EmailLeadsTableProps> = ({ data, onAddLea
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-1/2 px-3 py-2 border rounded-md text-black placeholder-gray-400"
         />
-        <Button onClick={onAddLead} className="flex items-center gap-2">
-          <Plus className="h-4 w-4" /> Add Lead
-        </Button>
+        <div className="flex gap-4">
+          <Button onClick={onAddLead} className="flex items-center gap-2">
+            <Plus className="h-4 w-4" /> Add Lead
+          </Button>
+
+       <CsvUploader campaignId={campaignId}/>
+        </div>
       </div>
 
       <Table className="[&_th]:text-left [&_td]:text-left w-full">

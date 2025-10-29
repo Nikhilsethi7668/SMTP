@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   ChevronDown,
-  Mail,
   Menu,
   Users,
   Phone,
@@ -13,10 +12,19 @@ import {
   Linkedin,
   RotateCcw,
   Flame,
+  Globe,
+  Mail,
   Zap,
+  ShoppingBag,
+  BarChart2,
+  Server,
+  Clock,
+  Layers,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function IndexNavbar() {
+  const navigate = useNavigate();
   const [openPopover, setOpenPopover] = useState<string | null>(null);
 
   const togglePopover = (menu: string) => {
@@ -31,7 +39,7 @@ export default function IndexNavbar() {
           <div className="w-8 h-8 rounded-md bg-blue-600 flex items-center justify-center text-white font-bold text-lg">
             <Mail className="w-4 h-4" />
           </div>
-          <span className="text-lg font-semibold text-slate-900">MailFlow</span>
+          <span className="text-lg font-semibold text-slate-900">InboxMail</span>
         </div>
 
         {/* Desktop Nav */}
@@ -51,124 +59,110 @@ export default function IndexNavbar() {
               />
             </PopoverTrigger>
 
-            {openPopover === "product" && (
-              <PopoverContent
-                align="start"
-                className="w-[900px] p-8 mt-4 shadow-xl bg-white rounded-2xl border flex justify-between gap-8"
-              >
-                {/* Column 1 */}
-                <div className="flex-1">
-                  <h3 className="text-xs font-semibold text-slate-500 mb-3">
-                    FIND QUALIFIED LEADS
-                  </h3>
-                  <p className="text-sm text-slate-500 mb-5">
-                    Get a list of high-potential leads with verified emails, phone numbers, and relevant details.
-                  </p>
-                  <div className="flex flex-col gap-3">
-                    <a href="#" className="flex items-center gap-2 hover:text-blue-600">
-                      <Users className="w-4 h-4 text-slate-500" />
-                      600M+ lead database
-                    </a>
-                    <a href="#" className="flex items-center gap-2 hover:text-blue-600">
-                      <Mail className="w-4 h-4 text-slate-500" />
-                      Email finder & verifier
-                    </a>
-                    <a href="#" className="flex items-center gap-2 hover:text-blue-600">
-                      <Phone className="w-4 h-4 text-slate-500" />
-                      Phone number finder
-                    </a>
-                  </div>
-                </div>
+{openPopover === "product" && (
+  <PopoverContent
+    align="start"
+    className="w-[900px] p-8 mt-4 shadow-xl bg-white rounded-2xl border flex justify-between gap-8"
+  >
+    {/* Column 1 */}
+    <div className="flex-1">
+      <h3 className="text-xs font-semibold text-slate-500 mb-3 uppercase tracking-wider">
+        ALL-IN-ONE EMAIL INFRASTRUCTURE
+      </h3>
+      <p className="text-sm text-slate-500 mb-5">
+        Manage everything from DNS to analytics — built to scale your cold email outreach with precision.
+      </p>
 
-                {/* Column 2 */}
-                <div className="flex-1">
-                  <h3 className="text-xs font-semibold text-slate-500 mb-3">
-                    AUTOMATE MULTICHANNEL SEQUENCES
-                  </h3>
-                  <p className="text-sm text-slate-500 mb-5">
-                    Run personalized outreach across email, LinkedIn, or phone from one spot.
-                  </p>
-                  <div className="flex flex-col gap-3">
-                    <a href="#" className="flex items-center gap-2 hover:text-blue-600">
-                      <MessageSquare className="w-4 h-4 text-slate-500" />
-                      Multichannel sequences
-                    </a>
-                    <a href="#" className="flex items-center gap-2 hover:text-blue-600">
-                      <Linkedin className="w-4 h-4 text-slate-500" />
-                      LinkedIn prospecting
-                    </a>
-                    <a href="#" className="flex items-center gap-2 hover:text-blue-600">
-                      <Phone className="w-4 h-4 text-slate-500" />
-                      In-app calling
-                    </a>
-                    <a href="#" className="flex items-center gap-2 hover:text-blue-600">
-                      <Zap className="w-4 h-4 text-slate-500" />
-                      AI-powered personalization
-                    </a>
-                  </div>
-                </div>
+      <div className="flex flex-col gap-4">
+        <div className="flex items-start gap-3">
+          <Globe className="w-5 h-5 text-blue-600 mt-1" />
+          <div>
+            <h4 className="font-semibold text-slate-800">DNS Management</h4>
+            <p className="text-sm text-slate-500">
+              Configure and monitor SPF, DKIM, and DMARC for bulletproof deliverability.
+            </p>
+          </div>
+        </div>
 
-                {/* Column 3 */}
-                <div className="flex-1">
-                  <h3 className="text-xs font-semibold text-slate-500 mb-3">LAND IN INBOXES</h3>
-                  <p className="text-sm text-slate-500 mb-5">
-                    Make sure your outreach gets delivered where it matters, out of the spam folder.
-                  </p>
-                  <div className="flex flex-col gap-3 mb-4">
-                    <a href="#" className="flex items-center gap-2 hover:text-blue-600">
-                      <RotateCcw className="w-4 h-4 text-slate-500" />
-                      Inbox rotation
-                    </a>
-                    <a href="#" className="flex items-center gap-2 hover:text-blue-600">
-                      <Flame className="w-4 h-4 text-slate-500" />
-                      Warm-up & deliverability booster
-                    </a>
-                  </div>
-                  <div className="bg-[#f3f4ff] p-4 rounded-xl shadow-inner flex flex-col items-start justify-center">
-                    <p className="text-sm font-medium text-slate-800 mb-1">
-                      Integrate your stack to MailFlow
-                    </p>
-                    <p className="text-xs text-slate-500 mb-3">
-                      Run your entire pipeline in one spot
-                    </p>
-                    <Button className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1.5">
-                      Check integrations
-                    </Button>
-                  </div>
-                </div>
-              </PopoverContent>
-            )}
+        <div className="flex items-start gap-3">
+          <Mail className="w-5 h-5 text-blue-600 mt-1" />
+          <div>
+            <h4 className="font-semibold text-slate-800">Cold Mailing Engine</h4>
+            <p className="text-sm text-slate-500">
+              Send high-volume personalized emails that reach inboxes — not spam folders.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {/* Column 2 */}
+    <div className="flex-1">
+      <h3 className="text-xs font-semibold text-slate-500 mb-3 uppercase tracking-wider">
+        SCALE OUTREACH FAST
+      </h3>
+      <p className="text-sm text-slate-500 mb-5">
+        Automate your outreach with intelligent workflows that work 24/7.
+      </p>
+
+      <div className="flex flex-col gap-4">
+        <div className="flex items-start gap-3">
+          <Zap className="w-5 h-5 text-blue-600 mt-1" />
+          <div>
+            <h4 className="font-semibold text-slate-800">Fast Email Delivery</h4>
+            <p className="text-sm text-slate-500">
+              Optimized sending speed and IP rotation ensure top-tier deliverability.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-start gap-3">
+          <ShoppingBag className="w-5 h-5 text-blue-600 mt-1" />
+          <div>
+            <h4 className="font-semibold text-slate-800">Instant Domain Purchase</h4>
+            <p className="text-sm text-slate-500">
+              Buy and warm up new domains directly from your dashboard — ready to send in minutes.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {/* Column 3 */}
+    <div className="flex-1">
+      <h3 className="text-xs font-semibold text-slate-500 mb-3 uppercase tracking-wider">
+        DELIVER & TRACK PERFORMANCE
+      </h3>
+      <p className="text-sm text-slate-500 mb-5">
+        Gain real-time insights on campaigns, domains, and IPs to refine strategy continuously.
+      </p>
+
+      <div className="flex flex-col gap-4">
+        <div className="flex items-start gap-3">
+          <BarChart2 className="w-5 h-5 text-blue-600 mt-1" />
+          <div>
+            <h4 className="font-semibold text-slate-800">Campaign Analytics</h4>
+            <p className="text-sm text-slate-500">
+              Visualize open, click, and reply rates with detailed, actionable dashboards.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-start gap-3">
+          <Server className="w-5 h-5 text-blue-600 mt-1" />
+          <div>
+            <h4 className="font-semibold text-slate-800">Dedicated IPs</h4>
+            <p className="text-sm text-slate-500">
+              Protect your reputation with private IPs tailored for each campaign or sender.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </PopoverContent>
+)}
           </Popover>
 
-          {/* Roles */}
-          <Popover open={openPopover === "roles"} onOpenChange={() => {}}>
-            <PopoverTrigger
-              onMouseEnter={()=> togglePopover("roles")}
-              onClick={() => togglePopover("roles")}
-              className="flex items-center gap-1 font-medium hover:text-blue-600 cursor-pointer"
-            >
-              Roles
-              <ChevronDown
-                className={`w-4 h-4 transition-transform ${
-                  openPopover === "roles" ? "rotate-180 text-blue-600" : ""
-                }`}
-              />
-            </PopoverTrigger>
-
-            {openPopover === "roles" && (
-              <PopoverContent
-                align="start"
-                className="w-[250px] p-4 mt-2 shadow-lg border bg-white rounded-xl"
-              >
-                <div className="flex flex-col gap-3">
-                  <a href="#" className="hover:text-blue-600">Sales Teams</a>
-                  <a href="#" className="hover:text-blue-600">Founders</a>
-                  <a href="#" className="hover:text-blue-600">Recruiters</a>
-                  <a href="#" className="hover:text-blue-600">Agencies</a>
-                </div>
-              </PopoverContent>
-            )}
-          </Popover>
 
           <a href="#" className="hover:text-blue-600 font-medium">Pricing</a>
 
@@ -187,27 +181,80 @@ export default function IndexNavbar() {
             </PopoverTrigger>
 
             {openPopover === "toolbox" && (
-              <PopoverContent
-                align="start"
-                className="w-[250px] p-4 mt-2 shadow-lg border bg-white rounded-xl"
-              >
-                <div className="flex flex-col gap-3">
-                  <a href="#" className="hover:text-blue-600">Email Finder</a>
-                  <a href="#" className="hover:text-blue-600">Cold Email Templates</a>
-                  <a href="#" className="hover:text-blue-600">Deliverability Checker</a>
-                </div>
-              </PopoverContent>
-            )}
+  <PopoverContent
+    align="start"
+    className="w-[380px] p-6 mt-3 shadow-xl border bg-white rounded-2xl"
+  >
+    <h3 className="text-xs font-semibold text-slate-500 mb-3 uppercase tracking-wider">
+      TOOLS & AUTOMATION
+    </h3>
+    <p className="text-sm text-slate-500 mb-6">
+      Everything you need to manage, automate, and scale your campaigns — all from one dashboard.
+    </p>
+
+    <div className="flex flex-col gap-4">
+      <div className="flex items-start gap-3">
+        <BarChart2 className="w-5 h-5 text-blue-600 mt-1" />
+        <div>
+          <h4 className="font-semibold text-slate-800">Campaign Analytics</h4>
+          <p className="text-sm text-slate-500">
+            Real-time tracking for opens, clicks, and replies with performance insights.
+          </p>
+        </div>
+      </div>
+
+      <div className="flex items-start gap-3">
+        <Clock className="w-5 h-5 text-blue-600 mt-1" />
+        <div>
+          <h4 className="font-semibold text-slate-800">Scheduled Campaigns</h4>
+          <p className="text-sm text-slate-500">
+            Automate send times and control delivery windows across accounts.
+          </p>
+        </div>
+      </div>
+
+      <div className="flex items-start gap-3">
+        <Layers className="w-5 h-5 text-blue-600 mt-1" />
+        <div>
+          <h4 className="font-semibold text-slate-800">Campaign Sequences</h4>
+          <p className="text-sm text-slate-500">
+            Build multistep sequences with conditional logic and auto follow-ups.
+          </p>
+        </div>
+      </div>
+
+      <div className="flex items-start gap-3">
+        <Globe className="w-5 h-5 text-blue-600 mt-1" />
+        <div>
+          <h4 className="font-semibold text-slate-800">Domain Integrations</h4>
+          <p className="text-sm text-slate-500">
+            Connect pre-warmed domains and manage DNS automatically for better deliverability.
+          </p>
+        </div>
+      </div>
+
+      <div className="flex items-start gap-3">
+        <Mail className="w-5 h-5 text-blue-600 mt-1" />
+        <div>
+          <h4 className="font-semibold text-slate-800">Email Account Integration</h4>
+          <p className="text-sm text-slate-500">
+            Seamless sync with Google Workspace, Microsoft 365, and custom IMAP accounts.
+          </p>
+        </div>
+      </div>
+    </div>
+  </PopoverContent>
+)}
+
           </Popover>
 
-          {/* <a href="#" className="text-blue-600 font-medium">We are hiring!</a> */}
         </nav>
 
         {/* Actions */}
         <div className="hidden md:flex items-center gap-3">
-          <Button variant="ghost" className="text-slate-700 hover:text-blue-600">Log in</Button>
+          <Button onClick={()=> navigate("/auth?auth=login")} variant="ghost" className="text-slate-700 hover:text-blue-600">Log in</Button>
           <Button variant="outline">Get a demo</Button>
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white">Sign up for free</Button>
+          <Button onClick={()=> navigate("/auth?auth=signup")} className="bg-blue-600 hover:bg-blue-700 text-white">Sign up for free</Button>
         </div>
 
         {/* Mobile Menu */}

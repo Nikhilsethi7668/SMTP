@@ -21,20 +21,6 @@ export const CampaignsLayout: React.FC = () => {
   const [status, setStatus] = useState<string>('All Status');
   const [campaignsData, setCampaignsData] = useState([]);
   const [open, setOpen] = useState(false);
-const campaigns: Campaign[] = [
-  {
-    _id: "68fe46721bc24c007cda8e59",
-    name: "Welcome Series",
-    status: "running" as "running" | "draft" | "paused" | "completed",
-    metrics_sent: 2000,
-    metrics_delivered: 1800,
-    metrics_opened: 900,
-    metrics_clicked: 400,
-    metrics_bounced: 50,
-    metrics_complaints: 10,
-    updatedAt: "2025-10-26T16:05:45.103Z",
-  },
-];
 
 const handleGetData = async () => {
   try {
@@ -86,28 +72,9 @@ const handleAction = (val: string, campaign: any) => {
 
         {/* Actions */}
         <div className="flex gap-4 items-center">
-          {/* Dropdowns */}
-          <div className="flex gap-2 md:gap-6">
-            <Dropdown
-              options={['All Types', 'Email', 'Social', 'Paid Ads']}
-              value={type}
-              onChange={setType}
-            />
-            <Dropdown
-              options={['All Status', 'Active', 'Paused', 'Completed']}
-              value={status}
-              onChange={setStatus}
-            />
-          </div>
-
-          {/* Divider */}
-          <span className="text-gray-300 hidden md:block">|</span>
 
           {/* Import & Add New */}
           <div className="flex gap-4 md:gap-6 items-center">
-            <Button variant="ghost" className="text-gray-600 hover:text-gray-800">
-              📤 Import
-            </Button>
             <Button onClick={()=> navigate("/app/dashboard/campaigns/create")} className="bg-gradient-primary text-white">
               + Add New
             </Button>
@@ -118,18 +85,24 @@ const handleAction = (val: string, campaign: any) => {
       {/* Campaigns Table Placeholder */}
       <div className="p-4 text-center text-gray-500 rounded">
         {campaignsData.length > 0 ? (
-         <Card>
-            <CardHeader>
-              <CardTitle>Campaign Overview</CardTitle>
-              <CardDescription>Manage and monitor all your email campaigns</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <CampaignTable onAction={handleAction} campaigns={campaignsData} />
-            </CardContent>
-          </Card>
-        ):(
-          <p>No campaigns created yet</p>
+  <Card>
+    <CardHeader>
+      <CardTitle>Campaign Overview</CardTitle>
+      <CardDescription>Manage and monitor all your email campaigns</CardDescription>
+    </CardHeader>
+    <CardContent>
+      <CampaignTable
+        onAction={handleAction}
+        campaigns={campaignsData.filter((c: any) =>
+          c.name.toLowerCase().includes(search.toLowerCase())
         )}
+      />
+    </CardContent>
+  </Card>
+) : (
+  <p>No campaigns created yet</p>
+)}
+
       </div>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>

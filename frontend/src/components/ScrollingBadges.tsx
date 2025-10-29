@@ -52,7 +52,7 @@ const MarqueeRow = ({
 
 export default function SeamlessBadges() {
   return (
-    <section className="relative w-full py-16 overflow-hidden">
+    <section className="relative w-full py-5 overflow-hidden">
       <div className="max-w-full mx-auto space-y-8">
 
         <MarqueeRow items={row1} />

@@ -20,6 +20,7 @@ import { ContactsPage } from "./pages/ConatctsPage";
 import { Template } from "./pages/Templates";
 import { Settings } from "./pages/Settings";
 import UniBox from "./pages/UniBox";
+import { Crm } from "./pages/Crm";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +45,8 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/app/analytics" element={<Analytics />} />
+          <Route path="/app/crm" element={<Crm />} />
+          
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
           <Route path="/verify-email" element={<EmailVerify/>} />

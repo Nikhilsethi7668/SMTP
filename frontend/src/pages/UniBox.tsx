@@ -4,7 +4,7 @@ import { Header } from "@/components/Header";
 import { SideBar } from "@/components/SideBar";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { Inbox, Mail, Clock, FileText } from "lucide-react";
+import { Inbox, Mail, Clock, FileText, Search } from "lucide-react";
 import api from "@/axiosInstance";
 
 interface Campaign {
@@ -78,6 +78,8 @@ const Unibox: React.FC = () => {
     fetchIncomingEmails();
   }, [selectedCampaign, campaigns]);
 
+  const [activeTab, setActiveTab] = React.useState<"primary" | "others">("primary");
+
   return (
     <div className="h-screen w-screen flex flex-col">
       {/* Header */}
@@ -150,6 +152,79 @@ const Unibox: React.FC = () => {
               </button>
             </div>
           </aside>
+          {/* left column second */}
+        <aside className="w-64 border-r bg-white rounded-lg shadow-sm flex flex-col">
+      <div className="w-full bg-white rounded-lg shadow-sm border border-gray-100 p-3">
+        {/* Tabs */}
+        <div className="flex border-b mb-3">
+          <button
+            onClick={() => setActiveTab("primary")}
+            className={`px-3 pb-2 text-sm font-semibold transition-colors ${
+              activeTab === "primary"
+                ? "text-blue-600 border-b-2 border-blue-600"
+                : "text-gray-500 hover:text-blue-600"
+            }`}
+          >
+            Primary
+          </button>
+          <button
+            onClick={() => setActiveTab("others")}
+            className={`px-3 pb-2 text-sm font-semibold transition-colors ${
+              activeTab === "others"
+                ? "text-blue-600 border-b-2 border-blue-600"
+                : "text-gray-500 hover:text-blue-600"
+            }`}
+          >
+            Others
+          </button>
+        </div>
+
+        {/* Search box */}
+        <div className="relative mb-3">
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search mail"
+            className="w-full pl-9 pr-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+          />
+        </div>
+
+        {/* Mail list */}
+        {activeTab === "primary" ? (
+          <div>
+            {/* Primary mails */}
+            <div className="relative border-l-2 border-blue-600 pl-3 py-2">
+              <div className="grid items-start justify-between">
+                <div className="flex items-center gap-2">
+                  <input type="checkbox" className="accent-blue-600" />
+                  <p className="text-sm font-semibold text-gray-800">
+                    support@instantly.ai
+                  </p>
+                </div>
+                <span className="text-xs text-gray-400">Oct 29, 2025</span>
+              </div>
+
+              <p className="text-sm font-medium mt-1">
+                Instantly Demo Email <span>🚀</span>
+              </p>
+              <p className="text-xs text-gray-500 mt-1 line-clamp-1">
+                This is a demo email just to show you how incoming replies will
+                appear in the Unibox!...
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="text-center py-6 text-sm text-gray-400">
+            No emails in Others
+          </div>
+        )}
+
+        {/* Load more */}
+        <button className="w-full mt-4 bg-gray-100 text-gray-400 text-sm py-2 rounded-md cursor-not-allowed">
+          Load more
+        </button>
+      </div>
+    </aside>
 
           {/* Right Column (Content View) */}
           <main className="flex-1 flex flex-col overflow-hidden">

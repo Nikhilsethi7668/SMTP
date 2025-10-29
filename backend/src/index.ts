@@ -17,6 +17,9 @@ import leadsRoutes from "./routes/leadsRoutes.js";
 import usersEmailRoutes from "./routes/usersEmailRoutes.js";
 import emailTemplateRoutes from "./routes/emailTemplateRoutes.js";
 import incomingEmailRoutes from "./routes/incomingEmailRoutes.js";
+import googleOauthRoutes from "./routes/googleOauth.js";
+import outlookAuthRoutes from "./routes/outlookAuth.js";
+import customConnectRoutes from "./routes/customConnect.js";
 
 const PORT = process.env.PORT || 5000;
 
@@ -43,6 +46,9 @@ const startServer = async () => {
     app.use('/api/emails', usersEmailRoutes);
     app.use('/api/email-templates', emailTemplateRoutes);
     app.use('/api/incoming-emails', incomingEmailRoutes);
+    app.use('/api', googleOauthRoutes);
+    app.use('/api', outlookAuthRoutes);
+    app.use('/api', customConnectRoutes);
     app.listen(PORT, () => {
       console.log(`Admin API server running on port ${PORT}`);
     });

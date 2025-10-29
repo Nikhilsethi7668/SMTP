@@ -1,7 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 export default function HeroSection() {
+  const navigate = useNavigate();
   return (
     <section className="relative bg-gradient-to-br from-white via-slate-50 to-blue-50 py-20 md:py-28 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center gap-12">
@@ -19,15 +21,8 @@ export default function HeroSection() {
           </p>
 
           <div className="flex flex-col sm:flex-row justify-center md:justify-start gap-4 pt-2">
-            <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white">
+            <Button onClick={()=> navigate("/auth?auth=signup")} size="lg" className="bg-blue-600 hover:bg-blue-700 text-white">
               Start Free Trial
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-blue-600 text-blue-600 hover:bg-blue-50"
-            >
-              View Features
             </Button>
           </div>
 

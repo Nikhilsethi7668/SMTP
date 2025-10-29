@@ -27,11 +27,14 @@ import {
   Plug,
   Mail,
   Zap,
-   Inbox, Globe, Database
+  Inbox,
+  Globe,
+  Database,
 } from "lucide-react";
 import Footer from "@/components/Footer";
 import InfrastructureSection from "@/components/InfrastructureSection";
 import HeroSection from "@/components/HeroSections";
+import PricingSection from "@/components/PricingSection";
 
 const Index = () => {
   const cardVariants = {
@@ -148,55 +151,55 @@ const Index = () => {
       className="min-h-screen bg-white text-slate-800"
     >
       <IndexNavbar />
-<HeroSection/>
+      <HeroSection />
       {/* HERO SECTION */}
-    <motion.section
-  ref={ref}
-  variants={fadeInUp}
-  initial="hidden"
-  animate={controls}
-  style={{ y: yParallax }}
-  className="bg-slate-200 py-20 w-[95%] mx-auto mt-6 h-[75vh] rounded-[2.5rem] flex justify-center items-center shadow-sm"
->
-  <motion.div
-    className="max-w-4xl mx-auto text-center px-6"
-    variants={fadeInUp}
-  >
-    <motion.h1
-      className="text-3xl md:text-4xl font-semibold leading-tight text-slate-900"
-      initial={{ opacity: 0, y: -40 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8 }}
-    >
-      The <span className="text-blue-600">email infrastructure</span> built for
-      performance, deliverability, and <span className="text-blue-600">trust</span>
-    </motion.h1>
-
-    <motion.p
-      className="mt-6 text-slate-600 text-lg"
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.3, duration: 0.8 }}
-    >
-      Power your outreach with dedicated SMTPs, pre-warmed domains, and real-time
-      deliverability insights — all managed from one dashboard.
-    </motion.p>
-
-    <motion.div
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.96 }}
-      className="mt-8"
-    >
-      <Button
-        onClick={() => navigate("/signup")}
-        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-5 text-base rounded-lg shadow-md"
+      <motion.section
+        ref={ref}
+        variants={fadeInUp}
+        initial="hidden"
+        animate={controls}
+        style={{ y: yParallax }}
+        className="bg-slate-200 py-20 w-[95%] mx-auto mt-6 h-[75vh] rounded-[2.5rem] flex justify-center items-center shadow-sm"
       >
-        Get Started
-      </Button>
-    </motion.div>
-  </motion.div>
-</motion.section>
+        <motion.div
+          className="max-w-4xl mx-auto text-center px-6"
+          variants={fadeInUp}
+        >
+          <motion.h1
+            className="text-3xl md:text-4xl font-semibold leading-tight text-slate-900"
+            initial={{ opacity: 0, y: -40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            The <span className="text-blue-600">email infrastructure</span>{" "}
+            built for performance, deliverability, and{" "}
+            <span className="text-blue-600">trust</span>
+          </motion.h1>
 
+          <motion.p
+            className="mt-6 text-slate-600 text-lg"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+          >
+            Power your outreach with dedicated SMTPs, pre-warmed domains, and
+            real-time deliverability insights — all managed from one dashboard.
+          </motion.p>
+
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.96 }}
+            className="mt-8"
+          >
+            <Button
+              onClick={() => navigate("/signup")}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-5 text-base rounded-lg shadow-md"
+            >
+              Get Started
+            </Button>
+          </motion.div>
+        </motion.div>
+      </motion.section>
 
       {/* FLOATING IMAGE SECTION */}
       <motion.section
@@ -229,93 +232,96 @@ const Index = () => {
       </motion.div>
 
       {/* FEATURES SECTION */}
-    <motion.section
-  className="bg-blue-600 w-full py-20"
-  variants={pageVariants}
-  initial="hidden"
-  whileInView="visible"
-  viewport={{ once: true }}
->
-  <motion.p
-    className="my-10 text-4xl font-semibold text-white text-center leading-snug"
-    variants={fadeInUp}
-  >
-    Manage, monitor, and scale your entire email infrastructure<br />
-    from one powerful dashboard.
-  </motion.p>
-
-  {[
-    {
-      title: "Dedicated SMTP & Pre-Warmed Accounts",
-      desc1:
-        "Each user gets a private, dedicated IP (VMTA) with automated warm-up and health scoring to maintain high deliverability from day one.",
-      desc2:
-        "Connect your own domains or purchase new ones directly inside the dashboard — all accounts are verified and pre-warmed for instant use.",
-      image:
-        "https://cdn.prod.website-files.com/5de921a1902d8d8b7a99f774/6881ef87077bc66588ece0bf_lemlist%20En%20visual-p-2000.png",
-    },
-    {
-      title: "Real-Time Inbox Placement & Deliverability Insights",
-      desc1:
-        "Track open rates, spam placement, and bounce trends across every campaign with our advanced analytics suite.",
-      desc2:
-        "View deliverability by domain, monitor sender reputation, and switch IPs automatically if one gets blocked — all within one click.",
-      image:
-        "https://cdn.prod.website-files.com/5de921a1902d8d8b7a99f774/6881ef87077bc66588ece0bf_lemlist%20En%20visual-p-2000.png",
-    },
-    {
-      title: "Unified Inbox & Smart Reply Tracking",
-      desc1:
-        "See all your replies and conversations in one place. Our unified inbox syncs every response, keeping your team aligned and responsive.",
-      desc2:
-        "Stop sending follow-ups automatically when a reply is detected — ensuring a human, natural communication flow.",
-      image:
-        "https://cdn.prod.website-files.com/5de921a1902d8d8b7a99f774/6881ef87077bc66588ece0bf_lemlist%20En%20visual-p-2000.png",
-    },
-    {
-      title: "Delivery Optimization & IP Quality Control",
-      desc1:
-        "InboxMail constantly monitors each IP’s load, temperature, and sender score to maintain top-tier deliverability.",
-      desc2:
-        "If performance dips, transfer your senders to a healthier IP instantly — no downtime, no data loss, no deliverability drop.",
-      image:
-        "https://cdn.prod.website-files.com/5de921a1902d8d8b7a99f774/6881ef87077bc66588ece0bf_lemlist%20En%20visual-p-2000.png",
-    },
-  ].map((block, i) => (
-    <motion.section
-      key={i}
-      className={`flex flex-col ${
-        i % 2 === 1 ? "md:flex-row-reverse" : "md:flex-row"
-      } items-center justify-between bg-gradient-to-b from-white to-slate-100 rounded-[2.5rem] p-10 md:p-16 shadow-xl max-w-6xl mx-auto my-12`}
-      variants={i % 2 === 0 ? fadeInLeft : fadeInRight}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true }}
-    >
-      <div className="flex-1 md:px-12">
-        <h2 className="text-3xl font-semibold text-slate-900 mb-4">
-          {block.title}
-        </h2>
-        <p className="text-slate-600 mb-4">{block.desc1}</p>
-        <p className="text-slate-600">{block.desc2}</p>
-      </div>
-
-      <motion.div
-        className="flex-1 mt-8 md:mt-0"
-        whileHover={{ scale: 1.03 }}
+      <motion.section
+        className="bg-blue-600 w-full py-20"
+        variants={pageVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
       >
-        <div className="relative w-full h-full bg-gradient-to-br from-blue-500 to-blue-600 rounded-[2rem] p-4">
-          <motion.img
-            src={block.image}
-            alt={block.title}
-            className="rounded-[1.5rem] shadow-2xl w-full h-auto"
-          />
-        </div>
-      </motion.div>
-    </motion.section>
-  ))}
-</motion.section>
+        <motion.p
+          className="my-10 text-4xl font-semibold text-white text-center leading-snug"
+          variants={fadeInUp}
+        >
+          Manage, monitor, and scale your entire email infrastructure
+          <br />
+          from one powerful dashboard.
+        </motion.p>
 
+        {[
+          {
+            title: "Dedicated SMTP & Pre-Warmed Accounts",
+            desc1:
+              "Each user gets a private, dedicated IP (VMTA) with automated warm-up and health scoring to maintain high deliverability from day one.",
+            desc2:
+              "Connect your own domains or purchase new ones directly inside the dashboard — all accounts are verified and pre-warmed for instant use.",
+            image:
+              "https://cdn.prod.website-files.com/5de921a1902d8d8b7a99f774/6881ef87077bc66588ece0bf_lemlist%20En%20visual-p-2000.png",
+          },
+          {
+            title: "Real-Time Inbox Placement & Deliverability Insights",
+            desc1:
+              "Track open rates, spam placement, and bounce trends across every campaign with our advanced analytics suite.",
+            desc2:
+              "View deliverability by domain, monitor sender reputation, and switch IPs automatically if one gets blocked — all within one click.",
+            image:
+              "https://cdn.prod.website-files.com/5de921a1902d8d8b7a99f774/6881ef87077bc66588ece0bf_lemlist%20En%20visual-p-2000.png",
+          },
+          {
+            title: "Unified Inbox & Smart Reply Tracking",
+            desc1:
+              "See all your replies and conversations in one place. Our unified inbox syncs every response, keeping your team aligned and responsive.",
+            desc2:
+              "Stop sending follow-ups automatically when a reply is detected — ensuring a human, natural communication flow.",
+            image:
+              "https://cdn.prod.website-files.com/5de921a1902d8d8b7a99f774/6881ef87077bc66588ece0bf_lemlist%20En%20visual-p-2000.png",
+          },
+          {
+            title: "Delivery Optimization & IP Quality Control",
+            desc1:
+              "InboxMail constantly monitors each IP’s load, temperature, and sender score to maintain top-tier deliverability.",
+            desc2:
+              "If performance dips, transfer your senders to a healthier IP instantly — no downtime, no data loss, no deliverability drop.",
+            image:
+              "https://cdn.prod.website-files.com/5de921a1902d8d8b7a99f774/6881ef87077bc66588ece0bf_lemlist%20En%20visual-p-2000.png",
+          },
+        ].map((block, i) => (
+          <motion.section
+            key={i}
+            className={`flex flex-col ${
+              i % 2 === 1 ? "md:flex-row-reverse" : "md:flex-row"
+            } items-center justify-between bg-gradient-to-b from-white to-slate-100 rounded-[2.5rem] p-10 md:p-16 shadow-xl max-w-6xl mx-auto my-12`}
+            variants={i % 2 === 0 ? fadeInLeft : fadeInRight}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
+            <div className="flex-1 md:px-12">
+              <h2 className="text-3xl font-semibold text-slate-900 mb-4">
+                {block.title}
+              </h2>
+              <p className="text-slate-600 mb-4">{block.desc1}</p>
+              <p className="text-slate-600">{block.desc2}</p>
+            </div>
+
+            <motion.div
+              className="flex-1 mt-8 md:mt-0"
+              whileHover={{ scale: 1.03 }}
+            >
+              <div className="relative w-full h-full bg-gradient-to-br from-blue-500 to-blue-600 rounded-[2rem] p-4">
+                <motion.img
+                  src={block.image}
+                  alt={block.title}
+                  className="rounded-[1.5rem] shadow-2xl w-full h-auto"
+                />
+              </div>
+            </motion.div>
+          </motion.section>
+        ))}
+      </motion.section>
+        <motion.section id="pricing" variants={fadeInUp}>
+          <PricingSection/>
+        </motion.section>
       <motion.section variants={fadeInUp}>
         <section className="w-full bg-gradient-to-b from-slate-100 to-white py-24">
           {/* Header */}
@@ -548,86 +554,87 @@ const Index = () => {
         </div>
       </section>
 
-     <motion.div
-  layout
-  variants={fadeInUp}
-  initial="hidden"
-  whileInView="visible"
-  viewport={{ once: true, amount: 0.4 }}
-  className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mt-10 mx-auto px-6"
->
-  {[
-    {
-      icon: Inbox,
-      title: "Inbox Placement Tracking",
-      desc: "Monitor exactly where your emails land — Inbox, Spam, or Promotions — across multiple ISPs with real-time placement data.",
-      bg: "from-blue-50 to-blue-100",
-    },
-    {
-      icon: BarChart3,
-      title: "Mail Analytics Dashboard",
-      desc: "Visualize open rates, reply patterns, bounce data, and IP performance with AI-powered insights that optimize deliverability.",
-      bg: "from-violet-50 to-violet-100",
-    },
-    {
-      icon: Globe,
-      title: "Smart Domain Management",
-      desc: "Instantly connect existing domains or purchase new ones — complete with automated DNS setup, DKIM & DMARC verification.",
-      bg: "from-teal-50 to-green-100",
-    },
-    {
-      icon: ShieldCheck,
-      title: "MailGuard Monitoring",
-      desc: "Stay protected with alerts for reputation drops, IP blacklists, or deliverability issues before they impact your campaigns.",
-      bg: "from-rose-50 to-pink-100",
-    },
-    {
-      icon: Users,
-      title: "Unified Inbox & CRM",
-      desc: "Manage replies and threads in a single, elegant Unibox. Tag, assign, and follow-up effortlessly with built-in CRM tools.",
-      bg: "from-amber-50 to-orange-100",
-    },
-    {
-      icon: Database,
-      title: "Dedicated IP Infrastructure",
-      desc: "Every user gets a private SMTP VMTA IP — no shared IPs. Monitor IP load, sender limits, and easily transfer if one gets blocked.",
-      bg: "from-slate-50 to-slate-100",
-    },
-  ].map((f, i) => (
-    <motion.div
-      key={i}
-      layout
-      custom={i}
-      variants={fadeInUp}
-      className={`bg-gradient-to-br ${f.bg} p-8 rounded-3xl shadow-xl flex flex-col justify-between hover:shadow-2xl transition-all duration-300`}
-      whileHover={{
-        scale: 1.04,
-        rotate: 0.5,
-        boxShadow: "0px 8px 30px rgba(0,0,0,0.12)",
-      }}
-    >
-      <div>
-        <div className="flex items-center gap-3 mb-4">
-          <f.icon className="w-6 h-6 text-blue-600" />
-          <p className="font-semibold text-lg text-slate-900">{f.title}</p>
-        </div>
-        <p className="text-slate-600 leading-relaxed mb-6">{f.desc}</p>
-      </div>
-
-      <motion.a
-        href="#"
-        className="text-sm font-medium underline-offset-4 hover:underline text-blue-700 mt-auto"
-        whileHover={{ scale: 1.05 }}
+      <motion.div
+        layout
+        variants={fadeInUp}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.4 }}
+        className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mt-10 mx-auto px-6"
       >
-        Learn more →
-      </motion.a>
-    </motion.div>
-  ))}
-</motion.div>
-<motion.div variants={fadeInUp} className="mt-10">
-      <Footer />
+        {[
+          {
+            icon: Inbox,
+            title: "Inbox Placement Tracking",
+            desc: "Monitor exactly where your emails land — Inbox, Spam, or Promotions — across multiple ISPs with real-time placement data.",
+            bg: "from-blue-50 to-blue-100",
+          },
+          {
+            icon: BarChart3,
+            title: "Mail Analytics Dashboard",
+            desc: "Visualize open rates, reply patterns, bounce data, and IP performance with AI-powered insights that optimize deliverability.",
+            bg: "from-violet-50 to-violet-100",
+          },
+          {
+            icon: Globe,
+            title: "Smart Domain Management",
+            desc: "Instantly connect existing domains or purchase new ones — complete with automated DNS setup, DKIM & DMARC verification.",
+            bg: "from-teal-50 to-green-100",
+          },
+          {
+            icon: ShieldCheck,
+            title: "MailGuard Monitoring",
+            desc: "Stay protected with alerts for reputation drops, IP blacklists, or deliverability issues before they impact your campaigns.",
+            bg: "from-rose-50 to-pink-100",
+          },
+          {
+            icon: Users,
+            title: "Unified Inbox & CRM",
+            desc: "Manage replies and threads in a single, elegant Unibox. Tag, assign, and follow-up effortlessly with built-in CRM tools.",
+            bg: "from-amber-50 to-orange-100",
+          },
+          {
+            icon: Database,
+            title: "Dedicated IP Infrastructure",
+            desc: "Every user gets a private SMTP VMTA IP — no shared IPs. Monitor IP load, sender limits, and easily transfer if one gets blocked.",
+            bg: "from-slate-50 to-slate-100",
+          },
+        ].map((f, i) => (
+          <motion.div
+            key={i}
+            layout
+            custom={i}
+            variants={fadeInUp}
+            className={`bg-gradient-to-br ${f.bg} p-8 rounded-3xl shadow-xl flex flex-col justify-between hover:shadow-2xl transition-all duration-300`}
+            whileHover={{
+              scale: 1.04,
+              rotate: 0.5,
+              boxShadow: "0px 8px 30px rgba(0,0,0,0.12)",
+            }}
+          >
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <f.icon className="w-6 h-6 text-blue-600" />
+                <p className="font-semibold text-lg text-slate-900">
+                  {f.title}
+                </p>
+              </div>
+              <p className="text-slate-600 leading-relaxed mb-6">{f.desc}</p>
+            </div>
 
-</motion.div>
+            <motion.a
+              href="#"
+              className="text-sm font-medium underline-offset-4 hover:underline text-blue-700 mt-auto"
+              whileHover={{ scale: 1.05 }}
+            >
+              Learn more →
+            </motion.a>
+          </motion.div>
+        ))}
+      </motion.div>
+      <motion.div variants={fadeInUp} className="mt-10">
+        <Footer />
+      </motion.div>
     </motion.div>
   );
 };

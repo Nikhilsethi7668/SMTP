@@ -8,35 +8,42 @@ export const EmailAccounts = () => {
     const [emailsData, setEmailsData] = useState([]);
     const handleGetData = async () => {
       try {
-        const response = await api.get('/emails');
+        const response = await api.get('/accounts');
         if(response.data.success){
-          setEmailsData(response.data.data)
-          console.log(response.data.data)
+          setEmailsData(response.data.data);
+          console.log("Email accounts loaded:", response.data.data);
+        } else {
+          console.error("Failed to fetch accounts:", response.data.message);
+          setEmailsData([]);
         }
       } catch (error) {
-        console.log("Error fetching data:", error);
+        console.error("Error fetching data:", error);
+        setEmailsData([]);
       }
     };
 
-    const handleSetPrimary = async (email: string) => {
+    const handleSetPrimary = async (emailId: string) => {
       try {
-        const response = await api.patch(`/emails/${email}/set-primary`);
+        const response = await api.patch(`/accounts/${emailId}/set-primary`);
         if(response.data.success){
-          alert("Email set to primary");
+          alert("Email set as primary successfully");
+          await handleGetData(); // Refresh the data after setting primary
         }
       } catch (error) {
-        console.log("Error occured",error)
+        console.log("Error occurred", error);
+        alert("Failed to set email as primary");
       }
     };
-    const handleDeleteUser = async (email: string) => {
+    const handleDeleteUser = async (emailId: string) => {
       try {
-        const response = await api.delete(`/emails/${email}`);
+        const response = await api.delete(`/accounts/${emailId}/disconnect`);
         if(response.data.success){
-          alert("User Deleted");
+          alert("Account disconnected successfully");
           await handleGetData();
         }
       } catch (error) {
-        console.log("Error occured", error)
+        console.log("Error occurred", error);
+        alert("Failed to disconnect account");
       }
     }
     useEffect(() => {
@@ -59,7 +66,7 @@ export const EmailAccounts = () => {
       </div>
       <div className="flex flex-col justify-center items-center">
          {emailsData.length > 0 ? (
-          <EmailTable onSetPrimary={(email)=> handleSetPrimary(email)} onDeleteEmail={(value) => handleDeleteUser(value)} emails={emailsData} />
+          <EmailTable onSetPrimary={(emailId)=> handleSetPrimary(emailId)} onDeleteEmail={(emailId) => handleDeleteUser(emailId)} emails={emailsData} />
         ):(
           <>
             <img className="h-1/2 w-1/2"

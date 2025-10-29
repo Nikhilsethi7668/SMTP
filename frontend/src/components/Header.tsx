@@ -31,11 +31,11 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
             <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
               <Mail className="w-4 h-4 text-white" />
             </div>
-            <span className="text-xl font-bold">MailFlow</span>
+            <span className="text-xl font-bold">InboxMail</span>
           </div>
         </div>
 
-        <div className="flex-1 max-w-md hidden md:block">
+        {/* <div className="flex-1 max-w-md hidden md:block">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -44,7 +44,7 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
               className="pl-10 bg-background/50"
             />
           </div>
-        </div>
+        </div> */}
 
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon" className="relative">

@@ -1,354 +1,641 @@
-import { Navbar } from "@/components/Navbar";
+import {
+  motion,
+  useAnimation,
+  useScroll,
+  useTransform,
+  easeInOut,
+  easeIn,
+} from "framer-motion";
+import { useEffect } from "react";
+import { useInView } from "react-intersection-observer";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Star, Quote } from "lucide-react";
+import IndexNavbar from "@/components/IndexNavbar";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Check, Zap, Shield, BarChart3, Code, Mail, Star } from "lucide-react";
-import dashboardMockup from "@/assets/dashboard-mockup.png";
+import WhyChooseUs from "@/components/WhyChooseUs";
+import ScrollingBadges from "@/components/ScrollingBadges";
+import {
+  ChartLine,
+  Clock,
+  Percent,
+  RefreshCcw,
+  Users,
+  TrendingUp,
+  BarChart3,
+  Cloud,
+  ShieldCheck,
+  Plug,
+  Mail,
+  Zap,
+  Inbox,
+  Globe,
+  Database,
+} from "lucide-react";
+import Footer from "@/components/Footer";
+import InfrastructureSection from "@/components/InfrastructureSection";
+import HeroSection from "@/components/HeroSections";
+import PricingSection from "@/components/PricingSection";
 
 const Index = () => {
+  const cardVariants = {
+    hidden: { opacity: 0, y: 60 },
+    visible: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: { delay: i * 0.2, duration: 0.8, ease: "easeOut" },
+    }),
+  };
+
   const navigate = useNavigate();
+  const controls = useAnimation();
+  const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.2 });
 
-  const features = [
-    {
-      icon: Zap,
-      title: "Lightning Fast Delivery",
-      description: "Send emails in milliseconds with 99.9% uptime guarantee",
-    },
-    {
-      icon: Shield,
-      title: "Enterprise Security",
-      description: "Bank-level encryption and compliance with SOC 2, GDPR",
-    },
-    {
-      icon: BarChart3,
-      title: "Real-time Analytics",
-      description: "Track opens, clicks, bounces, and conversions instantly",
-    },
-    {
-      icon: Code,
-      title: "Developer-First API",
-      description: "Simple REST API with SDKs for all major languages",
-    },
-  ];
+  useEffect(() => {
+    if (inView) controls.start("visible");
+  }, [controls, inView]);
 
-  const trustedBrands = [
-    "Stripe", "Shopify", "Slack", "GitHub", "Notion", "Figma"
+  // 🌟 Section fade + lift animation
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 60 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.8, ease: easeInOut },
+    },
+  };
+
+  // 💫 Floating animation for icons
+  const floatAnimation = {
+    y: [0, -10, 0],
+    transition: { duration: 3, repeat: Infinity, ease: easeInOut },
+  };
+
+  // 📜 Page transition animation
+  const pageVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 0.6, ease: easeInOut } },
+    exit: { opacity: 0, transition: { duration: 0.4 } },
+  };
+
+  // 🌀 Scroll-based parallax
+  const { scrollY } = useScroll();
+  const yParallax = useTransform(scrollY, [0, 300], [0, -100]);
+
+  const fadeInLeft = {
+    hidden: { opacity: 0, x: -100 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: { duration: 0.8, ease: easeIn },
+    },
+  };
+
+  const fadeInRight = {
+    hidden: { opacity: 0, x: 100 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: { duration: 0.8, ease: easeIn },
+    },
+  };
+
+  const testimonials = [
+    {
+      stat: "+26% Reply Rate",
+      quote:
+        "We chose MailFlow for its seamless email and LinkedIn outreach combo. The simple interface saves us a lot of time, and the support team always has our backs when we need it.",
+      name: "Deborah Strougo",
+      role: "Business Growth Manager at IREV",
+      company: "IREV",
+      image: "https://randomuser.me/api/portraits/women/44.jpg",
+      bg: "from-white to-slate-50 text-slate-800",
+    },
+    {
+      stat: "10x Meetings Booked",
+      quote:
+        "Being able to drop a profile visit, follow up with a personalized email, and send a connection request has been such a powerful process. It allows you to add that human touch at scale.",
+      name: "Dave Shillingford",
+      role: "Sales Manager at RightMarket",
+      company: "RightMarket",
+      image: "https://randomuser.me/api/portraits/men/32.jpg",
+      bg: "from-blue-600 to-blue-700 text-white",
+    },
+    {
+      stat: "3x Sales Productivity",
+      quote:
+        "Staying organized and consistent is key in sales, and MailFlow helps me achieve exactly this. I can organize my outreach in a more effective, deeper, and personalized way.",
+      name: "Khushi Mehta",
+      role: "Partnerships Manager at Secret",
+      company: "Secret",
+      image: "https://randomuser.me/api/portraits/women/68.jpg",
+      bg: "from-blue-600 to-blue-700 text-white",
+    },
+    {
+      stat: "5x Sales Opportunities",
+      quote:
+        "Email finder and verifier help us filter out undeliverable emails, and automation ensures our emails appear at the top of prospects’ inboxes.",
+      name: "João Jorge",
+      role: "Head of Growth at WeTransact",
+      company: "WeTransact",
+      image: "https://randomuser.me/api/portraits/men/28.jpg",
+      bg: "from-white to-slate-50 text-slate-800",
+    },
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar transparent />
+    <motion.div
+      variants={pageVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+      className="min-h-screen bg-white text-slate-800"
+    >
+      <IndexNavbar />
+      <HeroSection />
+      {/* HERO SECTION */}
+      <motion.section
+        ref={ref}
+        variants={fadeInUp}
+        initial="hidden"
+        animate={controls}
+        style={{ y: yParallax }}
+        className="bg-slate-200 py-20 w-[95%] mx-auto mt-6 h-[75vh] rounded-[2.5rem] flex justify-center items-center shadow-sm"
+      >
+        <motion.div
+          className="max-w-4xl mx-auto text-center px-6"
+          variants={fadeInUp}
+        >
+          <motion.h1
+            className="text-3xl md:text-4xl font-semibold leading-tight text-slate-900"
+            initial={{ opacity: 0, y: -40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            The <span className="text-blue-600">email infrastructure</span>{" "}
+            built for performance, deliverability, and{" "}
+            <span className="text-blue-600">trust</span>
+          </motion.h1>
 
-      {/* Hero Section */}
-      <section className="relative pt-32 pb-20 px-4 overflow-hidden">
-        {/* Floating background elements */}
-        <div className="absolute top-20 left-10 w-20 h-20 bg-primary/5 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-40 right-20 w-32 h-32 bg-secondary/5 rounded-full blur-3xl animate-pulse delay-1000" />
-        
-        <div className="container mx-auto max-w-7xl">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left: Content */}
-            <div className="space-y-8 animate-fade-in-up">
-              <Badge className="bg-primary/10 text-primary hover:bg-primary/20 border-primary/20 w-fit">
-                ✨ 3,000 free emails — no credit card required
-              </Badge>
+          <motion.p
+            className="mt-6 text-slate-600 text-lg"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+          >
+            Power your outreach with dedicated SMTPs, pre-warmed domains, and
+            real-time deliverability insights — all managed from one dashboard.
+          </motion.p>
 
-              <div className="space-y-4">
-                <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight">
-                  Deliver Smarter Emails.{" "}
-                  <span className="bg-gradient-primary bg-clip-text text-transparent">
-                    Track Every Click.
-                  </span>
-                </h1>
-                <p className="text-xl text-muted-foreground max-w-xl">
-                  Send bulk transactional and marketing emails effortlessly. Built for developers,
-                  trusted by marketing teams.
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.96 }}
+            className="mt-8"
+          >
+            <Button
+              onClick={() => navigate("/signup")}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-5 text-base rounded-lg shadow-md"
+            >
+              Get Started
+            </Button>
+          </motion.div>
+        </motion.div>
+      </motion.section>
+
+      {/* FLOATING IMAGE SECTION */}
+      <motion.section
+        variants={fadeInUp}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+        className="relative z-10 top-[-5rem] flex justify-center"
+      >
+        <motion.div
+          whileHover={{ scale: 1.02 }}
+          className="bg-gradient-to-b from-slate-50 to-slate-300 w-[75%] h-[85%] border border-slate-300 overflow-hidden rounded-[2.5rem] p-4 shadow-xl"
+        >
+          <motion.img
+            src="https://cdn.prod.website-files.com/5de921a1902d8d8b7a99f774/6881ef87077bc66588ece0bf_lemlist%20En%20visual-p-2000.png"
+            alt="Dashboard Preview"
+            className="object-cover w-full h-full rounded-[2.5rem]"
+          />
+        </motion.div>
+      </motion.section>
+
+      {/* TESTIMONIAL + COMPANY SECTION */}
+      <motion.div
+        variants={fadeInUp}
+        initial="hidden"
+        animate={controls}
+        className="bg-blue-600"
+      >
+        <InfrastructureSection />
+      </motion.div>
+
+      {/* FEATURES SECTION */}
+      <motion.section
+        className="bg-blue-600 w-full py-20"
+        variants={pageVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+      >
+        <motion.p
+          className="my-10 text-4xl font-semibold text-white text-center leading-snug"
+          variants={fadeInUp}
+        >
+          Manage, monitor, and scale your entire email infrastructure
+          <br />
+          from one powerful dashboard.
+        </motion.p>
+
+        {[
+          {
+            title: "Dedicated SMTP & Pre-Warmed Accounts",
+            desc1:
+              "Each user gets a private, dedicated IP (VMTA) with automated warm-up and health scoring to maintain high deliverability from day one.",
+            desc2:
+              "Connect your own domains or purchase new ones directly inside the dashboard — all accounts are verified and pre-warmed for instant use.",
+            image:
+              "https://cdn.prod.website-files.com/5de921a1902d8d8b7a99f774/6881ef87077bc66588ece0bf_lemlist%20En%20visual-p-2000.png",
+          },
+          {
+            title: "Real-Time Inbox Placement & Deliverability Insights",
+            desc1:
+              "Track open rates, spam placement, and bounce trends across every campaign with our advanced analytics suite.",
+            desc2:
+              "View deliverability by domain, monitor sender reputation, and switch IPs automatically if one gets blocked — all within one click.",
+            image:
+              "https://cdn.prod.website-files.com/5de921a1902d8d8b7a99f774/6881ef87077bc66588ece0bf_lemlist%20En%20visual-p-2000.png",
+          },
+          {
+            title: "Unified Inbox & Smart Reply Tracking",
+            desc1:
+              "See all your replies and conversations in one place. Our unified inbox syncs every response, keeping your team aligned and responsive.",
+            desc2:
+              "Stop sending follow-ups automatically when a reply is detected — ensuring a human, natural communication flow.",
+            image:
+              "https://cdn.prod.website-files.com/5de921a1902d8d8b7a99f774/6881ef87077bc66588ece0bf_lemlist%20En%20visual-p-2000.png",
+          },
+          {
+            title: "Delivery Optimization & IP Quality Control",
+            desc1:
+              "InboxMail constantly monitors each IP’s load, temperature, and sender score to maintain top-tier deliverability.",
+            desc2:
+              "If performance dips, transfer your senders to a healthier IP instantly — no downtime, no data loss, no deliverability drop.",
+            image:
+              "https://cdn.prod.website-files.com/5de921a1902d8d8b7a99f774/6881ef87077bc66588ece0bf_lemlist%20En%20visual-p-2000.png",
+          },
+        ].map((block, i) => (
+          <motion.section
+            key={i}
+            className={`flex flex-col ${
+              i % 2 === 1 ? "md:flex-row-reverse" : "md:flex-row"
+            } items-center justify-between bg-gradient-to-b from-white to-slate-100 rounded-[2.5rem] p-10 md:p-16 shadow-xl max-w-6xl mx-auto my-12`}
+            variants={i % 2 === 0 ? fadeInLeft : fadeInRight}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
+            <div className="flex-1 md:px-12">
+              <h2 className="text-3xl font-semibold text-slate-900 mb-4">
+                {block.title}
+              </h2>
+              <p className="text-slate-600 mb-4">{block.desc1}</p>
+              <p className="text-slate-600">{block.desc2}</p>
+            </div>
+
+            <motion.div
+              className="flex-1 mt-8 md:mt-0"
+              whileHover={{ scale: 1.03 }}
+            >
+              <div className="relative w-full h-full bg-gradient-to-br from-blue-500 to-blue-600 rounded-[2rem] p-4">
+                <motion.img
+                  src={block.image}
+                  alt={block.title}
+                  className="rounded-[1.5rem] shadow-2xl w-full h-auto"
+                />
+              </div>
+            </motion.div>
+          </motion.section>
+        ))}
+      </motion.section>
+        <motion.section id="pricing" variants={fadeInUp}>
+          <PricingSection/>
+        </motion.section>
+      <motion.section variants={fadeInUp}>
+        <section className="w-full bg-gradient-to-b from-slate-100 to-white py-24">
+          {/* Header */}
+          <div className="max-w-6xl mx-auto px-6 text-center mb-12">
+            <h2 className="text-3xl md:text-5xl font-semibold text-slate-900 mb-6">
+              The All-in-One{" "}
+              <span className="text-blue-600">Cold Email Infrastructure</span>
+            </h2>
+
+            <p className="text-slate-600 text-lg max-w-3xl mx-auto leading-relaxed">
+              Power your outreach with a next-gen SMTP system built for serious
+              senders. From{" "}
+              <span className="font-semibold text-slate-800">
+                pre-warmed mail accounts
+              </span>{" "}
+              and
+              <span className="font-semibold text-slate-800">
+                dedicated IPs
+              </span>{" "}
+              to
+              <span className="font-semibold text-slate-800">
+                domain management
+              </span>{" "}
+              and
+              <span className="font-semibold text-slate-800">
+                live analytics
+              </span>{" "}
+              — InboxMail gives you the tools to scale safely, deliver smarter,
+              and land in more inboxes.
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12 text-left">
+              <div className="bg-white border border-slate-200 p-8 rounded-2xl shadow-sm hover:shadow-md transition-all">
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">
+                  ⚙️ Pre-Warmed SMTP Accounts
+                </h3>
+                <p className="text-slate-600 text-sm leading-relaxed">
+                  Skip warm-up delays. Buy verified, pre-warmed accounts and
+                  start sending instantly. Each user gets a dedicated SMTP IP
+                  (VMTA) — no shared pools, no noise.
                 </p>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button
-                  size="lg"
-                  onClick={() => navigate("/auth")}
-                  className="font-bold text-base group transition-all hover:shadow-hover hover:-translate-y-0.5"
-                >
-                  Get Started Free
-                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  onClick={() => navigate("/auth")}
-                  className="font-semibold text-base transition-all hover:shadow-card"
-                >
-                  Log In
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  onClick={() => navigate("/contact")}
-                  className="font-semibold text-base transition-all hover:shadow-card"
-                >
-                  Contact Sales
-                </Button>
+              <div className="bg-white border border-slate-200 p-8 rounded-2xl shadow-sm hover:shadow-md transition-all">
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">
+                  🌐 Dedicated IP Infrastructure
+                </h3>
+                <p className="text-slate-600 text-sm leading-relaxed">
+                  Every campaign runs on your own dedicated IP. Monitor IP load,
+                  deliverability, and quality. Upgrade or add new IPs as your
+                  sender volume grows.
+                </p>
               </div>
 
-              <div className="flex items-center gap-6 text-sm text-muted-foreground pt-4">
-                <div className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-primary" />
-                  No credit card needed
-                </div>
-                <div className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-primary" />
-                  Setup in 5 minutes
-                </div>
-                <div className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-primary" />
-                  Cancel anytime
-                </div>
+              <div className="bg-white border border-slate-200 p-8 rounded-2xl shadow-sm hover:shadow-md transition-all">
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">
+                  📊 Real-Time Mail Analytics
+                </h3>
+                <p className="text-slate-600 text-sm leading-relaxed">
+                  Track opens, clicks, replies, and IP performance with full
+                  campaign insights. Stay ahead with deliverability reports
+                  powered by MailGuard & InboxPlacement.
+                </p>
               </div>
             </div>
 
-            {/* Right: Dashboard Mockup */}
-            <div className="relative animate-fade-in-up delay-200">
-              <div className="absolute inset-0 bg-gradient-primary opacity-20 blur-3xl rounded-full" />
-              <img
-                src={dashboardMockup}
-                alt="Email analytics dashboard"
-                className="relative w-full rounded-xl shadow-hover border border-border"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Trusted By Section */}
-      <section className="py-12 px-4 border-y border-border bg-muted/30">
-        <div className="container mx-auto max-w-7xl">
-          <p className="text-center text-sm text-muted-foreground mb-8">
-            Trusted by 10,000+ developers and teams worldwide
-          </p>
-          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12">
-            {trustedBrands.map((brand) => (
-              <div
-                key={brand}
-                className="text-2xl font-bold text-muted-foreground/40 hover:text-muted-foreground/60 transition-colors"
-              >
-                {brand}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8 text-left">
+              <div className="bg-white border border-slate-200 p-8 rounded-2xl shadow-sm hover:shadow-md transition-all">
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">
+                  🔐 Connect or Buy Domains
+                </h3>
+                <p className="text-slate-600 text-sm leading-relaxed">
+                  Plug in your own domain or buy a new one inside the dashboard.
+                  Automatic DNS setup and domain rotation for better inbox
+                  placement.
+                </p>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* Features Section */}
-      <section id="features" className="py-20 px-4">
-        <div className="container mx-auto max-w-7xl">
-          <div className="text-center mb-16 space-y-4">
-            <Badge className="bg-primary/10 text-primary hover:bg-primary/20 border-primary/20">
-              Features
-            </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold">
-              Everything you need to send emails at scale
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Fast. Reliable. Developer-friendly.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {features.map((feature, index) => (
-              <div
-                key={feature.title}
-                className="p-6 bg-card rounded-xl border border-border shadow-card hover:shadow-hover transition-all hover:-translate-y-1 animate-fade-in-up"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <div className="w-12 h-12 bg-gradient-primary rounded-lg flex items-center justify-center mb-4">
-                  <feature.icon className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
-                <p className="text-sm text-muted-foreground">{feature.description}</p>
+              <div className="bg-white border border-slate-200 p-8 rounded-2xl shadow-sm hover:shadow-md transition-all">
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">
+                  💌 Unified Inbox (Unibox)
+                </h3>
+                <p className="text-slate-600 text-sm leading-relaxed">
+                  See every reply, thread, and inbox in one clean interface.
+                  Manage client conversations, monitor sender health, and stay
+                  synced in real time.
+                </p>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* Pricing Teaser */}
-      <section id="pricing" className="py-20 px-4 bg-muted/30">
-        <div className="container mx-auto max-w-4xl text-center space-y-8">
-          <div className="space-y-4">
-            <h2 className="text-4xl md:text-5xl font-bold">
-              Simple, transparent pricing
-            </h2>
-            <p className="text-xl text-muted-foreground">
-              Start free. Scale as you grow. No hidden fees.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="p-8 bg-card rounded-xl border border-border">
-              <div className="text-left space-y-4">
-                <h3 className="text-xl font-bold">Free</h3>
-                <div className="text-4xl font-bold">$0</div>
-                <p className="text-sm text-muted-foreground">3,000 emails/month</p>
-                <ul className="space-y-3 pt-4">
-                  <li className="flex items-center gap-2 text-sm">
-                    <Check className="w-4 h-4 text-primary" />
-                    All core features
-                  </li>
-                  <li className="flex items-center gap-2 text-sm">
-                    <Check className="w-4 h-4 text-primary" />
-                    API access
-                  </li>
-                  <li className="flex items-center gap-2 text-sm">
-                    <Check className="w-4 h-4 text-primary" />
-                    Basic analytics
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            <div className="p-8 bg-gradient-primary rounded-xl border-2 border-primary relative overflow-hidden">
-              <div className="absolute top-4 right-4">
-                <Badge className="bg-white text-primary">Popular</Badge>
-              </div>
-              <div className="text-left space-y-4">
-                <h3 className="text-xl font-bold text-white">Pro</h3>
-                <div className="text-4xl font-bold text-white">$49</div>
-                <p className="text-sm text-white/80">50,000 emails/month</p>
-                <ul className="space-y-3 pt-4">
-                  <li className="flex items-center gap-2 text-sm text-white">
-                    <Check className="w-4 h-4" />
-                    Everything in Free
-                  </li>
-                  <li className="flex items-center gap-2 text-sm text-white">
-                    <Check className="w-4 h-4" />
-                    Advanced analytics
-                  </li>
-                  <li className="flex items-center gap-2 text-sm text-white">
-                    <Check className="w-4 h-4" />
-                    Priority support
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            <div className="p-8 bg-card rounded-xl border border-border">
-              <div className="text-left space-y-4">
-                <h3 className="text-xl font-bold">Enterprise</h3>
-                <div className="text-4xl font-bold">Custom</div>
-                <p className="text-sm text-muted-foreground">Unlimited emails</p>
-                <ul className="space-y-3 pt-4">
-                  <li className="flex items-center gap-2 text-sm">
-                    <Check className="w-4 h-4 text-primary" />
-                    Everything in Pro
-                  </li>
-                  <li className="flex items-center gap-2 text-sm">
-                    <Check className="w-4 h-4 text-primary" />
-                    Dedicated support
-                  </li>
-                  <li className="flex items-center gap-2 text-sm">
-                    <Check className="w-4 h-4 text-primary" />
-                    Custom SLA
-                  </li>
-                </ul>
+              <div className="bg-white border border-slate-200 p-8 rounded-2xl shadow-sm hover:shadow-md transition-all">
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">
+                  ⚡ Built for Scale
+                </h3>
+                <p className="text-slate-600 text-sm leading-relaxed">
+                  Scale to hundreds of senders effortlessly. Our infrastructure
+                  grows with you — powerful, secure, and optimized for global
+                  deliverability.
+                </p>
               </div>
             </div>
           </div>
 
-          <Button
-            size="lg"
-            onClick={() => navigate("/auth")}
-            className="font-bold transition-all hover:shadow-hover hover:-translate-y-0.5"
+          <WhyChooseUs />
+          <ScrollingBadges />
+        </section>
+      </motion.section>
+      <section className="relative w-full bg-blue-600 py-24 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-10">
+          {/* CARD 1 - Dedicated SMTP Infrastructure */}
+          <motion.div
+            custom={0}
+            variants={cardVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            className="bg-white rounded-3xl p-8 shadow-xl border border-slate-200 backdrop-blur-md"
           >
-            Start Free Trial
-          </Button>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 px-4">
-        <div className="container mx-auto max-w-4xl">
-          <div className="bg-gradient-primary rounded-2xl p-12 text-center space-y-6 shadow-hover">
-            <h2 className="text-4xl md:text-5xl font-bold text-white">
-              Ready to scale your emails?
-            </h2>
-            <p className="text-xl text-white/90 max-w-2xl mx-auto">
-              Join thousands of developers and teams sending millions of emails every day.
+            <h3 className="text-2xl font-semibold text-slate-900 mb-3">
+              Dedicated SMTP Infrastructure
+            </h3>
+            <p className="text-slate-600 mb-8 leading-relaxed">
+              Each user gets their own <strong>dedicated SMTP IP (VMTA)</strong>{" "}
+              to ensure complete control, reliability, and deliverability. Scale
+              effortlessly by adding new IPs as your sender volume grows.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button
-                size="lg"
-                variant="secondary"
-                onClick={() => navigate("/auth")}
-                className="font-bold text-base bg-white text-primary hover:bg-white/90"
+
+            {/* Visual Block */}
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 shadow-inner">
+              <div className="flex items-center justify-between mb-6">
+                <h4 className="font-medium text-slate-900">
+                  Performance Snapshot
+                </h4>
+                <div className="flex gap-3">
+                  <button className="px-3 py-1 bg-slate-100 rounded-lg text-xs flex items-center gap-1 text-slate-700 hover:bg-slate-200 transition">
+                    <TrendingUp size={14} /> IP Health
+                  </button>
+                  <button className="px-3 py-1 bg-slate-100 rounded-lg text-xs flex items-center gap-1 text-slate-700 hover:bg-slate-200 transition">
+                    <BarChart3 size={14} /> Sender Load
+                  </button>
+                </div>
+              </div>
+
+              <div className="h-32 bg-gradient-to-b from-blue-200/40 to-transparent rounded-xl relative overflow-hidden">
+                <motion.div
+                  className="absolute bottom-0 left-0 w-full h-full bg-gradient-to-t from-blue-300/60 to-transparent rounded-xl"
+                  animate={{ y: [10, -10, 10] }}
+                  transition={{
+                    duration: 6,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                >
+                  <img
+                    src="https://cdn-icons-png.flaticon.com/512/3593/3593440.png"
+                    alt="SMTP growth"
+                    className="w-20 h-20 mx-auto mt-6 opacity-80"
+                  />
+                </motion.div>
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.6 }}
+                className="mt-6 space-y-2 text-sm text-slate-600"
               >
-                Get Started Free
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                onClick={() => navigate("/contact")}
-                className="font-semibold text-base border-white bg-transparent text-white hover:bg-white hover:text-primary"
-              >
-                Talk to Sales
-              </Button>
+                <p>✅ Dedicated IP per user — no shared pools</p>
+                <p>📈 Real-time IP quality & sender performance</p>
+                <p>🚀 Instantly scalable with additional IPs</p>
+              </motion.div>
             </div>
-          </div>
+          </motion.div>
+
+          {/* CARD 2 - Smart Domain Management & Integrations */}
+          <motion.div
+            custom={1}
+            variants={cardVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            className="bg-white rounded-3xl p-8 shadow-xl border border-slate-200 backdrop-blur-md"
+          >
+            <h3 className="text-2xl font-semibold text-slate-900 mb-3">
+              Smart Domain Management
+            </h3>
+            <p className="text-slate-600 mb-8 leading-relaxed">
+              Seamlessly connect or purchase new domains, integrate pre-warmed
+              Google & Microsoft accounts, and automate DNS setups — all in a
+              few clicks.
+            </p>
+
+            {/* Integrations Grid */}
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 shadow-inner grid grid-cols-2 gap-3 text-sm">
+              {[
+                { icon: Cloud, label: "Auto DNS Setup" },
+                { icon: ShieldCheck, label: "Pre-warmed IPs" },
+                { icon: Plug, label: "Google Workspace" },
+                { icon: Mail, label: "Microsoft 365" },
+                { icon: Zap, label: "Custom IMAP Domains" },
+                { icon: BarChart3, label: "Domain Analytics" },
+              ].map(({ icon: Icon, label }, i) => (
+                <div
+                  key={i}
+                  className="bg-white rounded-lg px-3 py-2 flex items-center gap-2 text-slate-700 border border-slate-200 hover:bg-slate-100 transition"
+                >
+                  <Icon size={14} /> {label}
+                </div>
+              ))}
+
+              <div className="col-span-2 flex gap-3 mt-3">
+                <div className="bg-slate-100 rounded-lg px-4 py-2 flex items-center gap-2 border border-slate-200">
+                  <img
+                    src="https://api.iconify.design/logos/google.svg"
+                    className="w-4 h-4"
+                    alt=""
+                  />
+                  <span className="text-slate-700">Google</span>
+                </div>
+                <div className="bg-blue-100 rounded-lg px-4 py-2 flex items-center gap-2 border border-blue-200">
+                  <img
+                    src="https://api.iconify.design/logos/microsoft.svg"
+                    className="w-4 h-4"
+                    alt=""
+                  />
+                  <span className="text-blue-700">Microsoft</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 px-4 border-t border-border bg-muted/30">
-        <div className="container mx-auto max-w-7xl">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-                  <Mail className="w-4 h-4 text-white" />
-                </div>
-                <span className="text-lg font-bold">MailFlow</span>
+      <motion.div
+        layout
+        variants={fadeInUp}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.4 }}
+        className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mt-10 mx-auto px-6"
+      >
+        {[
+          {
+            icon: Inbox,
+            title: "Inbox Placement Tracking",
+            desc: "Monitor exactly where your emails land — Inbox, Spam, or Promotions — across multiple ISPs with real-time placement data.",
+            bg: "from-blue-50 to-blue-100",
+          },
+          {
+            icon: BarChart3,
+            title: "Mail Analytics Dashboard",
+            desc: "Visualize open rates, reply patterns, bounce data, and IP performance with AI-powered insights that optimize deliverability.",
+            bg: "from-violet-50 to-violet-100",
+          },
+          {
+            icon: Globe,
+            title: "Smart Domain Management",
+            desc: "Instantly connect existing domains or purchase new ones — complete with automated DNS setup, DKIM & DMARC verification.",
+            bg: "from-teal-50 to-green-100",
+          },
+          {
+            icon: ShieldCheck,
+            title: "MailGuard Monitoring",
+            desc: "Stay protected with alerts for reputation drops, IP blacklists, or deliverability issues before they impact your campaigns.",
+            bg: "from-rose-50 to-pink-100",
+          },
+          {
+            icon: Users,
+            title: "Unified Inbox & CRM",
+            desc: "Manage replies and threads in a single, elegant Unibox. Tag, assign, and follow-up effortlessly with built-in CRM tools.",
+            bg: "from-amber-50 to-orange-100",
+          },
+          {
+            icon: Database,
+            title: "Dedicated IP Infrastructure",
+            desc: "Every user gets a private SMTP VMTA IP — no shared IPs. Monitor IP load, sender limits, and easily transfer if one gets blocked.",
+            bg: "from-slate-50 to-slate-100",
+          },
+        ].map((f, i) => (
+          <motion.div
+            key={i}
+            layout
+            custom={i}
+            variants={fadeInUp}
+            className={`bg-gradient-to-br ${f.bg} p-8 rounded-3xl shadow-xl flex flex-col justify-between hover:shadow-2xl transition-all duration-300`}
+            whileHover={{
+              scale: 1.04,
+              rotate: 0.5,
+              boxShadow: "0px 8px 30px rgba(0,0,0,0.12)",
+            }}
+          >
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <f.icon className="w-6 h-6 text-blue-600" />
+                <p className="font-semibold text-lg text-slate-900">
+                  {f.title}
+                </p>
               </div>
-              <p className="text-sm text-muted-foreground">
-                The modern email delivery platform for developers and teams.
-              </p>
+              <p className="text-slate-600 leading-relaxed mb-6">{f.desc}</p>
             </div>
 
-            <div>
-              <h4 className="font-semibold mb-4">Product</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#features" className="hover:text-foreground transition-colors">Features</a></li>
-                <li><a href="#pricing" className="hover:text-foreground transition-colors">Pricing</a></li>
-                <li><a href="#docs" className="hover:text-foreground transition-colors">API Docs</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-4">Company</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><button onClick={() => navigate("/contact")} className="hover:text-foreground transition-colors">Contact</button></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">About</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Blog</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-4">Legal</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition-colors">Privacy</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Terms</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Security</a></li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="mt-12 pt-8 border-t border-border text-center text-sm text-muted-foreground">
-            © 2025 MailFlow. All rights reserved.
-          </div>
-        </div>
-      </footer>
-    </div>
+            <motion.a
+              href="#"
+              className="text-sm font-medium underline-offset-4 hover:underline text-blue-700 mt-auto"
+              whileHover={{ scale: 1.05 }}
+            >
+              Learn more →
+            </motion.a>
+          </motion.div>
+        ))}
+      </motion.div>
+      <motion.div variants={fadeInUp} className="mt-10">
+        <Footer />
+      </motion.div>
+    </motion.div>
   );
 };
 

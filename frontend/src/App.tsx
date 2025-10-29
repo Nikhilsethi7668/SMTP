@@ -20,7 +20,9 @@ import { ContactsPage } from "./pages/ConatctsPage";
 import { Template } from "./pages/Templates";
 import { Settings } from "./pages/Settings";
 import UniBox from "./pages/UniBox";
+import { Crm } from "./pages/Crm";
 import CustomConnect from "./pages/account/CustomConnect";
+import SettingsPage from "./pages/settings/SettingsPage";
 
 const queryClient = new QueryClient();
 
@@ -37,7 +39,7 @@ const App = () => (
           <Route path="/app/dashboard/accounts" element={<Dashboard/>} />
           <Route path="/app/dashboard/contacts" element={<ContactsPage/>} />
           <Route path="/app/dashboard/templates" element={<Template/>} />
-          <Route path="/app/dashboard/settings" element={<Settings/>} />
+          <Route path="/app/dashboard/settings" element={<SettingsPage/>} />
           <Route path="/app/dashboard/unibox" element={<UniBox/>} />
           <Route path="/app/dashboard/campaigns" element={<Campaigns/>} />
           <Route path="/app/dashboard/campaigns/details" element={<CampaignDetails/>} />
@@ -46,6 +48,8 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/app/analytics" element={<Analytics />} />
+          <Route path="/app/crm" element={<Crm />} />
+          
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
           <Route path="/verify-email" element={<EmailVerify/>} />

@@ -83,7 +83,7 @@ router.get("/auth/google/callback", async (req, res) => {
     });
   }
 
-  res.send("✅ Gmail connected successfully!");
+  res.redirect("http://localhost:8080/app/dashboard/accounts");
 });
 
 export default router;

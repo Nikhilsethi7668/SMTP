@@ -64,9 +64,8 @@ export const uploadLeadsCSV = async (
       });
     }
 
-    const user = req.user._id;
+    const user = req.user.id;
     const campaign = (req as any).query.campaign as string;
-
     const results: { email: string }[] = [];
     const errors: { email: string; error: string }[] = [];
     const buffer = req.file.buffer;

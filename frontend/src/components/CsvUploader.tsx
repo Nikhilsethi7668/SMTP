@@ -2,7 +2,7 @@ import api from "@/axiosInstance";
 import React from "react";
 import { Button } from "./ui/button";
 
-export default function CsvUploader({ campaignId}) {
+export default function CsvUploader({ campaignId, onSuccess }) {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleButtonClick = () => {
@@ -25,6 +25,7 @@ export default function CsvUploader({ campaignId}) {
       });
 
       alert("✅ Upload successful: " + res.data.message);
+      onSuccess();
       console.log(res.data);
     } catch (err: any) {
       alert("❌ Upload failed: " + (err.response?.data?.message || err.message));

@@ -10,6 +10,8 @@ import { Campaign, CampaignAnalytics } from "@/components/CampaignAnalytics";
 import { CampaignLeads } from "@/components/CampaignLeads";
 import { CampaignSequences } from "@/components/CampaignSequences";
 import api from "@/axiosInstance";
+import ScheduleManager from "@/components/ScheduleManager";
+import CampaignSettings from "@/components/CampaignSettings";
 
 export const CampaignDetails = () => {
     const campaigns = 
@@ -37,6 +39,8 @@ export const CampaignDetails = () => {
     { key: "analytics", label: "Analytics" },
     { key: "leads", label: "Leads" },
     { key: "sequences", label: "Sequences" },
+    { key: "schedules", label: "Schedules"},
+    { key: "options", label: "Options" }
   ];
   const [activeTab, setActiveTab] = useState("analytics");
   const [CampaignDetails, setCampaignDetails] = useState<Campaign>({
@@ -81,6 +85,10 @@ export const CampaignDetails = () => {
         return <CampaignLeads campaignId={prefilledCampaignId} campaignName={prefilledCampaignName} />;
       case "sequences":
         return <CampaignSequences />;
+      case "schedules":
+        return <ScheduleManager/>
+      case "options":
+        return <CampaignSettings/>
       default:
         return null;
     }

@@ -21,6 +21,7 @@ import { Template } from "./pages/Templates";
 import { Settings } from "./pages/Settings";
 import UniBox from "./pages/UniBox";
 import { Crm } from "./pages/Crm";
+import CustomConnect from "./pages/account/CustomConnect";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ const App = () => (
         <Routes>
           <Route path="/app/dashboard/accounts/verify" element={<VerifyUserEmail/>} />
           <Route path="/app/dashboard/accounts/connect" element={<AccountConnect/>} />
+          <Route path="/app/dashboard/accounts/connect/custom" element={<CustomConnect/>} />
           <Route path="/app/dashboard/accounts" element={<Dashboard/>} />
           <Route path="/app/dashboard/contacts" element={<ContactsPage/>} />
           <Route path="/app/dashboard/templates" element={<Template/>} />

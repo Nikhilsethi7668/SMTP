@@ -23,11 +23,14 @@
     "csv-parser": "^3.2.0",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "googleapis": "^164.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.19.1",
     "multer": "^2.0.2",
+    "nodemailer": "^7.0.10",
     "pg": "^8.16.3",
     "redis": "^5.8.3",
+    "simple-oauth2": "^5.1.0",
     "stripe": "^19.1.0"
   },
   "devDependencies": {
@@ -40,6 +43,7 @@
     "@types/multer": "^2.0.0",
     "@types/node": "^24.8.1",
     "@types/pg": "^8.15.5",
+    "@types/simple-oauth2": "^5.0.7",
     "cross-env": "^10.1.0",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",

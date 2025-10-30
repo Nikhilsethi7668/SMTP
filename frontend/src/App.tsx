@@ -24,7 +24,6 @@ import UniBox from "./pages/UniBox";
 import { Crm } from "./pages/Crm";
 import CustomConnect from "./pages/account/CustomConnect";
 
-// ✅ Import ProtectedRoute
 import { ProtectedRoute } from "./ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -33,7 +32,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
-      <Sonner />
+      <Sonner position="top-center" richColors />
       <BrowserRouter>
         <Routes>
           {/* PUBLIC ROUTES */}

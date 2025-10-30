@@ -319,9 +319,9 @@ const Index = () => {
           </motion.section>
         ))}
       </motion.section>
-        <motion.section id="pricing" variants={fadeInUp}>
-          <PricingSection/>
-        </motion.section>
+      <motion.section id="pricing" variants={fadeInUp}>
+        <PricingSection />
+      </motion.section>
       <motion.section variants={fadeInUp}>
         <section className="w-full bg-gradient-to-b from-slate-100 to-white py-24">
           {/* Header */}

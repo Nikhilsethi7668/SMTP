@@ -11,6 +11,7 @@ import emailIllustration from "@/assets/email-platform-illustration.png";
 import api from "@/axiosInstance";
 import { useUserStore } from "../store/useUserStore";
 import { Spinner } from "@/components/ui/spinner";
+import { toast } from "sonner";
 const taglines = [
   "Deliver at scale. No limits.",
   "Trusted by developers and marketers alike.",
@@ -43,7 +44,6 @@ const Auth = () => {
     try {
       setIsLoading(true);
       if (!email || !password) {
-        alert("Please fill all required fields");
         throw new Error("Please fill all required feilds");
       }
       const response = await api.post("/auth/login", { email, password });
@@ -65,10 +65,10 @@ const Auth = () => {
         navigate("/app/dashboard/accounts");
       }
     } catch (error) {
-      alert("Login failed. Please try again.");
+      console.log(error);
+      toast.error(error?.response?.data?.message || (error as string));
       setIsLoading(false);
     }
-    console.log("Login attempt");
   };
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -76,12 +76,10 @@ const Auth = () => {
     e.preventDefault();
     console.log("Signup attempt");
     if (!email || !password || !fullName || !username || !confirmPassword) {
-      alert("Please fill all required fields");
       throw new Error("Please fill all required fields");
     }
     if (password !== confirmPassword) {
-      alert("Passwords do not match");
-      throw new Error("Passwords do not match");
+      throw new Error("Password and confrim password do not match");
     }
     try {
       const response = await api.post("/auth/signup", {
@@ -92,7 +90,6 @@ const Auth = () => {
         password,
       });
       if (response.status === 201) {
-        console.log("Signup successful, OTP sent to email");
         navigate(
           `/verify-email?email=${encodeURIComponent(
             email
@@ -100,7 +97,7 @@ const Auth = () => {
         );
       }
     } catch (error) {
-      alert("Signup failed. Please try again.");
+      toast.error(error?.response?.data?.message || (error as string));
       console.error("Signup error:", error);
       setIsLoading(false);
     } finally {
@@ -110,7 +107,6 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-gradient-bg flex flex-col">
-      {/* Simple header with back button */}
       <div className="p-4">
         <button
           onClick={() => navigate("/")}

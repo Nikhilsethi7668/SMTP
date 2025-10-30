@@ -3,18 +3,24 @@ import { Button } from "./ui/button";
 import { useNavigate } from "react-router-dom";
 import api from "@/axiosInstance";
 import { EmailTable } from "./EmailTable";
+import { toast } from "sonner";
 export const EmailAccounts = () => {
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
     const [emailsData, setEmailsData] = useState([]);
     const handleGetData = async () => {
       try {
+        setIsLoading(true)
         const response = await api.get('/emails');
         if(response.data.success){
-          setEmailsData(response.data.data)
-          console.log(response.data.data)
+          setEmailsData(response.data.data);
+          setIsLoading(false);
         }
       } catch (error) {
-        console.log("Error fetching data:", error);
+         setIsLoading(false);
+        toast.error(error?.response?.data?.message || error as string)
+      }finally{
+         setIsLoading(false);
       }
     };
 
@@ -22,10 +28,10 @@ export const EmailAccounts = () => {
       try {
         const response = await api.patch(`/emails/${email}/set-primary`);
         if(response.data.success){
-          alert("Email set to primary");
+          toast.success("Email set to primary");
         }
       } catch (error) {
-        console.log("Error occured",error)
+        toast.error(error?.response?.data?.message || error as string);
       }
     };
     const handleDeleteUser = async (email: string) => {
@@ -58,20 +64,25 @@ export const EmailAccounts = () => {
         </div>
       </div>
       <div className="flex flex-col justify-center items-center">
-         {emailsData.length > 0 ? (
-          <EmailTable onSetPrimary={(email)=> handleSetPrimary(email)} onDeleteEmail={(value) => handleDeleteUser(value)} emails={emailsData} />
+        {isLoading ? (
+          <p>Loading the email account...</p>
         ):(
           <>
-            <img className="h-1/2 w-1/2"
-              src={
-                "https://app.instantly.ai/_next/static/images/pixeltrue-welcome_compressed-de11c441d5eab8a212aff473eef7558c.svg"
-              }
-              alt="img"
-            />
-            <p>Add an email account to get started</p>
+            {emailsData.length > 0 ? (
+              <EmailTable onSetPrimary={(email)=> handleSetPrimary(email)} onDeleteEmail={(value) => handleDeleteUser(value)} emails={emailsData} />
+            ): isLoading === false && (
+              <>
+                <img className="h-1/2 w-1/2"
+                  src={
+                    "https://app.instantly.ai/_next/static/images/pixeltrue-welcome_compressed-de11c441d5eab8a212aff473eef7558c.svg"
+                  }
+                  alt="img"
+                />
+                <p>Add an email account to get started</p>
+              </>
+            )}
           </>
         )}
-       
       </div>
     </div>
   );

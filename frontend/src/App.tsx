@@ -23,6 +23,7 @@ import { Settings } from "./pages/Settings";
 import UniBox from "./pages/UniBox";
 import { Crm } from "./pages/Crm";
 import CustomConnect from "./pages/account/CustomConnect";
+import SettingsPage from "./pages/settings/SettingsPage";
 
 import { ProtectedRoute } from "./ProtectedRoute";
 

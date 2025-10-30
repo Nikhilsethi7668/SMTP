@@ -24,9 +24,9 @@ export const EmailAccounts = () => {
       }
     };
 
-    const handleSetPrimary = async (email: string) => {
+    const handleSetPrimary = async (emailId: string) => {
       try {
-        const response = await api.patch(`/emails/${email}/set-primary`);
+        const response = await api.patch(`/accounts/${emailId}/set-primary`);
         if(response.data.success){
           toast.success("Email set to primary");
         }
@@ -34,15 +34,16 @@ export const EmailAccounts = () => {
         toast.error(error?.response?.data?.message || error as string);
       }
     };
-    const handleDeleteUser = async (email: string) => {
+    const handleDeleteUser = async (emailId: string) => {
       try {
-        const response = await api.delete(`/emails/${email}`);
+        const response = await api.delete(`/accounts/${emailId}/disconnect`);
         if(response.data.success){
-          alert("User Deleted");
+          alert("Account disconnected successfully");
           await handleGetData();
         }
       } catch (error) {
-        console.log("Error occured", error)
+        console.log("Error occurred", error);
+        alert("Failed to disconnect account");
       }
     }
     useEffect(() => {

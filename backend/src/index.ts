@@ -14,7 +14,6 @@ import { startPolicyServer } from "./services/policyEngine.js";
 import { connectDB } from "./config/db.js";
 import { initPricingTable } from "./services/pricingService.js";
 import leadsRoutes from "./routes/leadsRoutes.js";
-import usersEmailRoutes from "./routes/usersEmailRoutes.js";
 import emailTemplateRoutes from "./routes/emailTemplateRoutes.js";
 import incomingEmailRoutes from "./routes/incomingEmailRoutes.js";
 import googleOauthRoutes from "./routes/googleOauth.js";
@@ -43,7 +42,6 @@ const startServer = async () => {
     app.use("/api/admin", adminRoutes);
     app.use("/api/keys", keyRoutes);
     app.use('/api/leads', leadsRoutes);
-    app.use('/api/emails', usersEmailRoutes);
     app.use('/api/email-templates', emailTemplateRoutes);
     app.use('/api/incoming-emails', incomingEmailRoutes);
     app.use('/api', googleOauthRoutes);

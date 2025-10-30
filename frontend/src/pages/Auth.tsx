@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Mail, Github, ArrowLeft } from "lucide-react";
 import emailIllustration from "@/assets/email-platform-illustration.png";
 import api from "@/axiosInstance";
+import { useUserStore } from "../store/useUserStore";
 import { Spinner } from "@/components/ui/spinner";
 const taglines = [
   "Deliver at scale. No limits.",
@@ -41,13 +42,26 @@ const Auth = () => {
     e.preventDefault();
     try {
       setIsLoading(true);
-      if(!email || !password){
+      if (!email || !password) {
         alert("Please fill all required fields");
         throw new Error("Please fill all required feilds");
       }
-      const response = await api.post("/auth/login", {email,password});
-      if(response.status === 200){
-        console.log("Login successful");
+      const response = await api.post("/auth/login", { email, password });
+      if (response.status === 200) {
+        console.log(response.data.user);
+        const data = response.data.user;
+        useUserStore.getState().setUser({
+          user_id: data._id,
+          full_name: data.full_name,
+          username: data.username,
+          role: data.role,
+          email: data.email,
+          daily_quota: data.daily_quota,
+          monthly_quota: data.monthly_quota,
+          used_today: data.used_today,
+          used_month: data.used_month,
+          rate_limit: data.rate_limit,
+        });
         navigate("/app/dashboard/accounts");
       }
     } catch (error) {
@@ -80,9 +94,10 @@ const Auth = () => {
       if (response.status === 201) {
         console.log("Signup successful, OTP sent to email");
         navigate(
-  `/verify-email?email=${encodeURIComponent(email)}&username=${encodeURIComponent(username)}`
-);
-
+          `/verify-email?email=${encodeURIComponent(
+            email
+          )}&username=${encodeURIComponent(username)}`
+        );
       }
     } catch (error) {
       alert("Signup failed. Please try again.");
@@ -242,7 +257,7 @@ const Auth = () => {
                       <Button className="w-full font-bold uppercase tracking-wide transition-all hover:shadow-hover hover:-translate-y-0.5">
                         <Spinner />
                       </Button>
-                    ): (
+                    ) : (
                       <Button
                         type="submit"
                         className="w-full font-bold uppercase tracking-wide transition-all hover:shadow-hover hover:-translate-y-0.5"

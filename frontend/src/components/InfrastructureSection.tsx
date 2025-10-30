@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { motion, useAnimation, Variants } from "framer-motion";
-import { ShieldCheck, Zap, Server, Users, Globe, Layers, BarChart2, Mail } from "lucide-react";
+import { ShieldCheck, Zap, Server, Users, Globe, Layers, BarChart2, Mail, } from "lucide-react";
 
 const fadeInUp: Variants = {
   hidden: { opacity: 0, y: 40 },

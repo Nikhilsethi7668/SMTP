@@ -134,14 +134,10 @@ export default function Analytics() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        let res;
-        if (selectedCampaign === "all") {
-          res = await api.get("/campaigns/metrics/all");
-        } else {
-          res = await api.get("/campaigns/metrics", {
-            params: { campaignId: selectedCampaign },
-          });
-        }
+        const res = await api.get("/campaigns/metrics", {
+          params: { campaignId: selectedCampaign === "all" ? undefined : selectedCampaign },
+        });
+
         setMetrics(res.data.data);
       } catch (error) {
         console.error("Error fetching metrics:", error);

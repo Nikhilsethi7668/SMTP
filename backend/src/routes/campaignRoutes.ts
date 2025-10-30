@@ -19,6 +19,8 @@ const router = express.Router();
 router.post("/campaigns",authenticate, createCampaign);
 router.get("/campaigns",authenticate, listCampaigns);
 router.get("/campaigns/names",authenticate, getCampaignNames);
+// Place specific routes BEFORE dynamic :id to avoid conflicts
+router.get("/campaigns/metrics",authenticate, getCampaignMetrics);
 router.get("/campaigns/:id",authenticate, getCampaign);
 router.put("/campaigns/:id",authenticate, updateCampaignHandler);
 router.delete("/campaigns/:id",authenticate, deleteCampaignHandler);
@@ -29,6 +31,5 @@ router.post("/campaigns/:id/metrics",authenticate, incrementCampaignMetric);
 router.post("/campaigns/:id/archive",authenticate, archiveCampaignHandler);
 
 // Campaign metrics endpoint (aggregate or specific campaign)
-router.get("/campaigns/metrics/all",authenticate, getCampaignMetrics);
 
 export default router;

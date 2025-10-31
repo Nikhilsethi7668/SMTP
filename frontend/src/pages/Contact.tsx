@@ -14,7 +14,7 @@ const Contact = () => {
     e.preventDefault();
     setSubmitted(true);
     toast.success("Message sent! We'll get back to you within 24 hours.");
-    
+
     // Reset form after 3 seconds
     setTimeout(() => {
       setSubmitted(false);
@@ -38,8 +38,8 @@ const Contact = () => {
                     Let's Talk About Your Email Needs 💬
                   </h1>
                   <p className="text-muted-foreground text-lg">
-                    Whether you need help getting started or want to discuss enterprise solutions,
-                    we're here to help.
+                    Whether you need help getting started or want to discuss
+                    enterprise solutions, we're here to help.
                   </p>
                 </div>
 
@@ -101,8 +101,9 @@ const Contact = () => {
                   </div>
 
                   <div className="bg-muted/50 border border-border rounded-lg p-4 text-sm text-muted-foreground">
-                    <strong className="text-foreground">Response time:</strong> We typically respond within
-                    24 hours during business days. For urgent matters, please mention it in your message.
+                    <strong className="text-foreground">Response time:</strong>{" "}
+                    We typically respond within 24 hours during business days.
+                    For urgent matters, please mention it in your message.
                   </div>
 
                   <Button
@@ -115,7 +116,10 @@ const Contact = () => {
 
                   <div className="text-center text-sm text-muted-foreground pt-4">
                     Prefer email?{" "}
-                    <a href="mailto:support@mailflow.com" className="text-primary hover:underline font-medium">
+                    <a
+                      href="mailto:support@mailflow.com"
+                      className="text-primary hover:underline font-medium"
+                    >
                       support@mailflow.com
                     </a>
                   </div>
@@ -129,7 +133,8 @@ const Contact = () => {
                 <div className="space-y-2">
                   <h2 className="text-3xl font-bold">Message Sent! 🎉</h2>
                   <p className="text-muted-foreground text-lg">
-                    Thank you for reaching out. Our team will get back to you within 24 hours.
+                    Thank you for reaching out. Our team will get back to you
+                    within 24 hours.
                   </p>
                 </div>
                 <Button
@@ -147,7 +152,10 @@ const Contact = () => {
             <div className="p-6 bg-card/50 rounded-lg border border-border">
               <div className="text-2xl mb-2">📧</div>
               <div className="font-semibold mb-1">Email Support</div>
-              <a href="mailto:support@mailflow.com" className="text-sm text-primary hover:underline">
+              <a
+                href="mailto:support@mailflow.com"
+                className="text-sm text-primary hover:underline"
+              >
                 support@mailflow.com
               </a>
             </div>

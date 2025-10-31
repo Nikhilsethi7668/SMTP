@@ -3,6 +3,7 @@ import { AppHeader } from '@/components/AppHeader'
 import { Button } from '@/components/ui/button'
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
 
 export const CreateCampaignForm: React.FC = () => {
     const navigate = useNavigate();
@@ -12,12 +13,12 @@ export const CreateCampaignForm: React.FC = () => {
     try {
       const response = await api.post("/campaigns",{ name: campaignName});
       if(response.data.success){
-        alert(`Campaign Created: ${campaignName}`)
+        toast.success(`Campaign Created: ${campaignName}`)
+        navigate(`/app/dashboard/campaigns/details?campaignName=${encodeURIComponent(campaignName)}`) // Navigate to campaign details page;
       }
     } catch (error) {
-      alert("Error occured")
+      toast.error(error?.response?.data?.message)
     }
-    navigate(`/app/dashboard/campaigns/details?campaignName=${encodeURIComponent(campaignName)}`) // Navigate to campaign details page;
   }
 
   const handleCancel = () => {

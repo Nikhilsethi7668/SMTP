@@ -3,22 +3,24 @@ import { Button } from "./ui/button";
 import { useNavigate } from "react-router-dom";
 import api from "@/axiosInstance";
 import { EmailTable } from "./EmailTable";
+import { toast } from "sonner";
 export const EmailAccounts = () => {
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
     const [emailsData, setEmailsData] = useState([]);
     const handleGetData = async () => {
       try {
-        const response = await api.get('/accounts');
+        setIsLoading(true)
+        const response = await api.get('/emails');
         if(response.data.success){
           setEmailsData(response.data.data);
-          console.log("Email accounts loaded:", response.data.data);
-        } else {
-          console.error("Failed to fetch accounts:", response.data.message);
-          setEmailsData([]);
+          setIsLoading(false);
         }
       } catch (error) {
-        console.error("Error fetching data:", error);
-        setEmailsData([]);
+         setIsLoading(false);
+        toast.error(error?.response?.data?.message || error as string)
+      }finally{
+         setIsLoading(false);
       }
     };
 
@@ -26,12 +28,10 @@ export const EmailAccounts = () => {
       try {
         const response = await api.patch(`/accounts/${emailId}/set-primary`);
         if(response.data.success){
-          alert("Email set as primary successfully");
-          await handleGetData(); // Refresh the data after setting primary
+          toast.success("Email set to primary");
         }
       } catch (error) {
-        console.log("Error occurred", error);
-        alert("Failed to set email as primary");
+        toast.error(error?.response?.data?.message || error as string);
       }
     };
     const handleDeleteUser = async (emailId: string) => {
@@ -65,20 +65,25 @@ export const EmailAccounts = () => {
         </div>
       </div>
       <div className="flex flex-col justify-center items-center">
-         {emailsData.length > 0 ? (
-          <EmailTable onSetPrimary={(emailId)=> handleSetPrimary(emailId)} onDeleteEmail={(emailId) => handleDeleteUser(emailId)} emails={emailsData} />
+        {isLoading ? (
+          <p>Loading the email account...</p>
         ):(
           <>
-            <img className="h-1/2 w-1/2"
-              src={
-                "https://app.instantly.ai/_next/static/images/pixeltrue-welcome_compressed-de11c441d5eab8a212aff473eef7558c.svg"
-              }
-              alt="img"
-            />
-            <p>Add an email account to get started</p>
+            {emailsData.length > 0 ? (
+              <EmailTable onSetPrimary={(email)=> handleSetPrimary(email)} onDeleteEmail={(value) => handleDeleteUser(value)} emails={emailsData} />
+            ): isLoading === false && (
+              <>
+                <img className="h-1/2 w-1/2"
+                  src={
+                    "https://app.instantly.ai/_next/static/images/pixeltrue-welcome_compressed-de11c441d5eab8a212aff473eef7558c.svg"
+                  }
+                  alt="img"
+                />
+                <p>Add an email account to get started</p>
+              </>
+            )}
           </>
         )}
-       
       </div>
     </div>
   );

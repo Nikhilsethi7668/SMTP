@@ -9,7 +9,9 @@ import { Badge } from "@/components/ui/badge";
 import { Mail, Github, ArrowLeft } from "lucide-react";
 import emailIllustration from "@/assets/email-platform-illustration.png";
 import api from "@/axiosInstance";
+import { useUserStore } from "../store/useUserStore";
 import { Spinner } from "@/components/ui/spinner";
+import { toast } from "sonner";
 const taglines = [
   "Deliver at scale. No limits.",
   "Trusted by developers and marketers alike.",
@@ -41,20 +43,32 @@ const Auth = () => {
     e.preventDefault();
     try {
       setIsLoading(true);
-      if(!email || !password){
-        alert("Please fill all required fields");
+      if (!email || !password) {
         throw new Error("Please fill all required feilds");
       }
-      const response = await api.post("/auth/login", {email,password});
-      if(response.status === 200){
-        console.log("Login successful");
+      const response = await api.post("/auth/login", { email, password });
+      if (response.status === 200) {
+        console.log(response.data.user);
+        const data = response.data.user;
+        useUserStore.getState().setUser({
+          user_id: data._id,
+          full_name: data.full_name,
+          username: data.username,
+          role: data.role,
+          email: data.email,
+          daily_quota: data.daily_quota,
+          monthly_quota: data.monthly_quota,
+          used_today: data.used_today,
+          used_month: data.used_month,
+          rate_limit: data.rate_limit,
+        });
         navigate("/app/dashboard/accounts");
       }
     } catch (error) {
-      alert("Login failed. Please try again.");
+      console.log(error);
+      toast.error(error?.response?.data?.message || (error as string));
       setIsLoading(false);
     }
-    console.log("Login attempt");
   };
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -62,12 +76,10 @@ const Auth = () => {
     e.preventDefault();
     console.log("Signup attempt");
     if (!email || !password || !fullName || !username || !confirmPassword) {
-      alert("Please fill all required fields");
       throw new Error("Please fill all required fields");
     }
     if (password !== confirmPassword) {
-      alert("Passwords do not match");
-      throw new Error("Passwords do not match");
+      throw new Error("Password and confrim password do not match");
     }
     try {
       const response = await api.post("/auth/signup", {
@@ -78,14 +90,14 @@ const Auth = () => {
         password,
       });
       if (response.status === 201) {
-        console.log("Signup successful, OTP sent to email");
         navigate(
-  `/verify-email?email=${encodeURIComponent(email)}&username=${encodeURIComponent(username)}`
-);
-
+          `/verify-email?email=${encodeURIComponent(
+            email
+          )}&username=${encodeURIComponent(username)}`
+        );
       }
     } catch (error) {
-      alert("Signup failed. Please try again.");
+      toast.error(error?.response?.data?.message || (error as string));
       console.error("Signup error:", error);
       setIsLoading(false);
     } finally {
@@ -95,7 +107,6 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-gradient-bg flex flex-col">
-      {/* Simple header with back button */}
       <div className="p-4">
         <button
           onClick={() => navigate("/")}
@@ -242,7 +253,7 @@ const Auth = () => {
                       <Button className="w-full font-bold uppercase tracking-wide transition-all hover:shadow-hover hover:-translate-y-0.5">
                         <Spinner />
                       </Button>
-                    ): (
+                    ) : (
                       <Button
                         type="submit"
                         className="w-full font-bold uppercase tracking-wide transition-all hover:shadow-hover hover:-translate-y-0.5"

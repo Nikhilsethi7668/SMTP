@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Contact from "./pages/Contact";
@@ -24,36 +25,132 @@ import { Crm } from "./pages/Crm";
 import CustomConnect from "./pages/account/CustomConnect";
 import SettingsPage from "./pages/settings/SettingsPage";
 
+import { ProtectedRoute } from "./ProtectedRoute";
+
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
-      <Sonner />
+      <Sonner position="top-center" richColors />
       <BrowserRouter>
         <Routes>
-          <Route path="/app/dashboard/accounts/verify" element={<VerifyUserEmail/>} />
-          <Route path="/app/dashboard/accounts/connect" element={<AccountConnect/>} />
-          <Route path="/app/dashboard/accounts/connect/custom" element={<CustomConnect/>} />
-          <Route path="/app/dashboard/accounts" element={<Dashboard/>} />
-          <Route path="/app/dashboard/contacts" element={<ContactsPage/>} />
-          <Route path="/app/dashboard/templates" element={<Template/>} />
-          <Route path="/app/dashboard/settings" element={<SettingsPage/>} />
-          <Route path="/app/dashboard/unibox" element={<UniBox/>} />
-          <Route path="/app/dashboard/campaigns" element={<Campaigns/>} />
-          <Route path="/app/dashboard/campaigns/details" element={<CampaignDetails/>} />
-          <Route path="/app/dashboard/campaigns/create" element={<CreateCampaignForm/>} />
+          {/* PUBLIC ROUTES */}
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/app/analytics" element={<Analytics />} />
-          <Route path="/app/crm" element={<Crm />} />
-          
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/verify-email" element={<EmailVerify />} />
+          <Route path="/keys" element={<ApiKeysPage />} />
+
+          {/* ✅ PROTECTED ROUTES */}
+          <Route
+            path="/app/dashboard/accounts/verify"
+            element={
+              <ProtectedRoute>
+                <VerifyUserEmail />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/dashboard/accounts/connect"
+            element={
+              <ProtectedRoute>
+                <AccountConnect />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/dashboard/accounts/connect/custom"
+            element={
+              <ProtectedRoute>
+                <CustomConnect />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/dashboard/accounts"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/dashboard/contacts"
+            element={
+              <ProtectedRoute>
+                <ContactsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/dashboard/templates"
+            element={
+              <ProtectedRoute>
+                <Template />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/dashboard/settings"
+            element={
+              <ProtectedRoute>
+                <Settings />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/dashboard/unibox"
+            element={
+              <ProtectedRoute>
+                <UniBox />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/dashboard/campaigns"
+            element={
+              <ProtectedRoute>
+                <Campaigns />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/dashboard/campaigns/details"
+            element={
+              <ProtectedRoute>
+                <CampaignDetails />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/dashboard/campaigns/create"
+            element={
+              <ProtectedRoute>
+                <CreateCampaignForm />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/analytics"
+            element={
+              <ProtectedRoute>
+                <Analytics />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/crm"
+            element={
+              <ProtectedRoute>
+                <Crm />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* CATCH-ALL */}
           <Route path="*" element={<NotFound />} />
-          <Route path="/verify-email" element={<EmailVerify/>} />
-          <Route path="/keys" element={<ApiKeysPage/>} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

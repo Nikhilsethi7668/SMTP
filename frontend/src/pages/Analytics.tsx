@@ -123,7 +123,7 @@ export default function Analytics() {
         const allOption = { _id: "all", name: "All Campaigns" };
         setCampaigns([allOption, ...res.data.campaigns]);
       } catch (err) {
-        console.error("Failed to fetch campaigns:", err);
+        toast.error(err?.response?.data?.message);
       }
     };
     fetchCampaigns();
@@ -134,13 +134,17 @@ export default function Analytics() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const res = await api.get("/campaigns/metrics", {
-          params: { campaignId: selectedCampaign === "all" ? undefined : selectedCampaign },
-        });
-
+        let res: any;
+        if (selectedCampaign === "all") {
+          res = await api.get("/campaigns/metrics/all");
+        } else {
+          res = await api.get("/campaigns/metrics", {
+            params: { campaignId: selectedCampaign },
+          });
+        }
         setMetrics(res.data.data);
       } catch (error) {
-        console.error("Error fetching metrics:", error);
+        toast.error(error?.response?.data?.message);
       } finally {
         setLoading(false);
       }
@@ -161,39 +165,27 @@ export default function Analytics() {
     },
     {
       title: "Open Rate",
-      value: metrics?.openRate
-        ? `${metrics.openRate.toFixed(1)}%`
-        : "0%",
+      value: metrics?.openRate ? `${metrics.openRate.toFixed(1)}%` : "0%",
       icon: MousePointer,
-      trend: metrics?.openRateChange
-        ? `${metrics.openRateChange}%`
-        : "+0%",
+      trend: metrics?.openRateChange ? `${metrics.openRateChange}%` : "+0%",
       trendUp: metrics?.openRateChange >= 0,
       accentColor: "bg-success/10",
       tooltip: "Percentage of recipients who opened your emails",
     },
     {
       title: "Click Rate",
-      value: metrics?.clickRate
-        ? `${metrics.clickRate.toFixed(1)}%`
-        : "0%",
+      value: metrics?.clickRate ? `${metrics.clickRate.toFixed(1)}%` : "0%",
       icon: Target,
-      trend: metrics?.clickRateChange
-        ? `${metrics.clickRateChange}%`
-        : "+0%",
+      trend: metrics?.clickRateChange ? `${metrics.clickRateChange}%` : "+0%",
       trendUp: metrics?.clickRateChange >= 0,
       accentColor: "bg-warning/10",
       tooltip: "Percentage of recipients who clicked links in your emails",
     },
     {
       title: "Reply Rate",
-      value: metrics?.replyRate
-        ? `${metrics.replyRate.toFixed(1)}%`
-        : "0%",
+      value: metrics?.replyRate ? `${metrics.replyRate.toFixed(1)}%` : "0%",
       icon: Reply,
-      trend: metrics?.replyRateChange
-        ? `${metrics.replyRateChange}%`
-        : "-0%",
+      trend: metrics?.replyRateChange ? `${metrics.replyRateChange}%` : "-0%",
       trendUp: metrics?.replyRateChange >= 0,
       accentColor: "bg-accent/10",
       tooltip: "Percentage of recipients who replied to your emails",
@@ -207,8 +199,7 @@ export default function Analytics() {
         : "+0%",
       trendUp: metrics?.opportunitiesChange >= 0,
       accentColor: "bg-primary/10",
-      tooltip:
-        "Number of qualified opportunities generated from campaigns",
+      tooltip: "Number of qualified opportunities generated from campaigns",
     },
   ];
 
@@ -236,14 +227,14 @@ export default function Analytics() {
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
               <div>
                 <h1 className="text-3xl font-bold tracking-tight">
-                  Analytics Dashboard {" "} {selectedCampaign !== "all" && (
-    <span>
-      {" - "}
-      {
-        campaigns.find((c) => c._id === selectedCampaign)?.name || ""
-      }
-    </span>
-  )}
+                  Analytics Dashboard{" "}
+                  {selectedCampaign !== "all" && (
+                    <span>
+                      {" - "}
+                      {campaigns.find((c) => c._id === selectedCampaign)
+                        ?.name || ""}
+                    </span>
+                  )}
                 </h1>
                 <p className="text-muted-foreground mt-1">
                   Track your email campaign performance
@@ -267,11 +258,19 @@ export default function Analytics() {
                   </SelectContent>
                 </Select>
 
-                <Button onClick={()=> toast.info("Feature coming soon")} variant="outline" size="icon">
+                <Button
+                  onClick={() => toast.info("Feature coming soon")}
+                  variant="outline"
+                  size="icon"
+                >
                   <Share2 className="h-4 w-4" />
                 </Button>
 
-                <Button  onClick={()=> toast.info("Feature coming soon")} variant="outline" size="icon">
+                <Button
+                  onClick={() => toast.info("Feature coming soon")}
+                  variant="outline"
+                  size="icon"
+                >
                   <Settings className="h-4 w-4" />
                 </Button>
               </div>
@@ -321,8 +320,7 @@ export default function Analytics() {
                         backgroundColor: "hsl(var(--card))",
                         border: "1px solid hsl(var(--border))",
                         borderRadius: "8px",
-                        boxShadow:
-                          "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                        boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
                       }}
                     />
                     <Legend wrapperStyle={{ paddingTop: "20px" }} />

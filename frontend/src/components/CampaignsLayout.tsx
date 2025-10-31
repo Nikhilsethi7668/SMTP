@@ -1,8 +1,14 @@
-import React, { useEffect, useState } from 'react'
-import { Button } from './ui/button'
-import { Dropdown } from './Dropdown'
-import { useNavigate } from 'react-router-dom'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useEffect, useState } from "react";
+import { Button } from "./ui/button";
+import { Dropdown } from "./Dropdown";
+import { useNavigate } from "react-router-dom";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -11,44 +17,45 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Campaign, CampaignTable } from './Campaigntable'
-import api from '@/axiosInstance';
+import { Campaign, CampaignTable } from "./Campaigntable";
+import api from "@/axiosInstance";
+import { toast } from "sonner";
 export const CampaignsLayout: React.FC = () => {
-    const navigate = useNavigate();
-     const [selectedCampaign, setSelectedCampaign] = useState<any>(null);
-  const [search, setSearch] = useState<string>('')
-  const [type, setType] = useState<string>('All Types')
-  const [status, setStatus] = useState<string>('All Status');
+  const navigate = useNavigate();
+  const [selectedCampaign, setSelectedCampaign] = useState<any>(null);
+  const [search, setSearch] = useState<string>("");
+  const [type, setType] = useState<string>("All Types");
+  const [status, setStatus] = useState<string>("All Status");
   const [campaignsData, setCampaignsData] = useState([]);
   const [open, setOpen] = useState(false);
 
-const handleGetData = async () => {
-  try {
-    const response = await api.get("/campaigns");
-    if(response.data.success){
-      setCampaignsData(response.data.campaigns)
+  const handleGetData = async () => {
+    try {
+      const response = await api.get("/campaigns");
+      if (response.data.success) {
+        setCampaignsData(response.data.campaigns);
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error as string)
     }
-  } catch (error) {
-    console.log("error occured",error)
-  }
-};
-useEffect(() => {
-  handleGetData();
-}, [])
+  };
+  useEffect(() => {
+    handleGetData();
+  }, []);
 
-const handleAction = (val: string, campaign: any) => {
+  const handleAction = (val: string, campaign: any) => {
     switch (val) {
       case "edit":
         console.log("edit called", campaign);
-        setSelectedCampaign(campaign); // store the clicked campaign
-        setOpen(true); // open the dialog
+        setSelectedCampaign(campaign); 
+        setOpen(true); 
         break;
 
       default:
         break;
     }
   };
-   const handleSave = () => {
+  const handleSave = () => {
     console.log("Saving changes for:", selectedCampaign);
     setOpen(false);
   };
@@ -72,10 +79,12 @@ const handleAction = (val: string, campaign: any) => {
 
         {/* Actions */}
         <div className="flex gap-4 items-center">
-
           {/* Import & Add New */}
           <div className="flex gap-4 md:gap-6 items-center">
-            <Button onClick={()=> navigate("/app/dashboard/campaigns/create")} className="bg-gradient-primary text-white">
+            <Button
+              onClick={() => navigate("/app/dashboard/campaigns/create")}
+              className="bg-gradient-primary text-white"
+            >
               + Add New
             </Button>
           </div>
@@ -85,24 +94,25 @@ const handleAction = (val: string, campaign: any) => {
       {/* Campaigns Table Placeholder */}
       <div className="p-4 text-center text-gray-500 rounded">
         {campaignsData.length > 0 ? (
-  <Card>
-    <CardHeader>
-      <CardTitle>Campaign Overview</CardTitle>
-      <CardDescription>Manage and monitor all your email campaigns</CardDescription>
-    </CardHeader>
-    <CardContent>
-      <CampaignTable
-        onAction={handleAction}
-        campaigns={campaignsData.filter((c: any) =>
-          c.name.toLowerCase().includes(search.toLowerCase())
+          <Card>
+            <CardHeader>
+              <CardTitle>Campaign Overview</CardTitle>
+              <CardDescription>
+                Manage and monitor all your email campaigns
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <CampaignTable
+                onAction={handleAction}
+                campaigns={campaignsData.filter((c: any) =>
+                  c.name.toLowerCase().includes(search.toLowerCase())
+                )}
+              />
+            </CardContent>
+          </Card>
+        ) : (
+          <p>No campaigns created yet</p>
         )}
-      />
-    </CardContent>
-  </Card>
-) : (
-  <p>No campaigns created yet</p>
-)}
-
       </div>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
@@ -140,5 +150,5 @@ const handleAction = (val: string, campaign: any) => {
         </DialogContent>
       </Dialog>
     </div>
-  )
-}
+  );
+};

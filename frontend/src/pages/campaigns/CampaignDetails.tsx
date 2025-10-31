@@ -12,6 +12,7 @@ import { CampaignSequences } from "@/components/CampaignSequences";
 import api from "@/axiosInstance";
 import ScheduleManager from "@/components/ScheduleManager";
 import CampaignSettings from "@/components/CampaignSettings";
+import { toast } from "sonner";
 
 export const CampaignDetails = () => {
     const campaigns = 
@@ -55,15 +56,14 @@ export const CampaignDetails = () => {
     metrics_complaints: 0,
     updatedAt: new Date().toISOString(),
   })
-  const handleGetAnalyticsData = async (id) => {
+  const handleGetAnalyticsData = async (id: string) => {
     try {
         const response = await api.get(`campaigns/${id}`);
         if(response.data.success){
-            console.log(response)
             setCampaignDetails(response.data.data)
         }
     } catch (error) {
-        console.log(error)
+       toast.error(error?.response?.data?.message)
     }
   }
   const renderTabContent = () => {

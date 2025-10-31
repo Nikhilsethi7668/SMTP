@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Mail, ArrowRight, CheckCircle2, ArrowLeft } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import api from "@/axiosInstance";
+import { toast } from "sonner";
 export default function EmailVerify() {
   const navigate = useNavigate();
   const query = new URLSearchParams(useLocation().search);
@@ -27,7 +28,7 @@ export default function EmailVerify() {
         setStep("otp");
       } catch (error) {
         console.error("Error sending OTP:", error);
-        alert("Failed to send OTP. Please try again.");
+        toast.error("Failed to send OTP. Please try again.");
       }
     }
   };
@@ -50,15 +51,14 @@ export default function EmailVerify() {
         purpose: "email_verification"}
       );
       if (response.data.success) {
-        alert("Email verified successfully! You can now log in.");
+        toast.success("Email verified successfully! You can now log in.");
         navigate("/app/dashboard/accounts");
       } else {
-        alert(`Verification failed: ${response.data.message}`);
+        toast.error(`Verification failed: ${response?.data?.message}`);
       }
     } catch (error) {
-      
+      toast.error(error?.response?.data?.message)
     }
-    alert(`Verifying OTP: ${otp.join("")} for ${email}`);
   };
 
   return (

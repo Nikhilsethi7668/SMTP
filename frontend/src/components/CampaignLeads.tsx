@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import CsvUploader from "./CsvUploader";
+import { toast } from "sonner";
 
 interface LeadEmail {
   _id: string;
@@ -45,7 +46,7 @@ export const CampaignLeads = ({ campaignId, campaignName }: { campaignId: string
         setLeadsData(response.data.data);
       }
     } catch (error) {
-      console.log(error);
+      toast.error(error?.response?.data?.message);
     }
   };
 
@@ -84,8 +85,8 @@ export const CampaignLeads = ({ campaignId, campaignName }: { campaignId: string
         setVerifyEmail(false);
       }
     } catch (error) {
-      console.log(error);
-      alert("Failed to add lead.");
+      console.error(error);
+      toast.error("Failed to add lead.");
     } finally {
       setLoading(false);
     }

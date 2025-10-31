@@ -12,12 +12,7 @@ import {
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-  TooltipProvider,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 
 const navigationItems = [
   { name: "Dashboard", icon: Home, path: "/app/dashboard/accounts" },
@@ -38,11 +33,11 @@ export const SideBar = ({ collapsed }: SideBarProps) => {
   return (
     <aside
       className={cn(
-        "relative left-0 top-0 h-[calc(100vh-4rem)] bg-card border-r border-border transition-all duration-300",
+        "relative left-0 top-0 h-[calc(100vh-4rem)] border-r border-border bg-card transition-all duration-300",
         collapsed ? "w-16" : "w-64"
       )}
     >
-      <nav className="p-4 space-y-2">
+      <nav className="space-y-2 p-4">
         <TooltipProvider>
           {navigationItems.map((item) => {
             const Icon = item.icon;
@@ -53,11 +48,9 @@ export const SideBar = ({ collapsed }: SideBarProps) => {
                     to={item.path}
                     className={({ isActive }) =>
                       cn(
-                        "flex items-center justify-center p-3 rounded-lg transition-all duration-200",
+                        "flex items-center justify-center rounded-lg p-3 transition-all duration-200",
                         "hover:bg-accent hover:text-accent-foreground",
-                        isActive
-                          ? "bg-primary/10 text-primary"
-                          : "text-muted-foreground"
+                        isActive ? "bg-primary/10 text-primary" : "text-muted-foreground"
                       )
                     }
                   >
@@ -81,10 +74,10 @@ export const SideBar = ({ collapsed }: SideBarProps) => {
                 to={item.path}
                 className={({ isActive }) =>
                   cn(
-                    "flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200",
+                    "flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-200",
                     "hover:bg-accent hover:text-accent-foreground",
                     isActive
-                      ? "bg-primary/10 text-primary font-medium border-l-4 border-primary"
+                      ? "border-l-4 border-primary bg-primary/10 font-medium text-primary"
                       : "text-muted-foreground"
                   )
                 }

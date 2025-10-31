@@ -142,7 +142,7 @@ const App = () => (
               </ProtectedRoute>
             }
           />
-           <Route
+          <Route
             path="/app/domains"
             element={
               <ProtectedRoute>
@@ -151,10 +151,13 @@ const App = () => (
             }
           />
           <Route
-          path="/app/email-accounts"
-          element={<ProtectedRoute>
-            <EmailAccounts/>
-          </ProtectedRoute>}/>
+            path="/app/email-accounts"
+            element={
+              <ProtectedRoute>
+                <EmailAccounts />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/app/crm"
             element={

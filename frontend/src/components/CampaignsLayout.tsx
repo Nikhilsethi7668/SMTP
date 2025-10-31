@@ -2,13 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { Dropdown } from "./Dropdown";
 import { useNavigate } from "react-router-dom";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -36,7 +30,7 @@ export const CampaignsLayout: React.FC = () => {
         setCampaignsData(response.data.campaigns);
       }
     } catch (error) {
-      toast.error(error?.response?.data?.message || error as string)
+      toast.error(error?.response?.data?.message || (error as string));
     }
   };
   useEffect(() => {
@@ -47,8 +41,8 @@ export const CampaignsLayout: React.FC = () => {
     switch (val) {
       case "edit":
         console.log("edit called", campaign);
-        setSelectedCampaign(campaign); 
-        setOpen(true); 
+        setSelectedCampaign(campaign);
+        setOpen(true);
         break;
 
       default:
@@ -62,25 +56,25 @@ export const CampaignsLayout: React.FC = () => {
   return (
     <div>
       {/* Header */}
-      <div className="text-2xl font-bold mb-4 border-b pb-2">
+      <div className="mb-4 border-b pb-2 text-2xl font-bold">
         <p>Campaigns</p>
       </div>
 
       {/* Toolbar */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+      <div className="mb-6 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
         {/* Search Bar */}
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search campaigns..."
-          className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primaryColor w-full md:w-64"
+          className="w-full rounded border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primaryColor md:w-64"
         />
 
         {/* Actions */}
-        <div className="flex gap-4 items-center">
+        <div className="flex items-center gap-4">
           {/* Import & Add New */}
-          <div className="flex gap-4 md:gap-6 items-center">
+          <div className="flex items-center gap-4 md:gap-6">
             <Button
               onClick={() => navigate("/app/dashboard/campaigns/create")}
               className="bg-gradient-primary text-white"
@@ -92,14 +86,12 @@ export const CampaignsLayout: React.FC = () => {
       </div>
 
       {/* Campaigns Table Placeholder */}
-      <div className="p-4 text-center text-gray-500 rounded">
+      <div className="rounded p-4 text-center text-gray-500">
         {campaignsData.length > 0 ? (
           <Card>
             <CardHeader>
               <CardTitle>Campaign Overview</CardTitle>
-              <CardDescription>
-                Manage and monitor all your email campaigns
-              </CardDescription>
+              <CardDescription>Manage and monitor all your email campaigns</CardDescription>
             </CardHeader>
             <CardContent>
               <CampaignTable
@@ -124,12 +116,12 @@ export const CampaignsLayout: React.FC = () => {
           </DialogHeader>
 
           {/* Example Form Inputs */}
-          <div className="space-y-4 mt-4">
+          <div className="mt-4 space-y-4">
             <label className="flex flex-col">
               <span className="text-sm font-medium">Campaign Name</span>
               <input
                 type="text"
-                className="border rounded-md p-2"
+                className="rounded-md border p-2"
                 value={selectedCampaign?.name || ""}
                 onChange={(e) =>
                   setSelectedCampaign({

@@ -15,8 +15,8 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
   // ✅ If no user, show message box instead of instant redirect
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-4">
-        <Card className="max-w-md w-full text-center p-6 shadow-lg border border-border">
+      <div className="flex min-h-screen items-center justify-center bg-background px-4">
+        <Card className="w-full max-w-md border border-border p-6 text-center shadow-lg">
           <CardHeader>
             <CardTitle className="text-2xl font-semibold">Access Denied</CardTitle>
             <CardDescription className="mt-2 text-muted-foreground">
@@ -36,8 +36,8 @@ export const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) 
   // ✅ Role-based restriction (optional)
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-4">
-        <Card className="max-w-md w-full text-center p-6 shadow-lg border border-border">
+      <div className="flex min-h-screen items-center justify-center bg-background px-4">
+        <Card className="w-full max-w-md border border-border p-6 text-center shadow-lg">
           <CardHeader>
             <CardTitle className="text-2xl font-semibold">Unauthorized</CardTitle>
             <CardDescription className="mt-2 text-muted-foreground">

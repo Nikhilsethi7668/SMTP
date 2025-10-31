@@ -9,10 +9,8 @@ export const Campaigns = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = React.useState(false);
 
   return (
-    <div className="h-screen w-screen flex flex-col">
-      <Header
-        onToggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-      />
+    <div className="flex h-screen w-screen flex-col">
+      <Header onToggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)} />
 
       <div className="flex flex-1 overflow-hidden">
         <SideBar collapsed={isSidebarCollapsed} />

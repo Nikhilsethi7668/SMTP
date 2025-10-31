@@ -25,6 +25,8 @@ import { Crm } from "./pages/Crm";
 import CustomConnect from "./pages/account/CustomConnect";
 
 import { ProtectedRoute } from "./ProtectedRoute";
+import EmailAccounts from "./pages/EmailAccounts";
+import Domain from "./pages/Domain";
 
 const queryClient = new QueryClient();
 
@@ -139,6 +141,19 @@ const App = () => (
               </ProtectedRoute>
             }
           />
+           <Route
+            path="/app/domains"
+            element={
+              <ProtectedRoute>
+                <Domain />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+          path="/app/email-accounts"
+          element={<ProtectedRoute>
+            <EmailAccounts/>
+          </ProtectedRoute>}/>
           <Route
             path="/app/crm"
             element={

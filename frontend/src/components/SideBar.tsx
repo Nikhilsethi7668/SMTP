@@ -4,7 +4,11 @@ import {
   Users,
   FileText,
   BarChart3,
+  Inbox,
+  LineChart,
+  UserCog,
   Settings,
+  Globe,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -16,11 +20,13 @@ import {
 } from "@/components/ui/tooltip";
 
 const navigationItems = [
-  { name: "Accounts", icon: Home, path: "/app/dashboard/accounts" },
+  { name: "Dashboard", icon: Home, path: "/app/dashboard/accounts" },
   { name: "Campaigns", icon: Mail, path: "/app/dashboard/campaigns" },
-  { name: "UniBox", icon: Mail, path: "/app/dashboard/unibox" },
-  { name: "Analytics", icon: BarChart3, path: "/app/analytics" },
-  { name: "CRM", icon: Mail, path: "/app/crm" },
+  { name: "Email Accounts", icon: UserCog, path: "/app/email-accounts" },
+  { name: "UniBox", icon: Inbox, path: "/app/dashboard/unibox" },
+  { name: "Analytics", icon: LineChart, path: "/app/analytics" },
+  { name: "Domains", icon: Globe, path: "/app/domains" },
+  { name: "CRM", icon: BarChart3, path: "/app/crm" },
   { name: "Settings", icon: Settings, path: "/app/dashboard/settings" },
 ];
 

@@ -1,7 +1,7 @@
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { Settings, LayoutGrid, Mail, Truck } from "lucide-react";
 
-const cardVariants = {
+const cardVariants: Variants = {
   hidden: {
     opacity: 0,
     rotateX: 75,
@@ -16,7 +16,7 @@ const cardVariants = {
     scale: 1,
     transition: {
       delay: i * 0.15,
-      type: "spring",
+      type: "spring" as const,
       stiffness: 120,
       damping: 14,
     },

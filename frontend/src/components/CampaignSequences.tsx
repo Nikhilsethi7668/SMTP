@@ -112,12 +112,14 @@ export const CampaignSequences = () => {
   return (
     <div className="flex h-[calc(100vh-80px)] bg-gray-50">
       {/* Left Panel */}
-      <div className="w-1/3 border-r bg-white p-4 overflow-y-auto">
+      <div className="w-1/3 overflow-y-auto border-r bg-white p-4">
         {steps.map((step) => (
           <Card
             key={step.id}
-            className={`mb-4 transition-all cursor-pointer border-2 ${
-              step.id === selected.stepId ? "border-blue-500 shadow-md" : "border-transparent hover:border-gray-300"
+            className={`mb-4 cursor-pointer border-2 transition-all ${
+              step.id === selected.stepId
+                ? "border-blue-500 shadow-md"
+                : "border-transparent hover:border-gray-300"
             }`}
             onClick={() =>
               setSelected({
@@ -127,7 +129,7 @@ export const CampaignSequences = () => {
             }
           >
             <CardContent className="p-4">
-              <div className="flex justify-between items-center">
+              <div className="flex items-center justify-between">
                 <h3 className="font-medium text-gray-800">{step.name}</h3>
                 <Button
                   variant="ghost"
@@ -144,8 +146,10 @@ export const CampaignSequences = () => {
                 {step.variants.map((v) => (
                   <div
                     key={v.id}
-                    className={`flex justify-between items-center p-2 rounded-md border text-sm truncate cursor-pointer ${
-                      v.id === selected.variantId ? "border-blue-500 bg-blue-50 text-blue-700" : "border-gray-200 hover:bg-gray-100"
+                    className={`flex cursor-pointer items-center justify-between truncate rounded-md border p-2 text-sm ${
+                      v.id === selected.variantId
+                        ? "border-blue-500 bg-blue-50 text-blue-700"
+                        : "border-gray-200 hover:bg-gray-100"
                     }`}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -174,15 +178,19 @@ export const CampaignSequences = () => {
                   size="sm"
                   className="w-full text-blue-600"
                 >
-                  <Plus className="h-4 w-4 mr-1" /> Add variant
+                  <Plus className="mr-1 h-4 w-4" /> Add variant
                 </Button>
               </div>
             </CardContent>
           </Card>
         ))}
 
-        <Button onClick={addStep} variant="outline" className="w-full border-dashed border-gray-400">
-          <Plus className="h-4 w-4 mr-1" /> Add step
+        <Button
+          onClick={addStep}
+          variant="outline"
+          className="w-full border-dashed border-gray-400"
+        >
+          <Plus className="mr-1 h-4 w-4" /> Add step
         </Button>
       </div>
 
@@ -190,34 +198,36 @@ export const CampaignSequences = () => {
       <div className="flex-1 bg-white p-8 shadow-inner">
         {selectedVariant ? (
           <div>
-            <div className="flex justify-between items-center border-b pb-4 mb-4">
+            <div className="mb-4 flex items-center justify-between border-b pb-4">
               <div className="flex-1">
                 <input
                   type="text"
                   value={selectedVariant.subject}
                   onChange={(e) => updateVariant("subject", e.target.value)}
-                  className="w-full p-2 border rounded-md mb-2"
+                  className="mb-2 w-full rounded-md border p-2"
                   placeholder="Subject"
                 />
                 <textarea
                   value={selectedVariant.body}
                   onChange={(e) => updateVariant("body", e.target.value)}
-                  className="w-full p-2 border rounded-md h-64"
+                  className="h-64 w-full rounded-md border p-2"
                   placeholder="Start typing your email content here..."
                 />
               </div>
-              <div className="flex gap-2 ml-4">
+              <div className="ml-4 flex gap-2">
                 <Button variant="ghost" size="sm">
-                  <Eye className="h-4 w-4 mr-1" /> Preview
+                  <Eye className="mr-1 h-4 w-4" /> Preview
                 </Button>
                 <Button variant="ghost" size="sm">
-                  <Zap className="h-4 w-4 mr-1" /> Test
+                  <Zap className="mr-1 h-4 w-4" /> Test
                 </Button>
               </div>
             </div>
           </div>
         ) : (
-          <div className="text-gray-500 text-center mt-20">Select a step or variant to preview.</div>
+          <div className="mt-20 text-center text-gray-500">
+            Select a step or variant to preview.
+          </div>
         )}
       </div>
     </div>

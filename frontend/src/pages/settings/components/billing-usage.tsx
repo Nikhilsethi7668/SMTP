@@ -1,20 +1,20 @@
-import { useState } from "react"
-import { BillingSection } from "./billing-section"
-import { PaymentSection } from "./payment-section"
-import { InvoicesSection } from "./invoices-section"
-import { EmailAccountsSection } from "./email-accounts-section"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import { BillingSection } from "./billing-section";
+import { PaymentSection } from "./payment-section";
+import { InvoicesSection } from "./invoices-section";
+import { EmailAccountsSection } from "./email-accounts-section";
+import { Button } from "@/components/ui/button";
 
-type BillingSubTab = "billing" | "payment" | "invoices" | "email"
+type BillingSubTab = "billing" | "payment" | "invoices" | "email";
 
 export function BillingUsage() {
-  const [activeSubTab, setActiveSubTab] = useState<BillingSubTab>("billing")
+  const [activeSubTab, setActiveSubTab] = useState<BillingSubTab>("billing");
 
   const subTabs: { id: BillingSubTab; label: string }[] = [
     { id: "billing", label: "Billing" },
     { id: "payment", label: "Payment & Invoices" },
     { id: "email", label: "Email accounts & Domains" },
-  ]
+  ];
 
   return (
     <div className="space-y-6">
@@ -26,7 +26,7 @@ export function BillingUsage() {
               variant={activeSubTab === tab.id ? "default" : "ghost"}
               key={tab.id}
               onClick={() => setActiveSubTab(tab.id)}
-              className={`w-full text-left px-3 py-3 justify-start rounded-lg font-medium transition-colors`}
+              className={`w-full justify-start rounded-lg px-3 py-3 text-left font-medium transition-colors`}
             >
               {tab.label}
             </Button>
@@ -42,5 +42,5 @@ export function BillingUsage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

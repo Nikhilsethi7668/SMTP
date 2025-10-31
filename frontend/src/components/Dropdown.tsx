@@ -1,16 +1,16 @@
-import * as React from 'react'
+import * as React from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu' // Adjust import path if needed
-import { Button } from './ui/button'
+} from "@/components/ui/dropdown-menu"; // Adjust import path if needed
+import { Button } from "./ui/button";
 
 interface DropdownProps {
-  options: string[]
-  value: string
-  onChange: (value: string) => void
+  options: string[];
+  value: string;
+  onChange: (value: string) => void;
 }
 
 export const Dropdown: React.FC<DropdownProps> = ({ options, value, onChange }) => {
@@ -24,12 +24,12 @@ export const Dropdown: React.FC<DropdownProps> = ({ options, value, onChange }) 
           <DropdownMenuItem
             key={index}
             onClick={() => onChange(option)}
-            className={option === value ? 'font-bold' : ''}
+            className={option === value ? "font-bold" : ""}
           >
             {option}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
     </DropdownMenu>
-  )
-}
+  );
+};

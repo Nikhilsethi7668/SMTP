@@ -54,11 +54,13 @@ const Unibox: React.FC = () => {
     const fetchIncomingEmails = async () => {
       setLoading(true);
       try {
-          // Fetch all emails
-          const response = await api.get(`/incoming-emails?showUnread=${showUnread}&${selectedCampaign==="All Campaigns" ? '' : `campaign=${selectedCampaign}`}`);
-          if (response.data.success) {
-            setIncomingEmails(response.data.data);
-          }
+        // Fetch all emails
+        const response = await api.get(
+          `/incoming-emails?showUnread=${showUnread}&${selectedCampaign === "All Campaigns" ? "" : `campaign=${selectedCampaign}`}`
+        );
+        if (response.data.success) {
+          setIncomingEmails(response.data.data);
+        }
       } catch (error) {
         console.error("Error fetching incoming emails:", error);
         setIncomingEmails([]);
@@ -82,7 +84,7 @@ const Unibox: React.FC = () => {
   const [activeTab, setActiveTab] = React.useState<"primary" | "others">("primary");
 
   return (
-    <div className="h-screen w-screen flex flex-col">
+    <div className="flex h-screen w-screen flex-col">
       {/* Header */}
       <Header onToggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)} />
 
@@ -91,21 +93,18 @@ const Unibox: React.FC = () => {
         <SideBar collapsed={isSidebarCollapsed} />
 
         {/* Main Content */}
-        <div className="flex-1 overflow-auto p-6 flex">
+        <div className="flex flex-1 overflow-auto p-6">
           {/* Left Column (Campaign list + More) */}
-          <aside className="w-64 border-r bg-white rounded-lg shadow-sm flex flex-col">
-            <div className="p-4 font-semibold text-lg border-b">
-              All Campaigns
-            </div>
+          <aside className="flex w-64 flex-col rounded-lg border-r bg-white shadow-sm">
+            <div className="border-b p-4 text-lg font-semibold">All Campaigns</div>
 
             {/* Campaign List */}
             <div className="flex-1 overflow-y-auto">
               <button
                 onClick={() => setSelectedCampaign("All Campaigns")}
                 className={cn(
-                  "w-full text-left px-4 py-2 hover:bg-gray-100 transition",
-                  selectedCampaign === "All Campaigns" &&
-                    "bg-blue-50 text-blue-600 font-medium"
+                  "w-full px-4 py-2 text-left transition hover:bg-gray-100",
+                  selectedCampaign === "All Campaigns" && "bg-blue-50 font-medium text-blue-600"
                 )}
               >
                 All Campaigns
@@ -115,9 +114,8 @@ const Unibox: React.FC = () => {
                   key={campaign._id}
                   onClick={() => setSelectedCampaign(campaign._id)}
                   className={cn(
-                    "w-full text-left px-4 py-2 hover:bg-gray-100 transition",
-                    selectedCampaign === campaign._id &&
-                      "bg-blue-50 text-blue-600 font-medium"
+                    "w-full px-4 py-2 text-left transition hover:bg-gray-100",
+                    selectedCampaign === campaign._id && "bg-blue-50 font-medium text-blue-600"
                   )}
                 >
                   {campaign.name}
@@ -126,116 +124,113 @@ const Unibox: React.FC = () => {
             </div>
 
             {/* More Section */}
-            <div className="border-t p-3 space-y-1">
-              <div className="text-sm font-medium text-gray-500 mb-1">More</div>
+            <div className="space-y-1 border-t p-3">
+              <div className="mb-1 text-sm font-medium text-gray-500">More</div>
 
-<div className="flex items-center justify-between gap-2">
-<p>Unread</p><Switch defaultChecked={false} onCheckedChange={(checked) => setShowUnread(checked as boolean)} />
-
-</div>
+              <div className="flex items-center justify-between gap-2">
+                <p>Unread</p>
+                <Switch
+                  defaultChecked={false}
+                  onCheckedChange={(checked) => setShowUnread(checked as boolean)}
+                />
+              </div>
             </div>
           </aside>
           {/* left column second */}
-        <aside className="w-64 border-r bg-white rounded-lg shadow-sm flex flex-col">
-      <div className="w-full bg-white rounded-lg shadow-sm border border-gray-100 p-3">
-        {/* Tabs */}
-        <div className="flex pb-2 border-b mb-3 gap-3">
-          <Button
-          size="sm"
-          variant={activeTab === "primary" ? "default" : "outline"}
-            onClick={() => setActiveTab("primary")}
-          >
-            Primary
-          </Button>
-          <Button
-          size="sm"
-          variant={activeTab === "others" ? "default" : "outline"}
-            onClick={() => setActiveTab("others")}
-          >
-            Others
-          </Button>
-        </div>
-
-        {/* Search box */}
-        <div className="relative mb-3">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search mail"
-            className="w-full pl-9 pr-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-          />
-        </div>
-
-        {/* Mail list */}
-        {activeTab === "primary" ? (
-          <div>
-            {incomingEmails.length === 0 ? (
-              <div className="text-center py-6 text-sm text-gray-400">No emails</div>
-            ) : (
-              incomingEmails.map((email) => (
-                <div
-                  key={email._id}
-                  onClick={() => setSelectedEmail(email)}
-                  className={cn(
-                    "relative pl-3 py-2 cursor-pointer border-l-2 transition",
-                    selectedEmail?._id === email._id
-                      ? "border-blue-600 bg-blue-50/40"
-                      : "border-transparent hover:bg-gray-50"
-                  )}
+          <aside className="flex w-64 flex-col rounded-lg border-r bg-white shadow-sm">
+            <div className="w-full rounded-lg border border-gray-100 bg-white p-3 shadow-sm">
+              {/* Tabs */}
+              <div className="mb-3 flex gap-3 border-b pb-2">
+                <Button
+                  size="sm"
+                  variant={activeTab === "primary" ? "default" : "outline"}
+                  onClick={() => setActiveTab("primary")}
                 >
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2 min-w-0 flex-1">
-                      <input type="checkbox" className="accent-blue-600" />
-                      <p className="text-sm font-semibold text-gray-800 truncate">
-                        {email.from}
-                      </p>
-                    </div>
-                    <span className="text-xs text-gray-400 whitespace-nowrap flex-shrink-0">
-                      {new Date(email.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
+                  Primary
+                </Button>
+                <Button
+                  size="sm"
+                  variant={activeTab === "others" ? "default" : "outline"}
+                  onClick={() => setActiveTab("others")}
+                >
+                  Others
+                </Button>
+              </div>
 
-                  <p className="text-sm font-medium mt-1 truncate">{email.subject}</p>
-                  <p className="text-xs text-gray-500 mt-1 line-clamp-1">{email.body}</p>
+              {/* Search box */}
+              <div className="relative mb-3">
+                <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search mail"
+                  className="w-full rounded-md border py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+
+              {/* Mail list */}
+              {activeTab === "primary" ? (
+                <div>
+                  {incomingEmails.length === 0 ? (
+                    <div className="py-6 text-center text-sm text-gray-400">No emails</div>
+                  ) : (
+                    incomingEmails.map((email) => (
+                      <div
+                        key={email._id}
+                        onClick={() => setSelectedEmail(email)}
+                        className={cn(
+                          "relative cursor-pointer border-l-2 py-2 pl-3 transition",
+                          selectedEmail?._id === email._id
+                            ? "border-blue-600 bg-blue-50/40"
+                            : "border-transparent hover:bg-gray-50"
+                        )}
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex min-w-0 flex-1 items-center gap-2">
+                            <input type="checkbox" className="accent-blue-600" />
+                            <p className="truncate text-sm font-semibold text-gray-800">
+                              {email.from}
+                            </p>
+                          </div>
+                          <span className="flex-shrink-0 whitespace-nowrap text-xs text-gray-400">
+                            {new Date(email.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
+
+                        <p className="mt-1 truncate text-sm font-medium">{email.subject}</p>
+                        <p className="mt-1 line-clamp-1 text-xs text-gray-500">{email.body}</p>
+                      </div>
+                    ))
+                  )}
                 </div>
-              ))
-            )}
-          </div>
-        ) : (
-          <div className="text-center py-6 text-sm text-gray-400">
-            No emails in Others
-          </div>
-        )}
+              ) : (
+                <div className="py-6 text-center text-sm text-gray-400">No emails in Others</div>
+              )}
 
-        {/* Load more */}
-        <button className="w-full mt-4 bg-gray-100 text-gray-400 text-sm py-2 rounded-md cursor-not-allowed">
-          Load more
-        </button>
-      </div>
-    </aside>
+              {/* Load more */}
+              <button className="mt-4 w-full cursor-not-allowed rounded-md bg-gray-100 py-2 text-sm text-gray-400">
+                Load more
+              </button>
+            </div>
+          </aside>
 
           {/* Right Column (Content View) */}
-          <main className="flex-1 flex flex-col overflow-hidden">
+          <main className="flex flex-1 flex-col overflow-hidden">
             {loading ? (
-              <div className="flex items-center justify-center h-full">
+              <div className="flex h-full items-center justify-center">
                 <div className="text-gray-500">Loading...</div>
               </div>
             ) : incomingEmails.length === 0 ? (
-              <div className="flex items-center justify-center h-full">
-                <Card className="max-w-md w-full bg-gray-50 shadow-none border-none text-center">
+              <div className="flex h-full items-center justify-center">
+                <Card className="w-full max-w-md border-none bg-gray-50 text-center shadow-none">
                   <CardContent>
                     <div className="flex flex-col items-center">
                       <img
                         src="https://cdn-icons-png.flaticon.com/512/748/748074.png"
                         alt="Empty"
-                        className="w-32 h-32 opacity-40 mb-4"
+                        className="mb-4 h-32 w-32 opacity-40"
                       />
-                      <h2 className="text-lg font-semibold mb-1">
-                        No email found
-                      </h2>
-                      <p className="text-sm text-gray-500">
-                        Select a email to view its details
-                      </p>
+                      <h2 className="mb-1 text-lg font-semibold">No email found</h2>
+                      <p className="text-sm text-gray-500">Select a email to view its details</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -243,31 +238,35 @@ const Unibox: React.FC = () => {
             ) : (
               <div className="flex-1 overflow-y-auto p-4">
                 {!selectedEmail ? (
-                  <div className="text-center text-sm text-gray-400">Select an email to view details</div>
+                  <div className="text-center text-sm text-gray-400">
+                    Select an email to view details
+                  </div>
                 ) : (
-                  <div className="max-w-4xl mx-auto space-y-3">
+                  <div className="mx-auto max-w-4xl space-y-3">
                     <Card className="transition-shadow">
-                      <CardContent className="p-4 space-y-3">
-                        <div className="flex justify-between items-start">
+                      <CardContent className="space-y-3 p-4">
+                        <div className="flex items-start justify-between">
                           <div>
-                            <div className="font-semibold text-sm">From: {selectedEmail.from}</div>
+                            <div className="text-sm font-semibold">From: {selectedEmail.from}</div>
                             <div className="text-sm text-gray-600">To: {selectedEmail.to}</div>
                           </div>
-                          <div className="text-xs text-gray-400 whitespace-nowrap">
+                          <div className="whitespace-nowrap text-xs text-gray-400">
                             {new Date(selectedEmail.createdAt).toLocaleString()}
                           </div>
                         </div>
-                        <div className="font-medium text-base">{selectedEmail.subject}</div>
-                        <div className="text-sm text-gray-700 whitespace-pre-wrap break-words">
+                        <div className="text-base font-medium">{selectedEmail.subject}</div>
+                        <div className="whitespace-pre-wrap break-words text-sm text-gray-700">
                           {selectedEmail.body}
                         </div>
                         <div className="pt-2">
-                          <span className={cn(
-                            "text-xs px-2 py-1 rounded",
-                            selectedEmail.status === "received" && "bg-green-100 text-green-800",
-                            selectedEmail.status === "processed" && "bg-blue-100 text-blue-800",
-                            selectedEmail.status === "failed" && "bg-red-100 text-red-800"
-                          )}>
+                          <span
+                            className={cn(
+                              "rounded px-2 py-1 text-xs",
+                              selectedEmail.status === "received" && "bg-green-100 text-green-800",
+                              selectedEmail.status === "processed" && "bg-blue-100 text-blue-800",
+                              selectedEmail.status === "failed" && "bg-red-100 text-red-800"
+                            )}
+                          >
                             {selectedEmail.status}
                           </span>
                         </div>

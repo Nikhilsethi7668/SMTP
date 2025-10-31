@@ -16,15 +16,9 @@ const row2 = [
   "Real-Time Automation",
 ];
 
-const MarqueeRow = ({
-  items,
-  reverse = false,
-}: {
-  items: string[];
-  reverse?: boolean;
-}) => {
+const MarqueeRow = ({ items, reverse = false }: { items: string[]; reverse?: boolean }) => {
   return (
-    <div className="relative flex overflow-hidden select-none">
+    <div className="relative flex select-none overflow-hidden">
       <motion.div
         className="flex min-w-max gap-6"
         animate={{
@@ -37,13 +31,12 @@ const MarqueeRow = ({
         }}
       >
         {[...items, ...items, ...items].map((item, i) => (
-         <div
-  key={i}
-  className="px-6 py-3 rounded-full bg-blue-600 text-white font-medium text-sm backdrop-blur-md border shadow-md hover:bg-slate-800/80 transition-colors duration-300"
->
-  {item}
-</div>
-
+          <div
+            key={i}
+            className="rounded-full border bg-blue-600 px-6 py-3 text-sm font-medium text-white shadow-md backdrop-blur-md transition-colors duration-300 hover:bg-slate-800/80"
+          >
+            {item}
+          </div>
         ))}
       </motion.div>
     </div>
@@ -52,9 +45,8 @@ const MarqueeRow = ({
 
 export default function SeamlessBadges() {
   return (
-    <section className="relative w-full py-5 overflow-hidden">
-      <div className="max-w-full mx-auto space-y-8">
-
+    <section className="relative w-full overflow-hidden py-5">
+      <div className="mx-auto max-w-full space-y-8">
         <MarqueeRow items={row1} />
         <MarqueeRow items={row2} reverse />
       </div>

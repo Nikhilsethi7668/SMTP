@@ -1,38 +1,46 @@
-import { AppHeader } from '@/components/AppHeader'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import api from '@/axiosInstance'
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Mail, Download } from 'lucide-react'
+import { AppHeader } from "@/components/AppHeader";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import api from "@/axiosInstance";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Mail, Download } from "lucide-react";
 
 const CustomConnect: React.FC = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  
+
   // Form state
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [imapUsername, setImapUsername] = useState('');
-  const [imapPassword, setImapPassword] = useState('');
-  const [imapHost, setImapHost] = useState('');
-  const [imapPort, setImapPort] = useState('993');
-  const [smtpHost, setSmtpHost] = useState('');
-  const [smtpPort, setSmtpPort] = useState('587');
-  const [smtpUsername, setSmtpUsername] = useState('');
-  const [smtpPassword, setSmtpPassword] = useState('');
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [imapUsername, setImapUsername] = useState("");
+  const [imapPassword, setImapPassword] = useState("");
+  const [imapHost, setImapHost] = useState("");
+  const [imapPort, setImapPort] = useState("993");
+  const [smtpHost, setSmtpHost] = useState("");
+  const [smtpPort, setSmtpPort] = useState("587");
+  const [smtpUsername, setSmtpUsername] = useState("");
+  const [smtpPassword, setSmtpPassword] = useState("");
 
   const handleBack = () => {
-    navigate('/app/dashboard/accounts/connect');
+    navigate("/app/dashboard/accounts/connect");
   };
 
   const handleNext = async () => {
     // Validate required fields
-    if (!email || !imapHost || !imapPort || !imapPassword || !smtpHost || !smtpPort || !smtpPassword) {
-      alert('Please fill in all required fields');
+    if (
+      !email ||
+      !imapHost ||
+      !imapPort ||
+      !imapPassword ||
+      !smtpHost ||
+      !smtpPort ||
+      !smtpPassword
+    ) {
+      alert("Please fill in all required fields");
       return;
     }
 
@@ -58,30 +66,30 @@ const CustomConnect: React.FC = () => {
     };
 
     try {
-      const response = await api.post('/connect/custom', payload);
+      const response = await api.post("/connect/custom", payload);
       if (response.data) {
-        alert('✅ ' + response.data.message);
-        navigate('/app/dashboard/accounts');
+        alert("✅ " + response.data.message);
+        navigate("/app/dashboard/accounts");
       }
     } catch (error: any) {
-      console.error('Error connecting custom account:', error);
-      alert('Failed to connect account: ' + (error.response?.data?.message || error.message));
+      console.error("Error connecting custom account:", error);
+      alert("Failed to connect account: " + (error.response?.data?.message || error.message));
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-gray-50">
+    <div className="flex h-screen w-screen flex-col bg-gray-50">
       <AppHeader onClickAction={handleBack} headings={"Select another provider"} />
 
       <div className="flex-1 overflow-auto p-6">
-        <div className="max-w-2xl mx-auto space-y-6">
+        <div className="mx-auto max-w-2xl space-y-6">
           {/* Account Info Section */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Mail className="w-6 h-6" />
+                <Mail className="h-6 w-6" />
                 Connect Any Provider Account
               </CardTitle>
               <p className="text-sm text-muted-foreground">IMAP / SMTP</p>
@@ -127,15 +135,13 @@ const CustomConnect: React.FC = () => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Download className="w-6 h-6" />
+                <Download className="h-6 w-6" />
                 IMAP Setup
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="imapUsername">
-                  IMAP Username
-                </Label>
+                <Label htmlFor="imapUsername">IMAP Username</Label>
                 <Input
                   id="imapUsername"
                   placeholder={email || "username@example.com"}
@@ -187,15 +193,13 @@ const CustomConnect: React.FC = () => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Mail className="w-6 h-6" />
+                <Mail className="h-6 w-6" />
                 SMTP Setup
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="smtpUsername">
-                  SMTP Username
-                </Label>
+                <Label htmlFor="smtpUsername">SMTP Username</Label>
                 <Input
                   id="smtpUsername"
                   placeholder={email || "username@example.com"}
@@ -245,12 +249,7 @@ const CustomConnect: React.FC = () => {
 
           {/* Action Buttons */}
           <div className="flex gap-4">
-            <Button
-              variant="outline"
-              onClick={handleBack}
-              className="flex-1"
-              disabled={isLoading}
-            >
+            <Button variant="outline" onClick={handleBack} className="flex-1" disabled={isLoading}>
               &lt; Back
             </Button>
             <Button
@@ -258,14 +257,13 @@ const CustomConnect: React.FC = () => {
               className="flex-1 bg-green-600 hover:bg-green-700"
               disabled={isLoading}
             >
-              {isLoading ? 'Connecting...' : 'Save >'}
+              {isLoading ? "Connecting..." : "Save >"}
             </Button>
           </div>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default CustomConnect
-
+export default CustomConnect;

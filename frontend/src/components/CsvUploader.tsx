@@ -7,13 +7,12 @@ export default function CsvUploader({ campaignId, onSuccess }) {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleButtonClick = () => {
-    fileInputRef.current?.click(); 
+    fileInputRef.current?.click();
   };
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-
 
     try {
       const formData = new FormData();
@@ -43,10 +42,7 @@ export default function CsvUploader({ campaignId, onSuccess }) {
         className="hidden"
       />
 
-      <Button
-        onClick={handleButtonClick}
-        className="bg-gradient-primary"
-      >
+      <Button onClick={handleButtonClick} className="bg-gradient-primary">
         📤 Upload CSV
       </Button>
     </div>

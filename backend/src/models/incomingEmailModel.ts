@@ -8,10 +8,12 @@ export interface IIncomingEmail extends Document {
     headers?: Record<string, any>;
     campaign: mongoose.Types.ObjectId | null;
     status: 'received' | 'processed' | 'failed';
+    read: boolean;
     metadata?: Record<string, any>;
     receivedAt: Date;
     createdAt: Date;
     updatedAt: Date;
+    user_id: mongoose.Types.ObjectId;
 }
 
 const IncomingEmailSchema = new Schema<IIncomingEmail>({
@@ -26,7 +28,6 @@ const IncomingEmailSchema = new Schema<IIncomingEmail>({
         required: true,
         trim: true,
         lowercase: true,
-        index: true
     },
     subject: {
         type: String,
@@ -50,12 +51,21 @@ const IncomingEmailSchema = new Schema<IIncomingEmail>({
         enum: ['received', 'processed', 'failed'],
         default: 'received'
     },
+    read: {
+        type: Boolean,
+        default: false
+    },
     metadata: {
         type: Schema.Types.Mixed
     },
     receivedAt: {
         type: Date,
         default: Date.now
+    },
+    user_id: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     }
 }, { timestamps: true });
 

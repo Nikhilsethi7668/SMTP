@@ -31,6 +31,10 @@ const EmailAccountSchema = new mongoose.Schema(
       user: String,
       pass: String,
     },
+    isPrimary: {
+      type: Boolean,
+      default: false,
+    },
     connectedAt: {
       type: Date,
       default: Date.now,

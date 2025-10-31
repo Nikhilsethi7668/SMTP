@@ -35,7 +35,9 @@ export const listCampaigns = async (req: Request, res: any) => {
 export const getCampaign = async (req: Request, res: any) => {
   try {
     const id = req.params.id;
-    if (!id) return res.status(400).json({ success: false, message: 'Invalid campaign id' });
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid campaign id' });
+    }
     const campaign = await campaignModel.getCampaignById(id?.toString());
     if (!campaign) return res.status(404).json({ success: false, message: 'Campaign not found' });
     return res.status(200).json({ success: true, campaign });
@@ -118,8 +120,8 @@ export const deleteCampaignHandler = async (req: Request, res: any) => {
 export const getCampaignMetrics = async (req: Request, res: any) => {
   try {
     const user_id = req.user.id;
-    const campaign_id = req.query.campaignId as string | undefined;
-    
+    const campaign_id = req?.query?.campaignId?.toString();
+    console.log("campaign_id", campaign_id);
     const metrics = await campaignModel.getCampaignMetrics(user_id?.toString(), campaign_id);
     
     if (!metrics) {

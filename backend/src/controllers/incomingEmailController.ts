@@ -2,6 +2,7 @@ import { Response } from 'express';
 import { TypedRequestBody, TypedRequestQuery, TypedRequest } from '../types/express/index.js';
 import IncomingEmail from '../models/incomingEmailModel.js';
 import Leads from '../models/leadModel.js';
+import mongoose from 'mongoose';
 
 interface CreateIncomingEmailBody {
     from: string;
@@ -14,8 +15,7 @@ interface CreateIncomingEmailBody {
 
 interface GetIncomingEmailQuery {
     campaign?: string;
-    to?: string;
-    status?: string;
+    showUnread?: string;
     limit?: string;
     page?: string;
 }
@@ -78,13 +78,12 @@ export const getIncomingEmails = async (
     res: Response
 ) => {
     try {
-        const { campaign, to, status, limit = '50', page = '1' } = req.query;
-
+        const { campaign, showUnread, limit = '50', page = '1' } = req.query;
+        const user_id = req.user.id;
         const filter: any = {};
-        
+        if (showUnread==="true") filter.read = false;
         if (campaign) filter.campaign = campaign;
-        if (to) filter.to = to.toLowerCase().trim();
-        if (status) filter.status = status;
+        filter.user_id = user_id as mongoose.Types.ObjectId;
 
         const limitNum = parseInt(limit as string);
         const pageNum = parseInt(page as string);
@@ -94,7 +93,8 @@ export const getIncomingEmails = async (
             .sort({ createdAt: -1 })
             .limit(limitNum)
             .skip(skip)
-            .populate('campaign', 'name subject');
+            .populate('campaign', 'name subject')
+            .populate('user_id', 'full_name');
 
         const total = await IncomingEmail.countDocuments(filter);
 

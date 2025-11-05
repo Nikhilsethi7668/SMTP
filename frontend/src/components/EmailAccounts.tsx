@@ -22,12 +22,6 @@ export const EmailAccounts = () => {
       }finally{
          setIsLoading(false);
       }
-    } catch (error) {
-      setIsLoading(false);
-      toast.error(error?.response?.data?.message || (error as string));
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   const handleSetPrimary = async (emailId: string) => {

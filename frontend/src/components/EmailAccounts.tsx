@@ -5,16 +5,22 @@ import api from "@/axiosInstance";
 import { EmailTable } from "./EmailTable";
 import { toast } from "sonner";
 export const EmailAccounts = () => {
-  const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
-  const [emailsData, setEmailsData] = useState([]);
-  const handleGetData = async () => {
-    try {
-      setIsLoading(true);
-      const response = await api.get("/emails");
-      if (response.data.success) {
-        setEmailsData(response.data.data);
-        setIsLoading(false);
+    const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
+    const [emailsData, setEmailsData] = useState([]);
+    const handleGetData = async () => {
+      try {
+        setIsLoading(true)
+        const response = await api.get('/accounts');
+        if(response.data.success){
+          setEmailsData(response.data.data);
+          setIsLoading(false);
+        }
+      } catch (error) {
+         setIsLoading(false);
+        toast.error(error?.response?.data?.message || error as string)
+      }finally{
+         setIsLoading(false);
       }
     } catch (error) {
       setIsLoading(false);

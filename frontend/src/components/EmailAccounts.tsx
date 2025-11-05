@@ -11,7 +11,7 @@ export const EmailAccounts = () => {
     const handleGetData = async () => {
       try {
         setIsLoading(true)
-        const response = await api.get('/emails');
+        const response = await api.get('/accounts');
         if(response.data.success){
           setEmailsData(response.data.data);
           setIsLoading(false);

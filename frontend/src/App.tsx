@@ -19,11 +19,11 @@ import ApiKeysPage from "./pages/KeyPage";
 import { VerifyUserEmail } from "./pages/account/VerifyUserEmail";
 import { ContactsPage } from "./pages/ConatctsPage";
 import { Template } from "./pages/Templates";
-import { Settings } from "./pages/Settings";
+import SettingsPage from "./pages/settings/SettingsPage";
 import UniBox from "./pages/UniBox";
 import { Crm } from "./pages/Crm";
 import CustomConnect from "./pages/account/CustomConnect";
-import SettingsPage from "./pages/settings/SettingsPage";
+
 
 import { ProtectedRoute } from "./ProtectedRoute";
 import EmailAccounts from "./pages/EmailAccounts";
@@ -98,7 +98,7 @@ const App = () => (
             path="/app/dashboard/settings"
             element={
               <ProtectedRoute>
-                <Settings />
+                <SettingsPage />
               </ProtectedRoute>
             }
           />

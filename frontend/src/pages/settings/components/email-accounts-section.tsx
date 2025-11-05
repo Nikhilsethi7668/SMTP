@@ -1,23 +1,24 @@
-
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Info } from "lucide-react"
-import { useState } from "react"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Info } from "lucide-react";
+import { useState } from "react";
 
 export function EmailAccountsSection() {
-  const [searchQuery, setSearchQuery] = useState("")
+  const [searchQuery, setSearchQuery] = useState("");
 
   return (
     <div className="space-y-6">
       {/* Get Passwords */}
-      <div className="bg-card border border-border rounded-lg p-6">
-        <div className="flex justify-between items-center mb-4">
+      <div className="rounded-lg border border-border bg-card p-6">
+        <div className="mb-4 flex items-center justify-between">
           <h3 className="text-lg font-semibold text-foreground">Email accounts & Domains</h3>
           <Button variant="default">Get passwords</Button>
         </div>
-        <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-6 flex gap-3">
+        <div className="mb-6 flex gap-3 rounded-lg border border-primary/20 bg-primary/10 p-4">
           <Info className="h-4 w-4 text-primary" />
-          <p className="text-sm text-primary">Updating the default password will cause auto-reconnect to not work</p>
+          <p className="text-sm text-primary">
+            Updating the default password will cause auto-reconnect to not work
+          </p>
         </div>
 
         {/* Search */}
@@ -31,10 +32,10 @@ export function EmailAccountsSection() {
         </div>
 
         {/* Empty State */}
-        <div className="text-center py-12">
+        <div className="py-12 text-center">
           <p className="text-muted-foreground">Your domain purchases will appear here</p>
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -26,6 +26,8 @@ import CustomConnect from "./pages/account/CustomConnect";
 import SettingsPage from "./pages/settings/SettingsPage";
 
 import { ProtectedRoute } from "./ProtectedRoute";
+import EmailAccounts from "./pages/EmailAccounts";
+import Domain from "./pages/Domain";
 
 const queryClient = new QueryClient();
 
@@ -137,6 +139,22 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <Analytics />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/domains"
+            element={
+              <ProtectedRoute>
+                <Domain />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/email-accounts"
+            element={
+              <ProtectedRoute>
+                <EmailAccounts />
               </ProtectedRoute>
             }
           />

@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
-import { useUserStore } from "@/store/useUserStore"; 
+import { useUserStore } from "@/store/useUserStore";
 import { useMemo } from "react";
 
 interface HeaderProps {
@@ -46,20 +46,20 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
 
   // ✅ Logout handler
   const handleLogout = () => {
-    clearUser(); 
-    navigate("/"); 
+    clearUser();
+    navigate("/");
   };
 
   return (
-    <header className="relative top-0 left-0 right-0 h-16 bg-card border-b border-border z-50 px-4">
-      <div className="h-full flex items-center justify-between gap-4">
+    <header className="relative left-0 right-0 top-0 z-50 h-16 border-b border-border bg-card px-4">
+      <div className="flex h-full items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={onToggleSidebar}>
             <Menu className="h-5 w-5" />
           </Button>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-              <Mail className="w-4 h-4 text-white" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-primary">
+              <Mail className="h-4 w-4 text-white" />
             </div>
             <span className="text-xl font-bold">InboxMail</span>
           </div>
@@ -69,7 +69,7 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon" className="relative">
             <Bell className="h-5 w-5" />
-            <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs">
+            <Badge className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center p-0 text-xs">
               3
             </Badge>
           </Button>
@@ -78,7 +78,7 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                 <Avatar>
-                  <AvatarFallback className={`${avatarColor} text-white font-semibold`}>
+                  <AvatarFallback className={`${avatarColor} font-semibold text-white`}>
                     {initial}
                   </AvatarFallback>
                 </Avatar>

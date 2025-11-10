@@ -100,6 +100,7 @@ const Auth = () => {
     } catch (error: any) {
       const errorMessage = error?.response?.data?.message || error?.message || "An error occurred";
       toast.error(errorMessage);
+
       console.error("Signup error:", error);
       setIsLoading(false);
     } finally {

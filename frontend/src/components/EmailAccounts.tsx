@@ -68,7 +68,6 @@ export const EmailAccounts = () => {
       toast.error(errorMessage);
     }
   };
-
   useEffect(() => {
     handleGetData();
   }, []);

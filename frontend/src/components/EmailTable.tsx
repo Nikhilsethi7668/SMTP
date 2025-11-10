@@ -36,17 +36,14 @@ interface EmailTableProps {
   emails: UserEmail[];
   onSetPrimary: (emailId: string) => void;
   onDeleteEmail: (emailId: string) => void;
+  onStartWarmup?: (emailId: string) => void;
 }
 
-export const EmailTable: React.FC<EmailTableProps> = ({
-  emails,
-  onSetPrimary,
-  onDeleteEmail,
-}) => {
+export const EmailTable: React.FC<EmailTableProps> = ({ emails, onSetPrimary, onDeleteEmail }) => {
   return (
-    <div className="h-full w-full flex flex-col p-4">
-      <div className="flex-1 overflow-auto border rounded-lg">
-        <Table className="[&_th]:text-left [&_td]:text-left min-w-full">
+    <div className="flex h-full w-full flex-col p-4">
+      <div className="flex-1 overflow-auto rounded-lg border">
+        <Table className="min-w-full [&_td]:text-left [&_th]:text-left">
           <TableHeader>
             <TableRow className="bg-muted/50">
               <TableHead className="font-semibold">Email</TableHead>
@@ -58,18 +55,17 @@ export const EmailTable: React.FC<EmailTableProps> = ({
           </TableHeader>
           <TableBody>
             {emails.map((email) => (
-              <TableRow
-                key={email._id}
-                className="hover:bg-muted/30 transition-colors"
-              >
+              <TableRow key={email._id} className="transition-colors hover:bg-muted/30">
                 <TableCell className="font-medium">{email.email}</TableCell>
                 <TableCell>
                   <Badge
                     variant="outline"
                     className={
-                      email.provider === "gmail" ? "bg-red-50 text-red-700" :
-                      email.provider === "outlook" ? "bg-blue-50 text-blue-700" :
-                      "bg-gray-50 text-gray-700"
+                      email.provider === "gmail"
+                        ? "bg-red-50 text-red-700"
+                        : email.provider === "outlook"
+                          ? "bg-blue-50 text-blue-700"
+                          : "bg-gray-50 text-gray-700"
                     }
                   >
                     {email.provider.charAt(0).toUpperCase() + email.provider.slice(1)}
@@ -83,18 +79,18 @@ export const EmailTable: React.FC<EmailTableProps> = ({
                 <TableCell>
                   <Badge
                     variant="outline"
-                    className={email.isPrimary ? "bg-green-50 text-green-700" : "bg-muted text-muted-foreground"}
+                    className={
+                      email.isPrimary
+                        ? "bg-green-50 text-green-700"
+                        : "bg-muted text-muted-foreground"
+                    }
                   >
                     {email.isPrimary ? "Primary" : "Secondary"}
                   </Badge>
                 </TableCell>
                 <TableCell className="flex gap-2">
                   {!email.isPrimary && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => onSetPrimary(email._id)}
-                    >
+                    <Button size="sm" variant="outline" onClick={() => onSetPrimary(email._id)}>
                       Set Primary
                     </Button>
                   )}

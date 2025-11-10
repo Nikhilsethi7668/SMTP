@@ -1,35 +1,35 @@
-import { AppHeader } from '@/components/AppHeader'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Check, Mail } from 'lucide-react'
+import { AppHeader } from "@/components/AppHeader";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Check, Mail } from "lucide-react";
 
 const AccountConnect: React.FC = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState<string | null>(null);
 
   const handleGoogleConnect = () => {
-    setIsLoading('google');
-    window.location.href = `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/google`;
+    setIsLoading("google");
+    window.location.href = `${import.meta.env.VITE_API_URL || "http://localhost:5000/api"}/auth/google`;
   };
 
   const handleMicrosoftConnect = () => {
-    setIsLoading('microsoft');
-    window.location.href = `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/outlook`;
+    setIsLoading("microsoft");
+    window.location.href = `${import.meta.env.VITE_API_URL || "http://localhost:5000/api"}/auth/outlook`;
   };
 
   const handleCustomProvider = () => {
-    navigate('/app/dashboard/accounts/connect/custom');
+    navigate("/app/dashboard/accounts/connect/custom");
   };
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-gray-50">
+    <div className="flex h-screen w-screen flex-col bg-gray-50">
       <AppHeader onClickAction={() => navigate(-1)} headings={"Back"} />
 
-      <div className="flex-1 flex items-center justify-center p-6">
-        <Card className="max-w-md w-full">
+      <div className="flex flex-1 items-center justify-center p-6">
+        <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle>Connect existing accounts</CardTitle>
           </CardHeader>
@@ -37,11 +37,11 @@ const AccountConnect: React.FC = () => {
             {/* Features */}
             <div className="space-y-3">
               <div className="flex items-center gap-3">
-                <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
+                <Check className="h-5 w-5 flex-shrink-0 text-green-600" />
                 <p className="text-sm">Connect any IMAP or SMTP email provider</p>
               </div>
               <div className="flex items-center gap-3">
-                <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
+                <Check className="h-5 w-5 flex-shrink-0 text-green-600" />
                 <p className="text-sm">Sync up replies in the Unibox</p>
               </div>
             </div>
@@ -55,12 +55,12 @@ const AccountConnect: React.FC = () => {
               <Button
                 onClick={handleGoogleConnect}
                 variant="outline"
-                className="w-full justify-start h-auto p-4 hover:bg-accent"
+                className="h-auto w-full justify-start p-4 hover:bg-accent"
                 disabled={isLoading !== null}
               >
-                <div className="flex items-center gap-4 w-full">
+                <div className="flex w-full items-center gap-4">
                   <div className="flex-shrink-0">
-                    <svg className="w-8 h-8" viewBox="0 0 24 24">
+                    <svg className="h-8 w-8" viewBox="0 0 24 24">
                       <path
                         d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                         fill="#4285F4"
@@ -90,12 +90,12 @@ const AccountConnect: React.FC = () => {
               <Button
                 onClick={handleMicrosoftConnect}
                 variant="outline"
-                className="w-full justify-start h-auto p-4 hover:bg-accent"
+                className="h-auto w-full justify-start p-4 hover:bg-accent"
                 disabled={isLoading !== null}
               >
-                <div className="flex items-center gap-4 w-full">
+                <div className="flex w-full items-center gap-4">
                   <div className="flex-shrink-0">
-                    <svg className="w-8 h-8" viewBox="0 0 24 24" fill="#D83B01">
+                    <svg className="h-8 w-8" viewBox="0 0 24 24" fill="#D83B01">
                       <path d="M0 0h11.377v11.372H0z" fill="#F25022" />
                       <path d="M12.623 0H24v11.372H12.623z" fill="#00A4EF" />
                       <path d="M0 12.628h11.377V24H0z" fill="#7FBA00" />
@@ -113,12 +113,12 @@ const AccountConnect: React.FC = () => {
               <Button
                 onClick={handleCustomProvider}
                 variant="outline"
-                className="w-full justify-start h-auto p-4 hover:bg-accent"
+                className="h-auto w-full justify-start p-4 hover:bg-accent"
                 disabled={isLoading !== null}
               >
-                <div className="flex items-center gap-4 w-full">
+                <div className="flex w-full items-center gap-4">
                   <div className="flex-shrink-0">
-                    <Mail className="w-8 h-8 text-muted-foreground" />
+                    <Mail className="h-8 w-8 text-muted-foreground" />
                   </div>
                   <div className="flex-1 text-left">
                     <p className="font-medium">Any Provider</p>
@@ -131,7 +131,7 @@ const AccountConnect: React.FC = () => {
         </Card>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default AccountConnect
+export default AccountConnect;

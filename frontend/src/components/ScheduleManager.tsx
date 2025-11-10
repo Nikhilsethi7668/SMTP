@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -22,7 +21,7 @@ import { CalendarDays } from "lucide-react";
  * - PUT /api/schedules/:id
  */
 async function fetchSchedules() {
-    return [];
+  return [];
   const res = await fetch("/api/schedules");
 }
 
@@ -64,36 +63,34 @@ export default function ScheduleManager() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64 text-slate-500">
+      <div className="flex h-64 items-center justify-center text-slate-500">
         Loading schedules...
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col md:flex-row gap-6 w-full max-w-6xl mx-auto p-6">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 p-6 md:flex-row">
       {/* LEFT SIDEBAR */}
-      <div className="w-full md:w-1/3 border rounded-xl p-4 bg-white shadow-sm">
+      <div className="w-full rounded-xl border bg-white p-4 shadow-sm md:w-1/3">
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <CalendarDays className="w-4 h-4 text-slate-500" />
-              <span className="text-slate-700 font-medium">Start</span>
+              <CalendarDays className="h-4 w-4 text-slate-500" />
+              <span className="font-medium text-slate-700">Start</span>
             </div>
-            <span className="text-blue-600 text-sm font-medium cursor-pointer">
-              Now
-            </span>
+            <span className="cursor-pointer text-sm font-medium text-blue-600">Now</span>
           </div>
 
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <CalendarDays className="w-4 h-4 text-slate-500" />
-              <span className="text-slate-700 font-medium">End</span>
+              <CalendarDays className="h-4 w-4 text-slate-500" />
+              <span className="font-medium text-slate-700">End</span>
             </div>
-            <span className="text-slate-500 text-sm">No end date</span>
+            <span className="text-sm text-slate-500">No end date</span>
           </div>
 
-          <div className="border-t my-3" />
+          <div className="my-3 border-t" />
 
           <div className="space-y-2">
             {schedules.map((sch, i) => (
@@ -107,19 +104,16 @@ export default function ScheduleManager() {
                 }`}
               >
                 <div className="flex items-center gap-2">
-                  <CalendarDays className="w-4 h-4 text-blue-600" />
-                  <span className="text-slate-800 font-medium">{sch.name}</span>
+                  <CalendarDays className="h-4 w-4 text-blue-600" />
+                  <span className="font-medium text-slate-800">{sch.name}</span>
                 </div>
               </div>
             ))}
             <Button
               variant="outline"
-              className="w-full mt-2"
+              className="mt-2 w-full"
               onClick={() =>
-                setSchedules([
-                  ...schedules,
-                  { name: `Schedule ${schedules.length + 1}` },
-                ])
+                setSchedules([...schedules, { name: `Schedule ${schedules.length + 1}` }])
               }
             >
               Add schedule
@@ -132,9 +126,9 @@ export default function ScheduleManager() {
       <div className="flex-1 space-y-6">
         {/* Schedule Name */}
         <Card className="shadow-sm">
-          <CardContent className="p-6 space-y-4">
+          <CardContent className="space-y-4 p-6">
             <div>
-              <Label className="text-slate-700 font-medium">Schedule Name</Label>
+              <Label className="font-medium text-slate-700">Schedule Name</Label>
               <Input
                 value={schedules[selected]?.name || ""}
                 onChange={(e) => {
@@ -150,11 +144,11 @@ export default function ScheduleManager() {
 
         {/* Timing */}
         <Card className="shadow-sm">
-          <CardContent className="p-6 space-y-4">
-            <Label className="text-slate-700 font-medium">Timing</Label>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
+          <CardContent className="space-y-4 p-6">
+            <Label className="font-medium text-slate-700">Timing</Label>
+            <div className="mt-2 grid grid-cols-1 gap-4 md:grid-cols-3">
               <div>
-                <Label className="text-slate-600 text-sm">From</Label>
+                <Label className="text-sm text-slate-600">From</Label>
                 <Select>
                   <SelectTrigger>
                     <SelectValue placeholder="9:00 AM" />
@@ -169,7 +163,7 @@ export default function ScheduleManager() {
                 </Select>
               </div>
               <div>
-                <Label className="text-slate-600 text-sm">To</Label>
+                <Label className="text-sm text-slate-600">To</Label>
                 <Select>
                   <SelectTrigger>
                     <SelectValue placeholder="6:00 PM" />
@@ -184,24 +178,16 @@ export default function ScheduleManager() {
                 </Select>
               </div>
               <div>
-                <Label className="text-slate-600 text-sm">Timezone</Label>
+                <Label className="text-sm text-slate-600">Timezone</Label>
                 <Select>
                   <SelectTrigger>
                     <SelectValue placeholder="Eastern Time (US & Canada)" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="EST">
-                      Eastern Time (US & Canada)
-                    </SelectItem>
-                    <SelectItem value="PST">
-                      Pacific Time (US & Canada)
-                    </SelectItem>
-                    <SelectItem value="GMT">
-                      Greenwich Mean Time (GMT)
-                    </SelectItem>
-                    <SelectItem value="IST">
-                      India Standard Time (IST)
-                    </SelectItem>
+                    <SelectItem value="EST">Eastern Time (US & Canada)</SelectItem>
+                    <SelectItem value="PST">Pacific Time (US & Canada)</SelectItem>
+                    <SelectItem value="GMT">Greenwich Mean Time (GMT)</SelectItem>
+                    <SelectItem value="IST">India Standard Time (IST)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -211,34 +197,28 @@ export default function ScheduleManager() {
 
         {/* Days */}
         <Card className="shadow-sm">
-          <CardContent className="p-6 space-y-4">
-            <Label className="text-slate-700 font-medium">Days</Label>
-            <div className="flex flex-wrap gap-4 mt-2">
-              {[
-                "Monday",
-                "Tuesday",
-                "Wednesday",
-                "Thursday",
-                "Friday",
-                "Saturday",
-                "Sunday",
-              ].map((day) => (
-                <div key={day} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={day}
-                    defaultChecked={[
-                      "Monday",
-                      "Tuesday",
-                      "Wednesday",
-                      "Thursday",
-                      "Friday",
-                    ].includes(day)}
-                  />
-                  <Label htmlFor={day} className="text-slate-600">
-                    {day}
-                  </Label>
-                </div>
-              ))}
+          <CardContent className="space-y-4 p-6">
+            <Label className="font-medium text-slate-700">Days</Label>
+            <div className="mt-2 flex flex-wrap gap-4">
+              {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map(
+                (day) => (
+                  <div key={day} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={day}
+                      defaultChecked={[
+                        "Monday",
+                        "Tuesday",
+                        "Wednesday",
+                        "Thursday",
+                        "Friday",
+                      ].includes(day)}
+                    />
+                    <Label htmlFor={day} className="text-slate-600">
+                      {day}
+                    </Label>
+                  </div>
+                )
+              )}
             </div>
           </CardContent>
         </Card>
@@ -246,7 +226,7 @@ export default function ScheduleManager() {
         {/* Save Button */}
         <div className="flex justify-start">
           <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2 rounded-lg"
+            className="rounded-lg bg-blue-600 px-8 py-2 text-white hover:bg-blue-700"
             onClick={handleSave}
           >
             Save

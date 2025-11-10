@@ -9,7 +9,9 @@ import { Badge } from "@/components/ui/badge";
 import { Mail, Github, ArrowLeft } from "lucide-react";
 import emailIllustration from "@/assets/email-platform-illustration.png";
 import api from "@/axiosInstance";
+import { useUserStore } from "../store/useUserStore";
 import { Spinner } from "@/components/ui/spinner";
+import { toast } from "sonner";
 const taglines = [
   "Deliver at scale. No limits.",
   "Trusted by developers and marketers alike.",
@@ -41,20 +43,32 @@ const Auth = () => {
     e.preventDefault();
     try {
       setIsLoading(true);
-      if(!email || !password){
-        alert("Please fill all required fields");
+      if (!email || !password) {
         throw new Error("Please fill all required feilds");
       }
-      const response = await api.post("/auth/login", {email,password});
-      if(response.status === 200){
-        console.log("Login successful");
+      const response = await api.post("/auth/login", { email, password });
+      if (response.status === 200) {
+        console.log(response.data.user);
+        const data = response.data.user;
+        useUserStore.getState().setUser({
+          user_id: data._id,
+          full_name: data.full_name,
+          username: data.username,
+          role: data.role,
+          email: data.email,
+          daily_quota: data.daily_quota,
+          monthly_quota: data.monthly_quota,
+          used_today: data.used_today,
+          used_month: data.used_month,
+          rate_limit: data.rate_limit,
+        });
         navigate("/app/dashboard/accounts");
       }
     } catch (error) {
-      alert("Login failed. Please try again.");
+      console.log(error);
+      toast.error(error?.response?.data?.message || (error as string));
       setIsLoading(false);
     }
-    console.log("Login attempt");
   };
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -62,12 +76,10 @@ const Auth = () => {
     e.preventDefault();
     console.log("Signup attempt");
     if (!email || !password || !fullName || !username || !confirmPassword) {
-      alert("Please fill all required fields");
       throw new Error("Please fill all required fields");
     }
     if (password !== confirmPassword) {
-      alert("Passwords do not match");
-      throw new Error("Passwords do not match");
+      throw new Error("Password and confrim password do not match");
     }
     try {
       const response = await api.post("/auth/signup", {
@@ -78,14 +90,14 @@ const Auth = () => {
         password,
       });
       if (response.status === 201) {
-        console.log("Signup successful, OTP sent to email");
         navigate(
-  `/verify-email?email=${encodeURIComponent(email)}&username=${encodeURIComponent(username)}`
-);
-
+          `/verify-email?email=${encodeURIComponent(
+            email
+          )}&username=${encodeURIComponent(username)}`
+        );
       }
     } catch (error) {
-      alert("Signup failed. Please try again.");
+      toast.error(error?.response?.data?.message || (error as string));
       console.error("Signup error:", error);
       setIsLoading(false);
     } finally {
@@ -94,38 +106,33 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-bg flex flex-col">
-      {/* Simple header with back button */}
+    <div className="flex min-h-screen flex-col bg-gradient-bg">
       <div className="p-4">
         <button
           onClick={() => navigate("/")}
-          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors group"
+          className="group flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+          <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
           Back to home
         </button>
       </div>
 
-      <div className="flex-1 flex items-center justify-center p-4">
-        <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-8 lg:gap-16">
+      <div className="flex flex-1 items-center justify-center p-4">
+        <div className="grid w-full max-w-6xl gap-8 lg:grid-cols-2 lg:gap-16">
           {/* Brand Area */}
-          <div className="hidden lg:flex flex-col justify-center space-y-8 animate-fade-in-up">
+          <div className="hidden animate-fade-in-up flex-col justify-center space-y-8 lg:flex">
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-primary rounded-lg flex items-center justify-center">
-                  <Mail className="w-6 h-6 text-white" />
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-primary">
+                  <Mail className="h-6 w-6 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-foreground">
-                    MailFlow
-                  </h2>
-                  <p className="text-sm text-muted-foreground">
-                    Email Delivery Platform
-                  </p>
+                  <h2 className="text-2xl font-bold text-foreground">MailFlow</h2>
+                  <p className="text-sm text-muted-foreground">Email Delivery Platform</p>
                 </div>
               </div>
 
-              <Badge className="bg-primary/10 text-primary hover:bg-primary/20 border-primary/20">
+              <Badge className="border-primary/20 bg-primary/10 text-primary hover:bg-primary/20">
                 ✨ 3,000 emails free on signup — limited time!
               </Badge>
             </div>
@@ -139,7 +146,7 @@ const Auth = () => {
             <div className="space-y-4">
               <p
                 key={currentTagline}
-                className="text-2xl font-semibold text-foreground animate-fade-in-up"
+                className="animate-fade-in-up text-2xl font-semibold text-foreground"
               >
                 {taglines[currentTagline]}
               </p>
@@ -147,15 +154,11 @@ const Auth = () => {
               <div className="grid grid-cols-2 gap-4 pt-4">
                 <div className="space-y-1">
                   <div className="text-3xl font-bold text-primary">99.9%</div>
-                  <div className="text-sm text-muted-foreground">
-                    Deliverability Rate
-                  </div>
+                  <div className="text-sm text-muted-foreground">Deliverability Rate</div>
                 </div>
                 <div className="space-y-1">
                   <div className="text-3xl font-bold text-primary">5B+</div>
-                  <div className="text-sm text-muted-foreground">
-                    Emails Sent Monthly
-                  </div>
+                  <div className="text-sm text-muted-foreground">Emails Sent Monthly</div>
                 </div>
               </div>
             </div>
@@ -163,25 +166,22 @@ const Auth = () => {
 
           {/* Auth Form */}
           <div className="flex items-center justify-center">
-            <div className="w-full max-w-md bg-card shadow-card border border-border rounded-xl p-8 animate-fade-in-up">
+            <div className="w-full max-w-md animate-fade-in-up rounded-xl border border-border bg-card p-8 shadow-card">
               {/* Mobile header */}
-              <div className="lg:hidden mb-6 text-center">
-                <div className="inline-flex items-center gap-2 mb-4">
-                  <div className="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center">
-                    <Mail className="w-5 h-5 text-white" />
+              <div className="mb-6 text-center lg:hidden">
+                <div className="mb-4 inline-flex items-center gap-2">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-primary">
+                    <Mail className="h-5 w-5 text-white" />
                   </div>
                   <span className="text-xl font-bold">MailFlow</span>
                 </div>
-                <Badge className="bg-primary/10 text-primary hover:bg-primary/20 border-primary/20">
+                <Badge className="border-primary/20 bg-primary/10 text-primary hover:bg-primary/20">
                   ✨ 3,000 free emails
                 </Badge>
               </div>
 
-              <Tabs
-                defaultValue={activeAuth ? activeAuth : "login"}
-                className="w-full"
-              >
-                <TabsList className="grid w-full grid-cols-2 mb-8">
+              <Tabs defaultValue={activeAuth ? activeAuth : "login"} className="w-full">
+                <TabsList className="mb-8 grid w-full grid-cols-2">
                   <TabsTrigger value="login">Log in</TabsTrigger>
                   <TabsTrigger value="signup">Sign up</TabsTrigger>
                 </TabsList>
@@ -191,8 +191,8 @@ const Auth = () => {
                   <div className="space-y-2 text-center">
                     <h1 className="text-2xl font-bold">Welcome back 👋</h1>
                     <p className="text-muted-foreground">
-                      Your emails are waiting. Log in to manage your campaigns,
-                      API keys, and reports.
+                      Your emails are waiting. Log in to manage your campaigns, API keys, and
+                      reports.
                     </p>
                   </div>
 
@@ -226,26 +226,23 @@ const Auth = () => {
                         <Checkbox id="remember" />
                         <label
                           htmlFor="remember"
-                          className="text-sm text-muted-foreground cursor-pointer select-none"
+                          className="cursor-pointer select-none text-sm text-muted-foreground"
                         >
                           Remember me
                         </label>
                       </div>
-                      <a
-                        href="#"
-                        className="text-sm text-primary hover:underline font-medium"
-                      >
+                      <a href="#" className="text-sm font-medium text-primary hover:underline">
                         Forgot password?
                       </a>
                     </div>
                     {isLoading ? (
-                      <Button className="w-full font-bold uppercase tracking-wide transition-all hover:shadow-hover hover:-translate-y-0.5">
+                      <Button className="w-full font-bold uppercase tracking-wide transition-all hover:-translate-y-0.5 hover:shadow-hover">
                         <Spinner />
                       </Button>
-                    ): (
+                    ) : (
                       <Button
                         type="submit"
-                        className="w-full font-bold uppercase tracking-wide transition-all hover:shadow-hover hover:-translate-y-0.5"
+                        className="w-full font-bold uppercase tracking-wide transition-all hover:-translate-y-0.5 hover:shadow-hover"
                       >
                         Log In to Dashboard →
                       </Button>
@@ -256,9 +253,7 @@ const Auth = () => {
                         <span className="w-full border-t border-border" />
                       </div>
                       <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-card px-2 text-muted-foreground">
-                          or continue with
-                        </span>
+                        <span className="bg-card px-2 text-muted-foreground">or continue with</span>
                       </div>
                     </div>
 
@@ -266,7 +261,7 @@ const Auth = () => {
                       <Button
                         type="button"
                         variant="outline"
-                        className="transition-all hover:shadow-card hover:-translate-y-0.5"
+                        className="transition-all hover:-translate-y-0.5 hover:shadow-card"
                       >
                         <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                           <path
@@ -291,14 +286,14 @@ const Auth = () => {
                       <Button
                         type="button"
                         variant="outline"
-                        className="transition-all hover:shadow-card hover:-translate-y-0.5"
+                        className="transition-all hover:-translate-y-0.5 hover:shadow-card"
                       >
                         <Github className="mr-2 h-4 w-4" />
                         GitHub
                       </Button>
                     </div>
 
-                    <div className="text-center text-sm text-muted-foreground pt-4">
+                    <div className="pt-4 text-center text-sm text-muted-foreground">
                       New to the platform?{" "}
                       <button
                         type="button"
@@ -308,7 +303,7 @@ const Auth = () => {
                           ) as HTMLElement;
                           signupTab?.click();
                         }}
-                        className="text-primary hover:underline font-medium"
+                        className="font-medium text-primary hover:underline"
                       >
                         Create your free account
                       </button>{" "}
@@ -320,9 +315,7 @@ const Auth = () => {
                 {/* Signup Tab */}
                 <TabsContent value="signup" className="space-y-6">
                   <div className="space-y-2 text-center">
-                    <h1 className="text-2xl font-bold">
-                      Start Sending Smarter Emails ✉️
-                    </h1>
+                    <h1 className="text-2xl font-bold">Start Sending Smarter Emails ✉️</h1>
                     <p className="text-muted-foreground">
                       Set up your account and get your first 3,000 emails free.
                     </p>
@@ -366,10 +359,7 @@ const Auth = () => {
 
                     <div className="space-y-2">
                       <Label htmlFor="signup-company">
-                        Company{" "}
-                        <span className="text-muted-foreground text-xs">
-                          (optional)
-                        </span>
+                        Company <span className="text-xs text-muted-foreground">(optional)</span>
                       </Label>
                       <Input
                         onChangeEvent={(val) => setCompanyName(val)}
@@ -404,7 +394,7 @@ const Auth = () => {
                       />
                     </div>
 
-                    <div className="bg-muted/50 border border-border rounded-lg p-3 text-sm text-muted-foreground">
+                    <div className="rounded-lg border border-border bg-muted/50 p-3 text-sm text-muted-foreground">
                       💳 No credit card needed. Get started in minutes.
                     </div>
 
@@ -413,7 +403,7 @@ const Auth = () => {
                     ) : (
                       <Button
                         type="submit"
-                        className="w-full font-bold uppercase tracking-wide transition-all hover:shadow-hover hover:-translate-y-0.5"
+                        className="w-full font-bold uppercase tracking-wide transition-all hover:-translate-y-0.5 hover:shadow-hover"
                       >
                         Create Free Account →
                       </Button>
@@ -424,9 +414,7 @@ const Auth = () => {
                         <span className="w-full border-t border-border" />
                       </div>
                       <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-card px-2 text-muted-foreground">
-                          or sign up with
-                        </span>
+                        <span className="bg-card px-2 text-muted-foreground">or sign up with</span>
                       </div>
                     </div>
 
@@ -434,7 +422,7 @@ const Auth = () => {
                       <Button
                         type="button"
                         variant="outline"
-                        className="transition-all hover:shadow-card hover:-translate-y-0.5"
+                        className="transition-all hover:-translate-y-0.5 hover:shadow-card"
                       >
                         <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                           <path
@@ -459,24 +447,22 @@ const Auth = () => {
                       <Button
                         type="button"
                         variant="outline"
-                        className="transition-all hover:shadow-card hover:-translate-y-0.5"
+                        className="transition-all hover:-translate-y-0.5 hover:shadow-card"
                       >
                         <Github className="mr-2 h-4 w-4" />
                         GitHub
                       </Button>
                     </div>
 
-                    <div className="text-center text-sm text-muted-foreground pt-4">
+                    <div className="pt-4 text-center text-sm text-muted-foreground">
                       Already have an account?{" "}
                       <button
                         type="button"
                         onClick={() => {
-                          const loginTab = document.querySelector(
-                            '[value="login"]'
-                          ) as HTMLElement;
+                          const loginTab = document.querySelector('[value="login"]') as HTMLElement;
                           loginTab?.click();
                         }}
-                        className="text-primary hover:underline font-medium"
+                        className="font-medium text-primary hover:underline"
                       >
                         Log in
                       </button>

@@ -3,7 +3,6 @@ import crypto from "crypto";
 import { Domain, IDomain } from "../models/domainModel.js";
 import mongoose from "mongoose";
 
-/** ✅ Generate DKIM keypair for a domain */
 export const generateDKIMKeys = async (selector: string, domain: string) => {
   const { publicKey, privateKey } = crypto.generateKeyPairSync("rsa", {
     modulusLength: 2048,

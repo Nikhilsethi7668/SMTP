@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import CsvUploader from "./CsvUploader";
+import { toast } from "sonner";
 
 interface LeadEmail {
   _id: string;
@@ -28,7 +29,13 @@ interface LeadEmail {
   status: "Not yet contacted" | "Contacted" | "Bounced" | "Replied";
 }
 
-export const CampaignLeads = ({ campaignId, campaignName }: { campaignId: string; campaignName: string }) => {
+export const CampaignLeads = ({
+  campaignId,
+  campaignName,
+}: {
+  campaignId: string;
+  campaignName: string;
+}) => {
   const [leadsData, setLeadsData] = useState<LeadEmail[]>([]);
   const [showDialog, setShowDialog] = useState(false);
 
@@ -45,7 +52,7 @@ export const CampaignLeads = ({ campaignId, campaignName }: { campaignId: string
         setLeadsData(response.data.data);
       }
     } catch (error) {
-      console.log(error);
+      toast.error(error?.response?.data?.message);
     }
   };
 
@@ -54,10 +61,9 @@ export const CampaignLeads = ({ campaignId, campaignName }: { campaignId: string
   }, []);
 
   const isValidEmail = (email: string) => {
-  const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  return regex.test(email);
-};
-
+    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return regex.test(email);
+  };
 
   const handleAddLead = async () => {
     if (!email) return;
@@ -84,19 +90,19 @@ export const CampaignLeads = ({ campaignId, campaignName }: { campaignId: string
         setVerifyEmail(false);
       }
     } catch (error) {
-      console.log(error);
-      alert("Failed to add lead.");
+      console.error(error);
+      toast.error("Failed to add lead.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="p-6 space-y-4">
+    <div className="space-y-4 p-6">
       {leadsData.length < 0 && (
         <div className="flex justify-end gap-4">
           <Button onClick={() => setShowDialog(true)}>+ Add Leads</Button>
-          <CsvUploader campaignId={campaignId} onSuccess={()=> handleGetData()} />
+          <CsvUploader campaignId={campaignId} onSuccess={() => handleGetData()} />
         </div>
       )}
 
@@ -118,16 +124,16 @@ export const CampaignLeads = ({ campaignId, campaignName }: { campaignId: string
             <DialogTitle>Add New Lead</DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-4 mt-2">
+          <div className="mt-2 space-y-4">
             <div>
-              <label className="block mb-1 text-sm font-medium">Email</label>
+              <label className="mb-1 block text-sm font-medium">Email</label>
               <input
                 type="email"
                 value={email}
                 required
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter email address"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-400 transition"
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>

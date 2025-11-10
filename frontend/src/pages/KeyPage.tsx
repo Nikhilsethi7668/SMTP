@@ -28,7 +28,11 @@ export default function ApiKeysPage() {
       const data = await res.json();
       setApiKeys(data);
     } catch (error) {
-      toast({ title: "Error fetching API keys", description: String(error), variant: "destructive" });
+      toast({
+        title: "Error fetching API keys",
+        description: String(error),
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -82,11 +86,11 @@ export default function ApiKeysPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto py-10 space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="mx-auto max-w-3xl space-y-6 py-10">
+      <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">API Keys</h1>
         <Button onClick={createKey} disabled={creating}>
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="mr-2 h-4 w-4" />
           Generate Key
         </Button>
       </div>
@@ -104,20 +108,20 @@ export default function ApiKeysPage() {
         </Card>
       ) : (
         apiKeys.map((key) => (
-          <Card key={key.id} className="relative group">
+          <Card key={key.id} className="group relative">
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="text-base font-medium">
                 Key #{key.id} — {key.is_active ? "Active" : "Inactive"}
               </CardTitle>
               <div className="flex gap-2">
                 <Button size="icon" variant="outline" onClick={() => copyToClipboard(key.key)}>
-                  <Copy className="w-4 h-4" />
+                  <Copy className="h-4 w-4" />
                 </Button>
                 <Button size="icon" variant="outline" onClick={() => regenerateKey(key.id)}>
-                  <RefreshCcw className="w-4 h-4" />
+                  <RefreshCcw className="h-4 w-4" />
                 </Button>
                 <Button size="icon" variant="destructive" onClick={() => deleteKey(key.id)}>
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
             </CardHeader>

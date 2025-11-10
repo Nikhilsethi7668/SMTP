@@ -10,6 +10,7 @@ import {
   Settings,
   Globe,
   Flame,
+  CreditCard,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -24,6 +25,7 @@ const navigationItems = [
   { name: "Analytics", icon: LineChart, path: "/app/analytics" },
   { name: "Domains", icon: Globe, path: "/app/domains" },
   { name: "CRM", icon: BarChart3, path: "/app/crm" },
+  { name: "Credits", icon: CreditCard, path: "/app/dashboard/credits" },
   { name: "Settings", icon: Settings, path: "/app/dashboard/settings" },
 ];
 

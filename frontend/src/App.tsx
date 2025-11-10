@@ -27,9 +27,9 @@ import CustomConnect from "./pages/account/CustomConnect";
 
 import { ProtectedRoute } from "./ProtectedRoute";
 import EmailAccounts from "./pages/EmailAccounts";
-import Domain from "./pages/Domain";
 import { CreditsPage } from "./pages/CreditsPage";
 import { EmailWarmupPage } from "./pages/EmailWarmup";
+import DomainsPage from "./pages/domain/DomainsPage";
 
 const queryClient = new QueryClient();
 
@@ -165,7 +165,7 @@ const App = () => (
             path="/app/domains"
             element={
               <ProtectedRoute>
-                <Domain />
+                <DomainsPage />
               </ProtectedRoute>
             }
           />

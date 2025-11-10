@@ -1,0 +1,709 @@
+[
+  {
+    "domain": "gladioarcane.com",
+    "emails": [
+      {
+        "email": "iris@gladioarcane.com",
+        "persona": "Iris Hernandez",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "kevin@gladioarcane.com",
+        "persona": "Kevin Jackson",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "laura@gladioarcane.com",
+        "persona": "Laura Wright",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "gary@gladioarcane.com",
+        "persona": "Gary Anderson",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "jack@gladioarcane.com",
+        "persona": "Jack Gonzalez",
+        "provider": "gmail",
+        "price": 10
+      }
+    ],
+    "domainPrice": 15,
+    "emailPrice": 10,
+    "status": "available"
+  },
+  {
+    "domain": "korasensemyriad.com",
+    "emails": [
+      {
+        "email": "sarah@korasensemyriad.com",
+        "persona": "Sarah Mitchell",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "david@korasensemyriad.com",
+        "persona": "David Chen",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "emily@korasensemyriad.com",
+        "persona": "Emily Rodriguez",
+        "provider": "gmail",
+        "price": 10
+      }
+    ],
+    "domainPrice": 15,
+    "emailPrice": 10,
+    "status": "available"
+  },
+  {
+    "domain": "axiszen.co",
+    "emails": [
+      {
+        "email": "michael@axiszen.co",
+        "persona": "Michael Thompson",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "jennifer@axiszen.co",
+        "persona": "Jennifer Martinez",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "robert@axiszen.co",
+        "persona": "Robert Lee",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "amanda@axiszen.co",
+        "persona": "Amanda White",
+        "provider": "gmail",
+        "price": 10
+      }
+    ],
+    "domainPrice": 15,
+    "emailPrice": 10,
+    "status": "available"
+  },
+  {
+    "domain": "loftyunisonoutlet.org",
+    "emails": [
+      {
+        "email": "christopher@loftyunisonoutlet.org",
+        "persona": "Christopher Brown",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "jessica@loftyunisonoutlet.org",
+        "persona": "Jessica Davis",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "daniel@loftyunisonoutlet.org",
+        "persona": "Daniel Wilson",
+        "provider": "gmail",
+        "price": 10
+      }
+    ],
+    "domainPrice": 15,
+    "emailPrice": 10,
+    "status": "available"
+  },
+  {
+    "domain": "eequationpace.com",
+    "emails": [
+      {
+        "email": "lisa@eequationpace.com",
+        "persona": "Lisa Taylor",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "james@eequationpace.com",
+        "persona": "James Moore",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "patricia@eequationpace.com",
+        "persona": "Patricia Johnson",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "william@eequationpace.com",
+        "persona": "William Garcia",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "linda@eequationpace.com",
+        "persona": "Linda Martinez",
+        "provider": "gmail",
+        "price": 10
+      }
+    ],
+    "domainPrice": 15,
+    "emailPrice": 10,
+    "status": "available"
+  },
+  {
+    "domain": "empooriginsfira.com",
+    "emails": [
+      {
+        "email": "richard@empooriginsfira.com",
+        "persona": "Richard Lewis",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "barbara@empooriginsfira.com",
+        "persona": "Barbara Walker",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "joseph@empooriginsfira.com",
+        "persona": "Joseph Hall",
+        "provider": "gmail",
+        "price": 10
+      }
+    ],
+    "domainPrice": 15,
+    "emailPrice": 10,
+    "status": "available"
+  },
+  {
+    "domain": "nexnanoplume.com",
+    "emails": [
+      {
+        "email": "susan@nexnanoplume.com",
+        "persona": "Susan Allen",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "thomas@nexnanoplume.com",
+        "persona": "Thomas Young",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "karen@nexnanoplume.com",
+        "persona": "Karen King",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "charles@nexnanoplume.com",
+        "persona": "Charles Wright",
+        "provider": "gmail",
+        "price": 10
+      }
+    ],
+    "domainPrice": 15,
+    "emailPrice": 10,
+    "status": "available"
+  },
+  {
+    "domain": "dawninspireesis.com",
+    "emails": [
+      {
+        "email": "nancy@dawninspireesis.com",
+        "persona": "Nancy Lopez",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "mark@dawninspireesis.com",
+        "persona": "Mark Hill",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "betty@dawninspireesis.com",
+        "persona": "Betty Scott",
+        "provider": "gmail",
+        "price": 10
+      }
+    ],
+    "domainPrice": 15,
+    "emailPrice": 10,
+    "status": "available"
+  },
+  {
+    "domain": "regihorizon.org",
+    "emails": [
+      {
+        "email": "donald@regihorizon.org",
+        "persona": "Donald Green",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "helen@regihorizon.org",
+        "persona": "Helen Adams",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "paul@regihorizon.org",
+        "persona": "Paul Baker",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "donna@regihorizon.org",
+        "persona": "Donna Nelson",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "steven@regihorizon.org",
+        "persona": "Steven Carter",
+        "provider": "gmail",
+        "price": 10
+      }
+    ],
+    "domainPrice": 15,
+    "emailPrice": 10,
+    "status": "available"
+  },
+  {
+    "domain": "spectmyriadparadigm.com",
+    "emails": [
+      {
+        "email": "carol@spectmyriadparadigm.com",
+        "persona": "Carol Mitchell",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "andrew@spectmyriadparadigm.com",
+        "persona": "Andrew Roberts",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "sharon@spectmyriadparadigm.com",
+        "persona": "Sharon Turner",
+        "provider": "gmail",
+        "price": 10
+      }
+    ],
+    "domainPrice": 15,
+    "emailPrice": 10,
+    "status": "available"
+  },
+  {
+    "domain": "guideamplitude.org",
+    "emails": [
+      {
+        "email": "kenneth@guideamplitude.org",
+        "persona": "Kenneth Phillips",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "michelle@guideamplitude.org",
+        "persona": "Michelle Campbell",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "joshua@guideamplitude.org",
+        "persona": "Joshua Parker",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "kimberly@guideamplitude.org",
+        "persona": "Kimberly Evans",
+        "provider": "gmail",
+        "price": 10
+      }
+    ],
+    "domainPrice": 15,
+    "emailPrice": 10,
+    "status": "available"
+  },
+  {
+    "domain": "conjuresolve.com",
+    "emails": [
+      {
+        "email": "kevin@conjuresolve.com",
+        "persona": "Kevin Edwards",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "deborah@conjuresolve.com",
+        "persona": "Deborah Collins",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "brian@conjuresolve.com",
+        "persona": "Brian Stewart",
+        "provider": "gmail",
+        "price": 10
+      }
+    ],
+    "domainPrice": 15,
+    "emailPrice": 10,
+    "status": "available"
+  },
+  {
+    "domain": "vanodynamicshonor.com",
+    "emails": [
+      {
+        "email": "rachel@vanodynamicshonor.com",
+        "persona": "Rachel Sanchez",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "edward@vanodynamicshonor.com",
+        "persona": "Edward Morris",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "cynthia@vanodynamicshonor.com",
+        "persona": "Cynthia Rogers",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "ronald@vanodynamicshonor.com",
+        "persona": "Ronald Reed",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "kathleen@vanodynamicshonor.com",
+        "persona": "Kathleen Cook",
+        "provider": "gmail",
+        "price": 10
+      }
+    ],
+    "domainPrice": 15,
+    "emailPrice": 10,
+    "status": "available"
+  },
+  {
+    "domain": "stratcapstoneoid.com",
+    "emails": [
+      {
+        "email": "anthony@stratcapstoneoid.com",
+        "persona": "Anthony Morgan",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "amy@stratcapstoneoid.com",
+        "persona": "Amy Bell",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "ryan@stratcapstoneoid.com",
+        "persona": "Ryan Murphy",
+        "provider": "gmail",
+        "price": 10
+      }
+    ],
+    "domainPrice": 15,
+    "emailPrice": 10,
+    "status": "available"
+  },
+  {
+    "domain": "angelaspirebooth.org",
+    "emails": [
+      {
+        "email": "angela@angelaspirebooth.org",
+        "persona": "Angela Bailey",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "eric@angelaspirebooth.org",
+        "persona": "Eric Rivera",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "melissa@angelaspirebooth.org",
+        "persona": "Melissa Cooper",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "jason@angelaspirebooth.org",
+        "persona": "Jason Richardson",
+        "provider": "gmail",
+        "price": 10
+      }
+    ],
+    "domainPrice": 15,
+    "emailPrice": 10,
+    "status": "available"
+  },
+  {
+    "domain": "jourdax.com",
+    "emails": [
+      {
+        "email": "stephanie@jourdax.com",
+        "persona": "Stephanie Cox",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "matthew@jourdax.com",
+        "persona": "Matthew Howard",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "rebecca@jourdax.com",
+        "persona": "Rebecca Ward",
+        "provider": "gmail",
+        "price": 10
+      }
+    ],
+    "domainPrice": 15,
+    "emailPrice": 10,
+    "status": "available"
+  },
+  {
+    "domain": "invigoratevirtue.com",
+    "emails": [
+      {
+        "email": "nicholas@invigoratevirtue.com",
+        "persona": "Nicholas Torres",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "shirley@invigoratevirtue.com",
+        "persona": "Shirley Peterson",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "christine@invigoratevirtue.com",
+        "persona": "Christine Gray",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "jack@invigoratevirtue.com",
+        "persona": "Jack Ramirez",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "janet@invigoratevirtue.com",
+        "persona": "Janet James",
+        "provider": "gmail",
+        "price": 10
+      }
+    ],
+    "domainPrice": 15,
+    "emailPrice": 10,
+    "status": "available"
+  },
+  {
+    "domain": "genexhydroware.com",
+    "emails": [
+      {
+        "email": "scott@genexhydroware.com",
+        "persona": "Scott Watson",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "victoria@genexhydroware.com",
+        "persona": "Victoria Brooks",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "brandon@genexhydroware.com",
+        "persona": "Brandon Kelly",
+        "provider": "gmail",
+        "price": 10
+      }
+    ],
+    "domainPrice": 15,
+    "emailPrice": 10,
+    "status": "available"
+  },
+  {
+    "domain": "axisring.org",
+    "emails": [
+      {
+        "email": "denise@axisring.org",
+        "persona": "Denise Sanders",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "benjamin@axisring.org",
+        "persona": "Benjamin Price",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "emily@axisring.org",
+        "persona": "Emily Bennett",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "samuel@axisring.org",
+        "persona": "Samuel Wood",
+        "provider": "gmail",
+        "price": 10
+      }
+    ],
+    "domainPrice": 15,
+    "emailPrice": 10,
+    "status": "available"
+  },
+  {
+    "domain": "acumensure.org",
+    "emails": [
+      {
+        "email": "frank@acumensure.org",
+        "persona": "Frank Barnes",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "donna@acumensure.org",
+        "persona": "Donna Ross",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "gregory@acumensure.org",
+        "persona": "Gregory Henderson",
+        "provider": "gmail",
+        "price": 10
+      }
+    ],
+    "domainPrice": 15,
+    "emailPrice": 10,
+    "status": "available"
+  },
+  {
+    "domain": "streamlinegroupmonos.com",
+    "emails": [
+      {
+        "email": "carolyn@streamlinegroupmonos.com",
+        "persona": "Carolyn Coleman",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "raymond@streamlinegroupmonos.com",
+        "persona": "Raymond Jenkins",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "catherine@streamlinegroupmonos.com",
+        "persona": "Catherine Perry",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "alexander@streamlinegroupmonos.com",
+        "persona": "Alexander Powell",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "maria@streamlinegroupmonos.com",
+        "persona": "Maria Long",
+        "provider": "gmail",
+        "price": 10
+      }
+    ],
+    "domainPrice": 15,
+    "emailPrice": 10,
+    "status": "available"
+  },
+  {
+    "domain": "warpstate.org",
+    "emails": [
+      {
+        "email": "patrick@warpstate.org",
+        "persona": "Patrick Patterson",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "diane@warpstate.org",
+        "persona": "Diane Hughes",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "stephen@warpstate.org",
+        "persona": "Stephen Flores",
+        "provider": "gmail",
+        "price": 10
+      }
+    ],
+    "domainPrice": 15,
+    "emailPrice": 10,
+    "status": "available"
+  },
+  {
+    "domain": "chromcurrent.com",
+    "emails": [
+      {
+        "email": "dorothy@chromcurrent.com",
+        "persona": "Dorothy Washington",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "gary@chromcurrent.com",
+        "persona": "Gary Butler",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "lisa@chromcurrent.com",
+        "persona": "Lisa Simmons",
+        "provider": "gmail",
+        "price": 10
+      },
+      {
+        "email": "ryan@chromcurrent.com",
+        "persona": "Ryan Foster",
+        "provider": "gmail",
+        "price": 10
+      }
+    ],
+    "domainPrice": 15,
+    "emailPrice": 10,
+    "status": "available"
+  }
+]
+

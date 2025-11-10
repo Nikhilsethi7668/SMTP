@@ -28,6 +28,8 @@ import CustomConnect from "./pages/account/CustomConnect";
 import { ProtectedRoute } from "./ProtectedRoute";
 import EmailAccounts from "./pages/EmailAccounts";
 import Domain from "./pages/Domain";
+import { CreditsPage } from "./pages/CreditsPage";
+import { EmailWarmupPage } from "./pages/EmailWarmup";
 
 const queryClient = new QueryClient();
 
@@ -134,6 +136,23 @@ const App = () => (
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/app/dashboard/credits"
+            element={
+              <ProtectedRoute>
+                <CreditsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/dashboard/email-warmup"
+            element={
+              <ProtectedRoute>
+                <EmailWarmupPage />
+              </ProtectedRoute>
+            }
+          />
+
           <Route
             path="/app/analytics"
             element={

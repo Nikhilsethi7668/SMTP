@@ -39,7 +39,7 @@ interface EmailTableProps {
   onStartWarmup?: (emailId: string) => void;
 }
 
-export const EmailTable: React.FC<EmailTableProps> = ({ emails, onSetPrimary, onDeleteEmail }) => {
+export const EmailTable: React.FC<EmailTableProps> = ({ emails, onSetPrimary, onDeleteEmail, onStartWarmup }) => {
   return (
     <div className="flex h-full w-full flex-col p-4">
       <div className="flex-1 overflow-auto rounded-lg border">
@@ -89,6 +89,15 @@ export const EmailTable: React.FC<EmailTableProps> = ({ emails, onSetPrimary, on
                   </Badge>
                 </TableCell>
                 <TableCell className="flex gap-2">
+                  {onStartWarmup && (
+                    <Button
+                      size="sm"
+                      className="bg-gradient-primary"
+                      onClick={() => onStartWarmup(email._id)}
+                    >
+                      Start Warmup
+                    </Button>
+                  )}
                   {!email.isPrimary && (
                     <Button size="sm" variant="outline" onClick={() => onSetPrimary(email._id)}>
                       Set Primary

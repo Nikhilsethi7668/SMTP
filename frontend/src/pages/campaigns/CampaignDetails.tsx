@@ -12,21 +12,21 @@ import { CampaignSequences } from "@/components/CampaignSequences";
 import api from "@/axiosInstance";
 import ScheduleManager from "@/components/ScheduleManager";
 import CampaignSettings from "@/components/CampaignSettings";
+import { toast } from "sonner";
 
 export const CampaignDetails = () => {
-    const campaigns = 
-      {
-        _id: "68fe46721bc24c007cda8e59",
-        name: "Welcome Series",
-        status: "running" as "running" | "draft" | "paused" | "completed",
-        metrics_sent: 2000,
-        metrics_delivered: 1800,
-        metrics_opened: 900,
-        metrics_clicked: 400,
-        metrics_bounced: 50,
-        metrics_complaints: 10,
-        updatedAt: "2025-10-26T16:05:45.103Z",
-      };
+  const campaigns = {
+    _id: "68fe46721bc24c007cda8e59",
+    name: "Welcome Series",
+    status: "running" as "running" | "draft" | "paused" | "completed",
+    metrics_sent: 2000,
+    metrics_delivered: 1800,
+    metrics_opened: 900,
+    metrics_clicked: 400,
+    metrics_bounced: 50,
+    metrics_complaints: 10,
+    updatedAt: "2025-10-26T16:05:45.103Z",
+  };
   const navigate = useNavigate();
   const query = new URLSearchParams(useLocation().search);
   const [isCampaignPause, setIsCampaignPause] = useState(false);
@@ -39,8 +39,8 @@ export const CampaignDetails = () => {
     { key: "analytics", label: "Analytics" },
     { key: "leads", label: "Leads" },
     { key: "sequences", label: "Sequences" },
-    { key: "schedules", label: "Schedules"},
-    { key: "options", label: "Options" }
+    { key: "schedules", label: "Schedules" },
+    { key: "options", label: "Options" },
   ];
   const [activeTab, setActiveTab] = useState("analytics");
   const [CampaignDetails, setCampaignDetails] = useState<Campaign>({
@@ -54,52 +54,60 @@ export const CampaignDetails = () => {
     metrics_bounced: 0,
     metrics_complaints: 0,
     updatedAt: new Date().toISOString(),
-  })
-  const handleGetAnalyticsData = async (id) => {
+  });
+  const handleGetAnalyticsData = async (id: string) => {
     try {
-        const response = await api.get(`campaigns/${id}`);
-        if(response.data.success){
-            console.log(response)
-            setCampaignDetails(response.data.data)
-        }
+      const response = await api.get(`campaigns/${id}`);
+      if (response.data.success) {
+        setCampaignDetails(response.data.data);
+      }
     } catch (error) {
-        console.log(error)
+      toast.error(error?.response?.data?.message);
     }
-  }
+  };
   const renderTabContent = () => {
     switch (activeTab) {
       case "analytics":
-        return <CampaignAnalytics campaign={CampaignDetails || {
-    _id: "",
-    name: prefilledCampaignName,
-    status: "draft",
-    metrics_sent: 0,
-    metrics_delivered: 0,
-    metrics_opened: 0,
-    metrics_clicked: 0,
-    metrics_bounced: 0,
-    metrics_complaints: 0,
-    updatedAt: new Date().toISOString(),
-  }} onPause={()=> console.log("pause")} onResume={()=> console.log("RESUME")}  />;
+        return (
+          <CampaignAnalytics
+            campaign={
+              CampaignDetails || {
+                _id: "",
+                name: prefilledCampaignName,
+                status: "draft",
+                metrics_sent: 0,
+                metrics_delivered: 0,
+                metrics_opened: 0,
+                metrics_clicked: 0,
+                metrics_bounced: 0,
+                metrics_complaints: 0,
+                updatedAt: new Date().toISOString(),
+              }
+            }
+            onPause={() => console.log("pause")}
+            onResume={() => console.log("RESUME")}
+          />
+        );
       case "leads":
-        return <CampaignLeads campaignId={prefilledCampaignId} campaignName={prefilledCampaignName} />;
+        return (
+          <CampaignLeads campaignId={prefilledCampaignId} campaignName={prefilledCampaignName} />
+        );
       case "sequences":
         return <CampaignSequences />;
       case "schedules":
-        return <ScheduleManager/>
+        return <ScheduleManager />;
       case "options":
-        return <CampaignSettings/>
+        return <CampaignSettings />;
       default:
         return null;
     }
   };
 
-useEffect(() => {
-  if(prefilledCampaignId){
-    handleGetAnalyticsData(prefilledCampaignId);
-  }
-}, [prefilledCampaignId])
-
+  useEffect(() => {
+    if (prefilledCampaignId) {
+      handleGetAnalyticsData(prefilledCampaignId);
+    }
+  }, [prefilledCampaignId]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -111,9 +119,9 @@ useEffect(() => {
         <SideBar collapsed={isSidebarCollapsed} />
 
         {/* Main Content */}
-        <div className="flex-1 flex flex-col p-6">
+        <div className="flex flex-1 flex-col p-6">
           {/* Tabs */}
-          <div className="flex items-center justify-between border-b border-gray-200 pb-2 mb-4">
+          <div className="mb-4 flex items-center justify-between border-b border-gray-200 pb-2">
             <div className="flex gap-6">
               {tabs.map((tab) => (
                 <button
@@ -121,7 +129,7 @@ useEffect(() => {
                   onClick={() => setActiveTab(tab.key)}
                   className={`pb-2 text-sm font-medium transition-all ${
                     activeTab === tab.key
-                      ? "text-black-600 border-b-2 border-black-600"
+                      ? "text-black-600 border-black-600 border-b-2"
                       : "text-gray-500 hover:text-gray-700"
                   }`}
                 >

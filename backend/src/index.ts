@@ -13,13 +13,16 @@ import keyRoutes from "./routes/keyRoutes.js";
 import { startPolicyServer } from "./services/policyEngine.js";
 import { connectDB } from "./config/db.js";
 import { initPricingTable } from "./services/pricingService.js";
+import { initCreditCostTable } from "./services/creditCostService.js";
 import leadsRoutes from "./routes/leadsRoutes.js";
 import emailTemplateRoutes from "./routes/emailTemplateRoutes.js";
 import incomingEmailRoutes from "./routes/incomingEmailRoutes.js";
 import googleOauthRoutes from "./routes/googleOauth.js";
 import outlookAuthRoutes from "./routes/outlookAuth.js";
 import customConnectRoutes from "./routes/customConnect.js";
-
+import domainRoutes from "./routes/domainRoutes.js";
+import creditsRoutes from "./routes/creditsRoutes.js";
+import emailWarmupRoutes from "./routes/emailWarmupRoutes.js";
 const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
@@ -33,6 +36,8 @@ const startServer = async () => {
     app.use(cookieParser()); 
     app.use(bodyParser.json());
         await connectDB();
+        await initPricingTable();
+        await initCreditCostTable();
 
     app.get("/health", (req, res) => res.json({ status: "ok" }));
     app.use("/api", apiRoutes);
@@ -44,9 +49,12 @@ const startServer = async () => {
     app.use('/api/leads', leadsRoutes);
     app.use('/api/email-templates', emailTemplateRoutes);
     app.use('/api/incoming-emails', incomingEmailRoutes);
+    app.use('/api/domains', domainRoutes);
+    app.use('/api/credits', creditsRoutes);
     app.use('/api', googleOauthRoutes);
     app.use('/api', outlookAuthRoutes);
     app.use('/api', customConnectRoutes);
+    app.use('/api', emailWarmupRoutes);
     app.listen(PORT, () => {
       console.log(`Admin API server running on port ${PORT}`);
     });

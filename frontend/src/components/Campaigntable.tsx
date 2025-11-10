@@ -42,14 +42,11 @@ const statusColors: Record<string, string> = {
   completed: "bg-info/10 text-info border-info/20",
 };
 
-export const CampaignTable: React.FC<CampaignTableProps> = ({
-  campaigns,
-  onAction,
-}) => {
+export const CampaignTable: React.FC<CampaignTableProps> = ({ campaigns, onAction }) => {
   const navigate = useNavigate();
   return (
-    <div className="border rounded-lg overflow-hidden w-full">
-      <Table className="[&_th]:text-left [&_td]:text-left w-full">
+    <div className="w-full overflow-hidden rounded-lg border">
+      <Table className="w-full [&_td]:text-left [&_th]:text-left">
         <TableHeader>
           <TableRow className="bg-muted/50">
             <TableHead className="font-semibold">Name</TableHead>
@@ -74,25 +71,27 @@ export const CampaignTable: React.FC<CampaignTableProps> = ({
             const bounced = c.metrics_bounced || 0;
             const complaints = c.metrics_complaints || 0;
 
-            const openRate =
-              delivered > 0 ? ((opened / delivered) * 100).toFixed(1) : "0.0";
-            const clickRate =
-              delivered > 0 ? ((clicked / delivered) * 100).toFixed(1) : "0.0";
-            const bounceRate =
-              sent > 0 ? ((bounced / sent) * 100).toFixed(1) : "0.0";
+            const openRate = delivered > 0 ? ((opened / delivered) * 100).toFixed(1) : "0.0";
+            const clickRate = delivered > 0 ? ((clicked / delivered) * 100).toFixed(1) : "0.0";
+            const bounceRate = sent > 0 ? ((bounced / sent) * 100).toFixed(1) : "0.0";
             const complaintRate =
               delivered > 0 ? ((complaints / delivered) * 100).toFixed(1) : "0.0";
 
             return (
-              <TableRow key={c._id} className="hover:bg-muted/30 transition-colors">
-                <TableCell onClick={()=> navigate(`/app/dashboard/campaigns/details?campaignName=${encodeURIComponent(c.name)}&campaignId=${encodeURIComponent(c._id)}`)} className="font-medium cursor-pointer">{c.name}</TableCell>
+              <TableRow key={c._id} className="transition-colors hover:bg-muted/30">
+                <TableCell
+                  onClick={() =>
+                    navigate(
+                      `/app/dashboard/campaigns/details?campaignName=${encodeURIComponent(c.name)}&campaignId=${encodeURIComponent(c._id)}`
+                    )
+                  }
+                  className="cursor-pointer font-medium"
+                >
+                  {c.name}
+                </TableCell>
                 <TableCell>
-                  <Badge
-                    variant="outline"
-                    className={statusColors[c.status || "draft"]}
-                  >
-                    {c.status?.charAt(0).toUpperCase() +
-                      c.status?.slice(1) || "Draft"}
+                  <Badge variant="outline" className={statusColors[c.status || "draft"]}>
+                    {c.status?.charAt(0).toUpperCase() + c.status?.slice(1) || "Draft"}
                   </Badge>
                 </TableCell>
 
@@ -103,9 +102,7 @@ export const CampaignTable: React.FC<CampaignTableProps> = ({
                 <TableCell>{bounceRate}%</TableCell>
                 <TableCell>{complaintRate}%</TableCell>
                 <TableCell className="text-sm text-muted-foreground">
-                  {c.updatedAt
-                    ? new Date(c.updatedAt).toLocaleString()
-                    : "—"}
+                  {c.updatedAt ? new Date(c.updatedAt).toLocaleString() : "—"}
                 </TableCell>
 
                 <TableCell>
@@ -118,28 +115,23 @@ export const CampaignTable: React.FC<CampaignTableProps> = ({
 
                     <DropdownMenuContent align="start">
                       <DropdownMenuItem onClick={() => onAction?.("edit", c)}>
-                        <Edit className="h-4 w-4 mr-2" /> Edit
+                        <Edit className="mr-2 h-4 w-4" /> Edit
                       </DropdownMenuItem>
 
                       <DropdownMenuItem onClick={() => onAction?.("duplicate", c)}>
-                        <Copy className="h-4 w-4 mr-2" /> Duplicate
+                        <Copy className="mr-2 h-4 w-4" /> Duplicate
                       </DropdownMenuItem>
 
                       <DropdownMenuItem
-                        onClick={() =>
-                          onAction?.(
-                            c.status === "running" ? "pause" : "start",
-                            c
-                          )
-                        }
+                        onClick={() => onAction?.(c.status === "running" ? "pause" : "start", c)}
                       >
                         {c.status === "running" ? (
                           <>
-                            <Pause className="h-4 w-4 mr-2" /> Pause
+                            <Pause className="mr-2 h-4 w-4" /> Pause
                           </>
                         ) : (
                           <>
-                            <Play className="h-4 w-4 mr-2" /> Start
+                            <Play className="mr-2 h-4 w-4" /> Start
                           </>
                         )}
                       </DropdownMenuItem>

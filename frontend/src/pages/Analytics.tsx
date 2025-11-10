@@ -8,12 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   LineChart,
   Line,
@@ -34,10 +29,11 @@ import {
   Reply,
   Target,
 } from "lucide-react";
-import { Header } from "@/components/Header";
-import { SideBar } from "@/components/SideBar";
+import { DashboardLayout } from "@/components/DashboardLayout";
 import api from "@/axiosInstance";
 import { toast } from "sonner";
+import { Header } from "@/components/Header";
+import { SideBar } from "@/components/SideBar";
 
 interface Campaign {
   _id: string;
@@ -65,16 +61,14 @@ const StatCard = ({
 }: StatCardProps) => {
   return (
     <Card className="relative overflow-hidden transition-all duration-200 hover:shadow-lg">
-      <div className={`absolute top-0 left-0 w-full h-1 ${accentColor}`} />
+      <div className={`absolute left-0 top-0 h-1 w-full ${accentColor}`} />
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <div className="flex items-center gap-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">
-            {title}
-          </CardTitle>
+          <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
-                <Info className="h-3.5 w-3.5 text-muted-foreground/50 hover:text-muted-foreground transition-colors" />
+                <Info className="h-3.5 w-3.5 text-muted-foreground/50 transition-colors hover:text-muted-foreground" />
               </TooltipTrigger>
               <TooltipContent>
                 <p className="max-w-xs text-xs">{tooltip}</p>
@@ -82,13 +76,11 @@ const StatCard = ({
             </Tooltip>
           </TooltipProvider>
         </div>
-        <div className={`p-2 rounded-lg ${accentColor} bg-opacity-10`}>
+        <div className={`rounded-lg p-2 ${accentColor} bg-opacity-10`}>
           <Icon
             className="h-4 w-4"
             style={{
-              color: `hsl(var(--${accentColor
-                .replace("bg-", "")
-                .replace("/10", "")}))`,
+              color: `hsl(var(--${accentColor.replace("bg-", "").replace("/10", "")}))`,
             }}
           />
         </div>
@@ -96,7 +88,7 @@ const StatCard = ({
       <CardContent>
         <div className="text-3xl font-bold tracking-tight">{value}</div>
         <p
-          className={`text-xs flex items-center gap-1 mt-2 ${
+          className={`mt-2 flex items-center gap-1 text-xs ${
             trendUp ? "text-success" : "text-destructive"
           }`}
         >
@@ -111,9 +103,9 @@ const StatCard = ({
 export default function Analytics() {
   const [selectedCampaign, setSelectedCampaign] = useState("all");
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState<any>(null);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   // 🔹 Fetch campaigns dynamically from API
   useEffect(() => {
@@ -123,7 +115,7 @@ export default function Analytics() {
         const allOption = { _id: "all", name: "All Campaigns" };
         setCampaigns([allOption, ...res.data.campaigns]);
       } catch (err) {
-        console.error("Failed to fetch campaigns:", err);
+        toast.error(err?.response?.data?.message);
       }
     };
     fetchCampaigns();
@@ -134,13 +126,17 @@ export default function Analytics() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const res = await api.get("/campaigns/metrics", {
-          params: { campaignId: selectedCampaign === "all" ? undefined : selectedCampaign },
-        });
-
+        let res: any;
+        if (selectedCampaign === "all") {
+          res = await api.get("/campaigns/metrics/all");
+        } else {
+          res = await api.get("/campaigns/metrics", {
+            params: { campaignId: selectedCampaign },
+          });
+        }
         setMetrics(res.data.data);
       } catch (error) {
-        console.error("Error fetching metrics:", error);
+        toast.error(error?.response?.data?.message);
       } finally {
         setLoading(false);
       }
@@ -161,39 +157,27 @@ export default function Analytics() {
     },
     {
       title: "Open Rate",
-      value: metrics?.openRate
-        ? `${metrics.openRate.toFixed(1)}%`
-        : "0%",
+      value: metrics?.openRate ? `${metrics.openRate.toFixed(1)}%` : "0%",
       icon: MousePointer,
-      trend: metrics?.openRateChange
-        ? `${metrics.openRateChange}%`
-        : "+0%",
+      trend: metrics?.openRateChange ? `${metrics.openRateChange}%` : "+0%",
       trendUp: metrics?.openRateChange >= 0,
       accentColor: "bg-success/10",
       tooltip: "Percentage of recipients who opened your emails",
     },
     {
       title: "Click Rate",
-      value: metrics?.clickRate
-        ? `${metrics.clickRate.toFixed(1)}%`
-        : "0%",
+      value: metrics?.clickRate ? `${metrics.clickRate.toFixed(1)}%` : "0%",
       icon: Target,
-      trend: metrics?.clickRateChange
-        ? `${metrics.clickRateChange}%`
-        : "+0%",
+      trend: metrics?.clickRateChange ? `${metrics.clickRateChange}%` : "+0%",
       trendUp: metrics?.clickRateChange >= 0,
       accentColor: "bg-warning/10",
       tooltip: "Percentage of recipients who clicked links in your emails",
     },
     {
       title: "Reply Rate",
-      value: metrics?.replyRate
-        ? `${metrics.replyRate.toFixed(1)}%`
-        : "0%",
+      value: metrics?.replyRate ? `${metrics.replyRate.toFixed(1)}%` : "0%",
       icon: Reply,
-      trend: metrics?.replyRateChange
-        ? `${metrics.replyRateChange}%`
-        : "-0%",
+      trend: metrics?.replyRateChange ? `${metrics.replyRateChange}%` : "-0%",
       trendUp: metrics?.replyRateChange >= 0,
       accentColor: "bg-accent/10",
       tooltip: "Percentage of recipients who replied to your emails",
@@ -202,13 +186,10 @@ export default function Analytics() {
       title: "Opportunities",
       value: metrics?.opportunities?.toLocaleString() ?? "0",
       icon: TrendingUp,
-      trend: metrics?.opportunitiesChange
-        ? `${metrics.opportunitiesChange}%`
-        : "+0%",
+      trend: metrics?.opportunitiesChange ? `${metrics.opportunitiesChange}%` : "+0%",
       trendUp: metrics?.opportunitiesChange >= 0,
       accentColor: "bg-primary/10",
-      tooltip:
-        "Number of qualified opportunities generated from campaigns",
+      tooltip: "Number of qualified opportunities generated from campaigns",
     },
   ];
 
@@ -224,37 +205,29 @@ export default function Analytics() {
 
   return (
     <div className="max-h-screen overflow-hidden">
-      <Header
-        onToggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-      />
+      <Header onToggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)} />
       <div className="flex flex-1 overflow-hidden">
         <SideBar collapsed={isSidebarCollapsed} />
 
-        <div className="flex-1 overflow-scroll p-6 h-screen">
-          <div className="flex-1 h-[120vh]">
+        <div className="h-screen flex-1 overflow-scroll p-6">
+          <div className="h-[120vh] flex-1">
             {/* Header with Campaign Filter */}
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+            <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div>
                 <h1 className="text-3xl font-bold tracking-tight">
-                  Analytics Dashboard {" "} {selectedCampaign !== "all" && (
-    <span>
-      {" - "}
-      {
-        campaigns.find((c) => c._id === selectedCampaign)?.name || ""
-      }
-    </span>
-  )}
+                  Analytics Dashboard{" "}
+                  {selectedCampaign !== "all" && (
+                    <span>
+                      {" - "}
+                      {campaigns.find((c) => c._id === selectedCampaign)?.name || ""}
+                    </span>
+                  )}
                 </h1>
-                <p className="text-muted-foreground mt-1">
-                  Track your email campaign performance
-                </p>
+                <p className="mt-1 text-muted-foreground">Track your email campaign performance</p>
               </div>
 
               <div className="flex items-center gap-3">
-                <Select
-                  value={selectedCampaign}
-                  onValueChange={setSelectedCampaign}
-                >
+                <Select value={selectedCampaign} onValueChange={setSelectedCampaign}>
                   <SelectTrigger className="w-[200px]">
                     <SelectValue placeholder="Select Campaign" />
                   </SelectTrigger>
@@ -267,18 +240,26 @@ export default function Analytics() {
                   </SelectContent>
                 </Select>
 
-                <Button onClick={()=> toast.info("Feature coming soon")} variant="outline" size="icon">
+                <Button
+                  onClick={() => toast.info("Feature coming soon")}
+                  variant="outline"
+                  size="icon"
+                >
                   <Share2 className="h-4 w-4" />
                 </Button>
 
-                <Button  onClick={()=> toast.info("Feature coming soon")} variant="outline" size="icon">
+                <Button
+                  onClick={() => toast.info("Feature coming soon")}
+                  variant="outline"
+                  size="icon"
+                >
                   <Settings className="h-4 w-4" />
                 </Button>
               </div>
             </div>
 
             {/* Stat Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+            <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5">
               {stats.map((stat, index) => (
                 <StatCard key={index} {...stat} />
               ))}
@@ -287,9 +268,7 @@ export default function Analytics() {
             {/* Activity Chart */}
             <Card className="shadow-lg">
               <CardHeader>
-                <CardTitle className="text-xl">
-                  Email Activity Over Time
-                </CardTitle>
+                <CardTitle className="text-xl">Email Activity Over Time</CardTitle>
                 <p className="text-sm text-muted-foreground">
                   Track sends, opens, clicks, and replies
                 </p>
@@ -311,18 +290,13 @@ export default function Analytics() {
                       fontSize={12}
                       tickLine={false}
                     />
-                    <YAxis
-                      stroke="hsl(var(--muted-foreground))"
-                      fontSize={12}
-                      tickLine={false}
-                    />
+                    <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} />
                     <RechartsTooltip
                       contentStyle={{
                         backgroundColor: "hsl(var(--card))",
                         border: "1px solid hsl(var(--border))",
                         borderRadius: "8px",
-                        boxShadow:
-                          "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                        boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
                       }}
                     />
                     <Legend wrapperStyle={{ paddingTop: "20px" }} />

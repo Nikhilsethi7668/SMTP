@@ -2,7 +2,13 @@ import { useState } from "react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,16 +19,19 @@ export default function CampaignSettings() {
   const [dailyLimit, setDailyLimit] = useState("30");
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
+    <div className="mx-auto max-w-5xl space-y-6">
       {/* Accounts */}
-      <div className="border rounded-xl p-6 bg-white shadow-sm">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-3">
+      <div className="rounded-xl border bg-white p-6 shadow-sm">
+        <div className="mb-3 flex flex-col md:flex-row md:items-center md:justify-between">
           <Label className="text-base font-medium">Accounts to use</Label>
-          <a href="http://localhost:8080/app/dashboard/accounts/connect" className="text-blue-600 text-sm hover:underline">
+          <a
+            href="http://localhost:8080/app/dashboard/accounts/connect"
+            className="text-sm text-blue-600 hover:underline"
+          >
             Connect new email account
           </a>
         </div>
-        <p className="text-sm text-slate-500 mb-2">
+        <p className="mb-2 text-sm text-slate-500">
           Select one or more accounts to send emails from
         </p>
         <Select>
@@ -38,7 +47,7 @@ export default function CampaignSettings() {
       </div>
 
       {/* Stop sending on reply */}
-      <div className="border rounded-xl p-6 bg-white shadow-sm flex items-center justify-between">
+      <div className="flex items-center justify-between rounded-xl border bg-white p-6 shadow-sm">
         <div>
           <Label className="text-base font-medium">Stop sending emails on reply</Label>
           <p className="text-sm text-slate-500">
@@ -62,8 +71,8 @@ export default function CampaignSettings() {
       </div>
 
       {/* Open Tracking */}
-      <div className="border rounded-xl p-6 bg-white shadow-sm">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-3">
+      <div className="rounded-xl border bg-white p-6 shadow-sm">
+        <div className="mb-3 flex flex-col md:flex-row md:items-center md:justify-between">
           <Label className="text-base font-medium">Open Tracking</Label>
           <div className="flex items-center gap-2">
             <Checkbox id="linkTracking" />
@@ -72,7 +81,7 @@ export default function CampaignSettings() {
             </Label>
           </div>
         </div>
-        <p className="text-sm text-slate-500 mb-3">Track email opens</p>
+        <p className="mb-3 text-sm text-slate-500">Track email opens</p>
         <div className="flex gap-2">
           <Button
             variant={!openTracking ? "default" : "outline"}
@@ -90,9 +99,9 @@ export default function CampaignSettings() {
       </div>
 
       {/* Delivery Optimization */}
-      <div className="border rounded-xl p-6 bg-white shadow-sm">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-3">
-          <Label className="text-base font-medium flex items-center gap-2">
+      <div className="rounded-xl border bg-white p-6 shadow-sm">
+        <div className="mb-3 flex flex-col md:flex-row md:items-center md:justify-between">
+          <Label className="flex items-center gap-2 text-base font-medium">
             Delivery Optimization <Badge variant="secondary">Recommended</Badge>
           </Label>
           <div className="flex items-center gap-3">
@@ -104,7 +113,7 @@ export default function CampaignSettings() {
             </div>
             <div className="flex items-center gap-2">
               <Checkbox id="firstOnly" />
-              <Label htmlFor="firstOnly" className="text-sm flex items-center gap-1">
+              <Label htmlFor="firstOnly" className="flex items-center gap-1 text-sm">
                 Send first email as text-only
                 <Badge className="bg-yellow-400 text-black">Pro</Badge>
               </Label>
@@ -115,9 +124,9 @@ export default function CampaignSettings() {
       </div>
 
       {/* Daily Limit */}
-      <div className="border rounded-xl p-6 bg-white shadow-sm">
+      <div className="rounded-xl border bg-white p-6 shadow-sm">
         <Label className="text-base font-medium">Daily Limit</Label>
-        <p className="text-sm text-slate-500 mb-3">
+        <p className="mb-3 text-sm text-slate-500">
           Max number of emails to send per day for this campaign
         </p>
         <Input

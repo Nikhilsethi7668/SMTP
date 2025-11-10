@@ -23,6 +23,7 @@ import customConnectRoutes from "./routes/customConnect.js";
 import domainRoutes from "./routes/domainRoutes.js";
 import creditsRoutes from "./routes/creditsRoutes.js";
 import emailWarmupRoutes from "./routes/emailWarmupRoutes.js";
+import preWarmedDomainRoutes from "./routes/preWarmedDomainRoutes.js";
 const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
@@ -55,6 +56,7 @@ const startServer = async () => {
     app.use('/api', outlookAuthRoutes);
     app.use('/api', customConnectRoutes);
     app.use('/api', emailWarmupRoutes);
+    app.use('/api', preWarmedDomainRoutes);
     app.listen(PORT, () => {
       console.log(`Admin API server running on port ${PORT}`);
     });

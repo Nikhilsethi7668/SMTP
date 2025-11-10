@@ -2,13 +2,31 @@ import { AppHeader } from "@/components/AppHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Check, Mail } from "lucide-react";
+import api from "@/axiosInstance";
 
 const AccountConnect: React.FC = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState<string | null>(null);
+  const [availableDomainsCount, setAvailableDomainsCount] = useState(392);
+
+  useEffect(() => {
+    fetchAvailableDomainsCount();
+  }, []);
+
+  const fetchAvailableDomainsCount = async () => {
+    try {
+      const response = await api.get("/pre-warmed-domains");
+      if (response.data.success) {
+        setAvailableDomainsCount(response.data.count || 0);
+      }
+    } catch (error) {
+      // Silently fail, use default count
+      console.error("Failed to fetch domain count:", error);
+    }
+  };
 
   const handleGoogleConnect = () => {
     setIsLoading("google");
@@ -28,11 +46,62 @@ const AccountConnect: React.FC = () => {
     <div className="flex h-screen w-screen flex-col bg-gray-50">
       <AppHeader onClickAction={() => navigate(-1)} headings={"Back"} />
 
-      <div className="flex flex-1 items-center justify-center p-6">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle>Connect existing accounts</CardTitle>
-          </CardHeader>
+      <div className="flex flex-1 items-center justify-center gap-10 p-6">
+          {/* Pre-warmed Accounts Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Pre-warmed accounts</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <div className="flex items-center gap-3">
+                  <Check className="h-5 w-5 flex-shrink-0 text-green-500" />
+                  <p className="text-sm">Pre-Made Accounts & Domains</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Check className="h-5 w-5 flex-shrink-0 text-green-500" />
+                  <p className="text-sm">Start Sending Right away</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Check className="h-5 w-5 flex-shrink-0 text-green-500" />
+                  <p className="text-sm">No Setup Required</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Check className="h-5 w-5 flex-shrink-0 text-green-500" />
+                  <p className="text-sm">Scale existing campaigns Instantly</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Check className="h-5 w-5 flex-shrink-0 text-green-500" />
+                  <p className="text-sm">High-quality US IP Accounts</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Check className="h-5 w-5 flex-shrink-0 text-green-500" />
+                  <p className="text-sm">Deliverability Optimized</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Check className="h-5 w-5 flex-shrink-0 text-green-500" />
+                  <p className="text-sm">Added to the premium warmup pool</p>
+                </div>
+              </div>
+              <div className="text-sm">
+                <p>{availableDomainsCount} domains remaining</p>
+              </div>
+              <Button
+                onClick={() => navigate("/app/dashboard/accounts/pre-warmed/select")}
+                  className="w-full p-8"
+                  size="lg"
+              >
+                Continue
+                <span className="ml-2 bg-yellow-500 text-black text-xs px-2 py-0.5 rounded-full font-semibold">New</span>
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Connect Existing Accounts Card */}
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle>Connect existing accounts</CardTitle>
+            </CardHeader>
           <CardContent className="space-y-6">
             {/* Features */}
             <div className="space-y-3">
@@ -128,7 +197,7 @@ const AccountConnect: React.FC = () => {
               </Button>
             </div>
           </CardContent>
-        </Card>
+          </Card>
       </div>
     </div>
   );

@@ -3,6 +3,7 @@ import api from '@/axiosInstance';
 export interface CreateCheckoutSessionRequest {
   amount: number;
   currency?: 'usd' | 'inr';
+  metadata?: Record<string, string>;
 }
 
 export interface CreateCheckoutSessionResponse {

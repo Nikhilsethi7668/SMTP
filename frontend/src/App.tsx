@@ -23,6 +23,8 @@ import SettingsPage from "./pages/settings/SettingsPage";
 import UniBox from "./pages/UniBox";
 import { Crm } from "./pages/Crm";
 import CustomConnect from "./pages/account/CustomConnect";
+import { PreWarmedDomainSelect } from "./pages/account/PreWarmedDomainSelect";
+import { PreWarmedOrder } from "./pages/account/PreWarmedOrder";
 
 
 import { ProtectedRoute } from "./ProtectedRoute";
@@ -69,6 +71,22 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <CustomConnect />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/dashboard/accounts/pre-warmed/select"
+            element={
+              <ProtectedRoute>
+                <PreWarmedDomainSelect />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/dashboard/accounts/pre-warmed/order"
+            element={
+              <ProtectedRoute>
+                <PreWarmedOrder />
               </ProtectedRoute>
             }
           />

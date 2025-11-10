@@ -44,7 +44,7 @@ const Auth = () => {
     try {
       setIsLoading(true);
       if (!email || !password) {
-        throw new Error("Please fill all required feilds");
+        throw new Error("Please fill all required fields");
       }
       const response = await api.post("/auth/login", { email, password });
       if (response.status === 200) {
@@ -64,24 +64,25 @@ const Auth = () => {
         });
         navigate("/app/dashboard/accounts");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
-      toast.error(error?.response?.data?.message || (error as string));
+      const errorMessage = error?.response?.data?.message || error?.message || "An error occurred";
+      toast.error(errorMessage);
       setIsLoading(false);
     }
   };
 
   const handleSignup = async (e: React.FormEvent) => {
-    setIsLoading(true);
     e.preventDefault();
+    setIsLoading(true);
     console.log("Signup attempt");
-    if (!email || !password || !fullName || !username || !confirmPassword) {
-      throw new Error("Please fill all required fields");
-    }
-    if (password !== confirmPassword) {
-      throw new Error("Password and confrim password do not match");
-    }
     try {
+      if (!email || !password || !fullName || !username || !confirmPassword) {
+        throw new Error("Please fill all required fields");
+      }
+      if (password !== confirmPassword) {
+        throw new Error("Password and confirm password do not match");
+      }
       const response = await api.post("/auth/signup", {
         fullName,
         username,
@@ -96,8 +97,10 @@ const Auth = () => {
           )}&username=${encodeURIComponent(username)}`
         );
       }
-    } catch (error) {
-      toast.error(error?.response?.data?.message || (error as string));
+    } catch (error: any) {
+      const errorMessage = error?.response?.data?.message || error?.message || "An error occurred";
+      toast.error(errorMessage);
+
       console.error("Signup error:", error);
       setIsLoading(false);
     } finally {
@@ -200,7 +203,7 @@ const Auth = () => {
                     <div className="space-y-2">
                       <Label htmlFor="login-email">Work Email</Label>
                       <Input
-                        onChangeEvent={(val) => setEmail(val)}
+                        onChange={(e) => setEmail(e.target.value)}
                         id="login-email"
                         type="email"
                         placeholder="you@company.com"
@@ -212,7 +215,7 @@ const Auth = () => {
                     <div className="space-y-2">
                       <Label htmlFor="login-password">Password</Label>
                       <Input
-                        onChangeEvent={(val) => setPassword(val)}
+                        onChange={(e) => setPassword(e.target.value)}
                         id="login-password"
                         type="password"
                         placeholder="••••••••"
@@ -325,7 +328,7 @@ const Auth = () => {
                     <div className="space-y-2">
                       <Label htmlFor="signup-name">Full Name</Label>
                       <Input
-                        onChangeEvent={(val) => setFullName(val)}
+                        onChange={(e) => setFullName(e.target.value)}
                         id="signup-name"
                         type="text"
                         placeholder="John Doe"
@@ -337,7 +340,7 @@ const Auth = () => {
                     <div className="space-y-2">
                       <Label htmlFor="signup-name">Username</Label>
                       <Input
-                        onChangeEvent={(val) => setUsername(val)}
+                        onChange={(e) => setUsername(e.target.value)}
                         id="signup-name"
                         type="text"
                         placeholder="John Doe"
@@ -348,7 +351,7 @@ const Auth = () => {
                     <div className="space-y-2">
                       <Label htmlFor="signup-email">Work Email</Label>
                       <Input
-                        onChangeEvent={(val) => setEmail(val)}
+                        onChange={(e) => setEmail(e.target.value)}
                         id="signup-email"
                         type="email"
                         placeholder="you@company.com"
@@ -362,7 +365,7 @@ const Auth = () => {
                         Company <span className="text-xs text-muted-foreground">(optional)</span>
                       </Label>
                       <Input
-                        onChangeEvent={(val) => setCompanyName(val)}
+                        onChange={(e) => setCompanyName(e.target.value)}
                         id="signup-company"
                         type="text"
                         placeholder="Acme Inc."
@@ -373,7 +376,7 @@ const Auth = () => {
                     <div className="space-y-2">
                       <Label htmlFor="signup-password">Password</Label>
                       <Input
-                        onChangeEvent={(val) => setPassword(val)}
+                        onChange={(e) => setPassword(e.target.value)}
                         id="signup-password"
                         type="password"
                         placeholder="••••••••"
@@ -385,7 +388,7 @@ const Auth = () => {
                     <div className="space-y-2">
                       <Label htmlFor="signup-confirm">Confirm Password</Label>
                       <Input
-                        onChangeEvent={(val) => setConfirmPassword(val)}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
                         id="signup-confirm"
                         type="password"
                         placeholder="••••••••"

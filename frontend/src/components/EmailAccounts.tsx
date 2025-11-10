@@ -38,12 +38,34 @@ export const EmailAccounts = () => {
     try {
       const response = await api.delete(`/accounts/${emailId}/disconnect`);
       if (response.data.success) {
-        alert("Account disconnected successfully");
+        toast.success("Account disconnected successfully");
         await handleGetData();
       }
     } catch (error) {
-      console.log("Error occurred", error);
-      alert("Failed to disconnect account");
+      toast.error(error?.response?.data?.message || (error as string));
+    }
+  };
+
+  const handleStartWarmup = async (emailId: string) => {
+    try {
+      const response = await api.post('/warmup', {
+        emailAccountId: emailId,
+        warmupSettings: {
+          dailyEmailLimit: 5,
+          replyRate: 30,
+          openRate: 40,
+          duration: 30
+        }
+      });
+      if (response.data.success) {
+        toast.success("Warmup started successfully!");
+        navigate("/app/dashboard/email-warmup");
+      } else {
+        toast.error(response.data.message || "Failed to start warmup");
+      }
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || "Failed to start warmup";
+      toast.error(errorMessage);
     }
   };
   useEffect(() => {
@@ -78,6 +100,7 @@ export const EmailAccounts = () => {
               <EmailTable
                 onSetPrimary={(email) => handleSetPrimary(email)}
                 onDeleteEmail={(value) => handleDeleteUser(value)}
+                onStartWarmup={(emailId) => handleStartWarmup(emailId)}
                 emails={emailsData}
               />
             ) : (

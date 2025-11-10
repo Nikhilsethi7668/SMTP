@@ -9,6 +9,7 @@ import {
   UserCog,
   Settings,
   Globe,
+  Flame,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -18,6 +19,7 @@ const navigationItems = [
   { name: "Dashboard", icon: Home, path: "/app/dashboard/accounts" },
   { name: "Campaigns", icon: Mail, path: "/app/dashboard/campaigns" },
   { name: "Email Accounts", icon: UserCog, path: "/app/email-accounts" },
+  { name: "Warmup", icon: Flame, path: "/app/dashboard/email-warmup" },
   { name: "UniBox", icon: Inbox, path: "/app/dashboard/unibox" },
   { name: "Analytics", icon: LineChart, path: "/app/analytics" },
   { name: "Domains", icon: Globe, path: "/app/domains" },

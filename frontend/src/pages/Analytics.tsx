@@ -29,10 +29,11 @@ import {
   Reply,
   Target,
 } from "lucide-react";
-import { Header } from "@/components/Header";
-import { SideBar } from "@/components/SideBar";
+import { DashboardLayout } from "@/components/DashboardLayout";
 import api from "@/axiosInstance";
 import { toast } from "sonner";
+import { Header } from "@/components/Header";
+import { SideBar } from "@/components/SideBar";
 
 interface Campaign {
   _id: string;
@@ -102,9 +103,9 @@ const StatCard = ({
 export default function Analytics() {
   const [selectedCampaign, setSelectedCampaign] = useState("all");
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [metrics, setMetrics] = useState<any>(null);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   // 🔹 Fetch campaigns dynamically from API
   useEffect(() => {

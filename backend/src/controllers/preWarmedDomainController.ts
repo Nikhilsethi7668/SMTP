@@ -212,3 +212,138 @@ export const getUserDomains = async (req: Request, res: Response) => {
   }
 };
 
+// Get all purchased domains
+export const getAllPurchasedDomains = async (req: Request, res: Response) => {
+  try {
+    const { search } = req.query;
+    const query: any = { status: "purchased" };
+
+    if (search) {
+      query.domain = { $regex: search, $options: "i" };
+    }
+
+    const domains = await PreWarmedDomain.find(query)
+      .select("domain emails forwarding userId createdAt updatedAt warmingup")
+      .populate("userId", "email full_name username")
+      .lean();
+
+    res.status(200).json({
+      success: true,
+      count: domains.length,
+      data: domains,
+    });
+  } catch (error: any) {
+    console.error("Error fetching all purchased domains:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch purchased domains",
+      error: error.message,
+    });
+  }
+};
+
+// Get all domains (admin) - regardless of status
+export const getAllDomains = async (req: Request, res: Response) => {
+  try {
+    const { search } = req.query;
+    const query: any = {};
+
+    if (search) {
+      query.domain = { $regex: search, $options: "i" };
+    }
+
+    const domains = await PreWarmedDomain.find(query)
+      .select("domain emails forwarding userId createdAt updatedAt status warmingup")
+      .populate("userId", "email full_name username")
+      .lean();
+
+    res.status(200).json({
+      success: true,
+      count: domains.length,
+      data: domains,
+    });
+  } catch (error: any) {
+    console.error("Error fetching all domains:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch domains",
+      error: error.message,
+    });
+  }
+};
+
+// Get domain by ID with full details
+export const getDomainById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const domainDoc = await PreWarmedDomain.findById(id)
+      .populate("userId", "email full_name username")
+      .lean();
+
+    if (!domainDoc) {
+      return res.status(404).json({
+        success: false,
+        message: "Domain not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: domainDoc,
+    });
+  } catch (error: any) {
+    console.error("Error fetching domain:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch domain",
+      error: error.message,
+    });
+  }
+};
+
+// Enable/disable warmup for a domain
+export const toggleDomainWarmup = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { warmingup } = req.body;
+
+    if (typeof warmingup !== "boolean") {
+      return res.status(400).json({
+        success: false,
+        message: "warmingup must be a boolean value",
+      });
+    }
+
+    const domainDoc = await PreWarmedDomain.findById(id);
+
+    if (!domainDoc) {
+      return res.status(404).json({
+        success: false,
+        message: "Domain not found",
+      });
+    }
+
+    domainDoc.warmingup = warmingup;
+    await domainDoc.save();
+
+    // Fetch the updated domain with populated userId
+    const updatedDomain = await PreWarmedDomain.findById(id)
+      .populate("userId", "email full_name username")
+      .lean();
+
+    res.status(200).json({
+      success: true,
+      message: `Warmup ${warmingup ? "enabled" : "disabled"} successfully`,
+      data: updatedDomain,
+    });
+  } catch (error: any) {
+    console.error("Error toggling domain warmup:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to toggle warmup",
+      error: error.message,
+    });
+  }
+};
+

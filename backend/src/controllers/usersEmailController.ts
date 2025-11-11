@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import crypto from "crypto";
 import { Types } from "mongoose";
-import UsersEmail from "../models/usersEmailModel.js";
 import mongoose from "mongoose";
+import EmailAccount from "../models/EmailAccount.js";
 
 const generateVerificationToken = (): string => {
   return crypto.randomBytes(32).toString("hex");
@@ -11,11 +11,11 @@ const generateVerificationToken = (): string => {
 // Add a new email for user
 export const addUserEmail = async (req: Request, res: Response) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user!.id;
     const { email, isPrimary = false } = req.body;
 
     // Check if email already exists
-    const existingEmail = await UsersEmail.findOne({ email });
+    const existingEmail = await EmailAccount.findOne({ email });
     if (existingEmail) {
       res.status(400).json({
         success: false,
@@ -28,13 +28,12 @@ export const addUserEmail = async (req: Request, res: Response) => {
     const verificationTokenExpires = new Date();
     verificationTokenExpires.setHours(verificationTokenExpires.getHours() + 24);
 
-    const userEmail = await UsersEmail.create({
-      email,
-      user: userId,
-      isPrimary,
+    const userEmail = await EmailAccount.create({
+      userId: userId,
+      email: email,
+      isPrimary: isPrimary,
       verificationToken,
       verificationTokenExpires,
-      isVerified: false,
     });
 
     // TODO: Send verification email here
@@ -65,31 +64,29 @@ export const verifyEmail = async (req: Request, res: Response) => {
   try {
     const { token } = req.params;
 
-    const userEmail = await UsersEmail.findOne({
+    const emailAccount = await EmailAccount.findOne({
       verificationToken: token,
       verificationTokenExpires: { $gt: new Date() },
     });
 
-    if (!userEmail) {
-      res.status(400).json({
+    if (!emailAccount) {
+      return res.status(400).json({
         success: false,
         message: "Invalid or expired verification token",
       });
-      return;
     }
 
-    userEmail.isVerified = true;
-    userEmail.verifiedAt = new Date();
-    userEmail.verificationToken = undefined;
-    userEmail.verificationTokenExpires = undefined;
-    await userEmail.save();
+    emailAccount.isVerified = true;
+    emailAccount.verificationToken = undefined;
+    emailAccount.verificationTokenExpires = undefined;
+    await emailAccount.save();
 
     res.status(200).json({
       success: true,
       message: "Email verified successfully",
       data: {
-        email: userEmail.email,
-        isVerified: userEmail.isVerified,
+        email: emailAccount.email,
+        isVerified: emailAccount.isVerified,
       },
     });
   } catch (error: any) {
@@ -105,11 +102,18 @@ export const verifyEmail = async (req: Request, res: Response) => {
 // Set primary email
 export const setPrimaryEmail = async (req: Request, res: Response) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user!.id;
     const { emailId } = req.params;
     console.log(emailId, userId)
-    const userEmail = await UsersEmail.findOneAndUpdate(
-      { _id: emailId, user: userId },
+    
+    // First, unset all other primary emails for this user
+    await EmailAccount.updateMany(
+      { userId: userId, _id: { $ne: emailId } },
+      { isPrimary: false }
+    );
+
+    const userEmail = await EmailAccount.findOneAndUpdate(
+      { _id: emailId, userId: userId },
       { isPrimary: true },
       { new: true }
     );
@@ -144,10 +148,10 @@ export const setPrimaryEmail = async (req: Request, res: Response) => {
 // Get user's emails
 export const getUserEmails = async (req: Request, res: Response) => {
   try {
-    const userId = req.user.id;
-    console.log(req.user.id);
-    const emails = await UsersEmail.find({
-      user: new mongoose.Types.ObjectId(userId),
+    const userId = req.user!.id;
+    console.log(req.user!.id);
+    const emails = await EmailAccount.find({
+      userId: new mongoose.Types.ObjectId(userId),
     })
       .select("-verificationToken -verificationTokenExpires -__v")
       .sort({ isPrimary: -1, email: 1 })
@@ -171,12 +175,12 @@ export const getUserEmails = async (req: Request, res: Response) => {
 // Delete user email
 export const deleteUserEmail = async (req: Request, res: Response) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user!.id;
     const { emailId } = req.params;
     console.log(emailId, userId);
-    const email = await UsersEmail.findOneAndDelete({
+    const email = await EmailAccount.findOneAndDelete({
       _id: emailId,
-      user: userId,
+      userId: userId,
       isPrimary: false,
     });
 
@@ -206,15 +210,15 @@ export const deleteUserEmail = async (req: Request, res: Response) => {
 // Resend verification email
 export const resendVerification = async (req: Request, res: Response) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user!.id;
     const { emailId } = req.params;
 
     const verificationToken = generateVerificationToken();
     const verificationTokenExpires = new Date();
     verificationTokenExpires.setHours(verificationTokenExpires.getHours() + 24);
 
-    const userEmail = await UsersEmail.findOneAndUpdate(
-      { _id: emailId, user: userId, isVerified: false },
+    const userEmail = await EmailAccount.findOneAndUpdate(
+      { _id: emailId, userId: userId, isVerified: false },
       {
         verificationToken,
         verificationTokenExpires,

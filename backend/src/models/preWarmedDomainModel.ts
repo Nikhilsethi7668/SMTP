@@ -17,6 +17,7 @@ export interface IPreWarmedDomain extends Document {
   status: "available" | "reserved" | "purchased";
   reservedUntil?: Date;
   reservedBy?: mongoose.Types.ObjectId;
+  warmingup:Boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -65,6 +66,9 @@ const PreWarmedDomainSchema = new Schema<IPreWarmedDomain>(
     },
     reservedUntil: {
       type: Date,
+    },
+    warmingup:{
+     type:Boolean
     },
     reservedBy: {
       type: Schema.Types.ObjectId,

@@ -5,6 +5,10 @@ import {
   getDomainEmails,
   purchaseDomain,
   getUserDomains,
+  getAllPurchasedDomains,
+  getAllDomains,
+  getDomainById,
+  toggleDomainWarmup,
 } from "../controllers/preWarmedDomainController.js";
 import { authenticate } from "../middleware/authMiddleware.js";
 
@@ -27,6 +31,18 @@ router.post("/pre-warmed-domains/purchase", purchaseDomain);
 
 // Get user's purchased domains
 router.get("/pre-warmed-domains/user", getUserDomains);
+
+// Get all purchased domains
+router.get("/pre-warmed-domains/purchased", getAllPurchasedDomains);
+
+// Admin routes - get all domains
+router.get("/pre-warmed-domains/all", getAllDomains);
+
+// Get domain by ID
+router.get("/pre-warmed-domains/id/:id", getDomainById);
+
+// Toggle warmup for a domain
+router.patch("/pre-warmed-domains/:id/warmup", toggleDomainWarmup);
 
 export default router;
 

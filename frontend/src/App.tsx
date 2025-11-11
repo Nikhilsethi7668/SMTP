@@ -32,6 +32,8 @@ import EmailAccounts from "./pages/EmailAccounts";
 import { CreditsPage } from "./pages/CreditsPage";
 import { EmailWarmupPage } from "./pages/EmailWarmup";
 import DomainsPage from "./pages/domain/DomainsPage";
+import PurchasedDomainsPage from "./pages/preWarmedDomains/PurchasedDomainsPage";
+import DomainDetailsPage from "./pages/preWarmedDomains/DomainDetailsPage";
 
 const queryClient = new QueryClient();
 
@@ -200,6 +202,22 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <Crm />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/dashboard/purchased-domains"
+            element={
+              <ProtectedRoute>
+                <PurchasedDomainsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/dashboard/purchased-domains/:id"
+            element={
+              <ProtectedRoute>
+                <DomainDetailsPage />
               </ProtectedRoute>
             }
           />

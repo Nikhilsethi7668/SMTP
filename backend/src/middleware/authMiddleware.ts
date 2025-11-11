@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
 export const authenticate = (req: Request, res: Response, next: NextFunction) => {
+  console.log('🔐 Authenticate middleware called for:', req.method, req.path);
   // 1️⃣ Try Authorization header first
   const authHeader = req.headers.authorization;
   let token: string | undefined;
@@ -18,7 +19,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
 
   // 3️⃣ If no token found
   if (!token) {
-    return res.status(401).json({ message: 'No token provided' });
+    return res.status(401).json({ message: 'No token provided!' });
   }
 
   try {

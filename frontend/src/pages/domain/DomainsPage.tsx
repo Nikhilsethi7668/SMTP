@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { DomainResponse, VerifyDomainResponse } from '@/services/domainApi';
 import { Globe, Clipboard, CheckCircle, Clock, Trash2, AlertCircle, XCircle } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -13,6 +14,7 @@ import { domainApi } from '@/services/domainApi';
 import { DashboardLayout } from '@/components/DashboardLayout';
 
 const DomainsPage = () => {
+  const navigate = useNavigate();
   const [domains, setDomains] = useState<DomainResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [newDomain, setNewDomain] = useState('');
@@ -216,10 +218,18 @@ const DomainsPage = () => {
           <h2 className="text-2xl font-semibold mb-4 flex items-center">
             <Globe className="mr-3 h-6 w-6" /> Sending Domains
           </h2>
-          <p className="text-muted-foreground mb-6">
-            Verify your domains to start sending emails. Add the provided DNS records to your domain's
-            registrar. It may take some time for DNS changes to propagate.
-          </p>
+          <div className="flex items-center justify-between mb-6">
+            <p className="text-muted-foreground">
+              Verify your domains to start sending emails. Add the provided DNS records to your domain's
+              registrar. It may take some time for DNS changes to propagate.
+            </p>
+            <Button
+              onClick={() => navigate('/app/purchase-domain')}
+              className="ml-4"
+            >
+              Buy Domain
+            </Button>
+          </div>
 
           {/* Success/Error Messages */}
           {success && (

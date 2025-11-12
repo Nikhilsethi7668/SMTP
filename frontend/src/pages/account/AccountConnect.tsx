@@ -2,6 +2,7 @@ import { AppHeader } from "@/components/AppHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Check, Mail } from "lucide-react";
@@ -43,14 +44,63 @@ const AccountConnect: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen w-screen flex-col bg-gray-50">
+    <div className="flex min-h-screen w-screen flex-col overflow-x-hidden bg-gray-50">
       <AppHeader onClickAction={() => navigate(-1)} headings={"Back"} />
 
-      <div className="flex flex-1 items-center justify-center gap-10 p-6">
-          {/* Pre-warmed Accounts Card */}
-          <Card>
+      <div className="flex flex-1 flex-col items-center justify-center gap-6 overflow-y-auto p-4 md:flex-row md:gap-10 md:p-6">
+          {/* Done-for-you Email Setup Card */}
+          <Card className="w-full max-w-md">
             <CardHeader>
-              <CardTitle>Pre-warmed accounts</CardTitle>
+              <CardTitle className="text-lg md:text-xl">Done-for-you Email Setup</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <div className="flex items-center gap-3">
+                  <Check className="h-5 w-5 flex-shrink-0 text-green-500" />
+                  <p className="text-sm">We Set Up Your Accounts</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Check className="h-5 w-5 flex-shrink-0 text-green-500" />
+                  <p className="text-sm break-words">You Choose The Domain & Account Names</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Check className="h-5 w-5 flex-shrink-0 text-green-500" />
+                  <p className="text-sm">Automatic reconnects</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Check className="h-5 w-5 flex-shrink-0 text-green-500" />
+                  <p className="text-sm">Save time and money</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Check className="h-5 w-5 flex-shrink-0 text-green-500" />
+                  <p className="text-sm">High-quality US IP accounts</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Check className="h-5 w-5 flex-shrink-0 text-green-500" />
+                  <p className="text-sm">Deliverability Optimized</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Check className="h-5 w-5 flex-shrink-0 text-green-500" />
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="text-sm">Added to the premium warmup pool</p>
+                    <Badge className="bg-yellow-500 text-black text-xs px-2 py-0.5 rounded-full font-semibold">Pro</Badge>
+                  </div>
+                </div>
+              </div>
+              <Button
+                onClick={() => navigate("/app/purchase-domain")}
+                className="w-full p-4 md:p-8"
+                size="lg"
+              >
+                Continue
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Pre-warmed Accounts Card */}
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle className="text-lg md:text-xl">Pre-warmed accounts</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -88,7 +138,7 @@ const AccountConnect: React.FC = () => {
               </div>
               <Button
                 onClick={() => navigate("/app/dashboard/accounts/pre-warmed/select")}
-                  className="w-full p-8"
+                  className="w-full p-4 md:p-8"
                   size="lg"
               >
                 Continue
@@ -100,7 +150,7 @@ const AccountConnect: React.FC = () => {
           {/* Connect Existing Accounts Card */}
           <Card className="w-full max-w-md">
             <CardHeader>
-              <CardTitle>Connect existing accounts</CardTitle>
+              <CardTitle className="text-lg md:text-xl">Connect existing accounts</CardTitle>
             </CardHeader>
           <CardContent className="space-y-6">
             {/* Features */}
@@ -124,12 +174,12 @@ const AccountConnect: React.FC = () => {
               <Button
                 onClick={handleGoogleConnect}
                 variant="outline"
-                className="h-auto w-full justify-start p-4 hover:bg-accent"
+                className="h-auto w-full justify-start p-3 md:p-4 hover:bg-accent"
                 disabled={isLoading !== null}
               >
-                <div className="flex w-full items-center gap-4">
+                <div className="flex w-full items-center gap-3 md:gap-4">
                   <div className="flex-shrink-0">
-                    <svg className="h-8 w-8" viewBox="0 0 24 24">
+                    <svg className="h-6 w-6 md:h-8 md:w-8" viewBox="0 0 24 24">
                       <path
                         d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                         fill="#4285F4"
@@ -159,12 +209,12 @@ const AccountConnect: React.FC = () => {
               <Button
                 onClick={handleMicrosoftConnect}
                 variant="outline"
-                className="h-auto w-full justify-start p-4 hover:bg-accent"
+                className="h-auto w-full justify-start p-3 md:p-4 hover:bg-accent"
                 disabled={isLoading !== null}
               >
-                <div className="flex w-full items-center gap-4">
+                <div className="flex w-full items-center gap-3 md:gap-4">
                   <div className="flex-shrink-0">
-                    <svg className="h-8 w-8" viewBox="0 0 24 24" fill="#D83B01">
+                    <svg className="h-6 w-6 md:h-8 md:w-8" viewBox="0 0 24 24" fill="#D83B01">
                       <path d="M0 0h11.377v11.372H0z" fill="#F25022" />
                       <path d="M12.623 0H24v11.372H12.623z" fill="#00A4EF" />
                       <path d="M0 12.628h11.377V24H0z" fill="#7FBA00" />
@@ -182,12 +232,12 @@ const AccountConnect: React.FC = () => {
               <Button
                 onClick={handleCustomProvider}
                 variant="outline"
-                className="h-auto w-full justify-start p-4 hover:bg-accent"
+                className="h-auto w-full justify-start p-3 md:p-4 hover:bg-accent"
                 disabled={isLoading !== null}
               >
-                <div className="flex w-full items-center gap-4">
+                <div className="flex w-full items-center gap-3 md:gap-4">
                   <div className="flex-shrink-0">
-                    <Mail className="h-8 w-8 text-muted-foreground" />
+                    <Mail className="h-6 w-6 md:h-8 md:w-8 text-muted-foreground" />
                   </div>
                   <div className="flex-1 text-left">
                     <p className="font-medium">Any Provider</p>

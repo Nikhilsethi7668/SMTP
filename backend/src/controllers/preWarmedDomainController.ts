@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { PreWarmedDomain } from "../models/preWarmedDomainModel.js";
+import { PreWarmedDomain } from "../models/unifiedDomainModel.js";
 import mongoose from "mongoose";
 
 // Get all available pre-warmed domains

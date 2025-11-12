@@ -1,6 +1,6 @@
 // src/services/dkimService.ts
 import crypto from "crypto";
-import { Domain, IDomain } from "../models/domainModel.js";
+import { Domain, IDomain } from "../models/unifiedDomainModel.js";
 import mongoose from "mongoose";
 
 export const generateDKIMKeys = async (selector: string, domain: string) => {
@@ -34,10 +34,14 @@ export const saveDKIMKeys = async (
 
 /** ✅ Generate DKIM DNS TXT record string */
 export const generateDKIMDNSRecord = (publicKey: string) => {
+  // Remove PEM headers and footers (handles both RSA and standard formats)
   const pubKeyClean = publicKey
+    .replace(/-----BEGIN RSA PUBLIC KEY-----/g, "")
+    .replace(/-----END RSA PUBLIC KEY-----/g, "")
     .replace(/-----BEGIN PUBLIC KEY-----/g, "")
     .replace(/-----END PUBLIC KEY-----/g, "")
-    .replace(/\n/g, "");
+    .replace(/\n/g, "")
+    .trim();
 
   return `v=DKIM1; k=rsa; p=${pubKeyClean}`;
 };

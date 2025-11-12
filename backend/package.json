@@ -10,7 +10,8 @@
     "start": "tsx src/index.ts",
     "dev": "nodemon --exec tsx src/index.ts",
     "type-check": "tsc --noEmit",
-    "seed:pre-warmed": "tsx src/scripts/importPreWarmedDomains.ts"
+    "seed:pre-warmed": "tsx src/scripts/importPreWarmedDomains.ts",
+    "seed:dummy": "tsx src/scripts/seedPreWarmedDomains.ts"
   },
   "keywords": [],
   "author": "",

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { enomService } from '../services/enomService.js';
-import { PurchasedDomain } from '../models/purchasedDomainModel.js';
+import { PurchasedDomain } from '../models/unifiedDomainModel.js';
 
 /**
  * Search for available domains
@@ -202,7 +202,8 @@ export const purchaseDomain = async (req: Request, res: Response) => {
       sld,
       tld,
       orderId: purchaseResult.orderId,
-      status: purchaseResult.status === 'pending' ? 'pending' : 'active',
+      purchaseStatus: purchaseResult.status === 'pending' ? 'pending' : 'active', // Use purchaseStatus for unified model
+      domainType: 'purchased' as const, // Set domain type
       years,
       expirationDate,
       purchaseDate: new Date(),

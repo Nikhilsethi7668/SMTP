@@ -44,6 +44,8 @@ export class EnomService {
     });
 
     try {
+
+      console.log(`${this.baseUrl}/interface.asp?${queryParams.toString()}`);
       const response = await axios.get(`${this.baseUrl}/interface.asp?${queryParams.toString()}`);
       const parsed = await this.parseXML(response.data);
       
@@ -82,6 +84,7 @@ export class EnomService {
     premium?: boolean;
   }> {
     const response = await this.makeApiCall('check', { sld, tld });
+    console.log(response);
     
     const domain = `${sld}.${tld}`;
     const available = response.RRPCode === '210' || response.RRPCode === '211';
@@ -154,6 +157,8 @@ export class EnomService {
 
     // Check all suggestions
     const results = await this.checkMultipleDomains(suggestions);
+    console.log(results);
+    
     return results;
   }
 

@@ -3,26 +3,35 @@ import { enomService } from '../services/enomService.js';
 import { PurchasedDomain } from '../models/unifiedDomainModel.js';
 
 /**
- * Search for available domains
- * GET /api/purchase-domains/search?keyword=example&tlds=com,net,org
+ * Search for available domains using NameSpinner API
+ * GET /api/purchase-domains/search?SearchTerm=example
+ * Or with additional NameSpinner parameters
+ * GET /api/purchase-domains/search?SearchTerm=example&MaxResults=50
  */
 export const searchDomains = async (req: Request, res: Response) => {
   try {
-    const { keyword, tlds } = req.query;
+    const { SearchTerm, keyword, ...additionalParams } = req.query;
 
-    if (!keyword || typeof keyword !== 'string') {
+    // Support both SearchTerm and keyword for backward compatibility
+    const searchTerm = (SearchTerm || keyword) as string;
+
+    if (!searchTerm || typeof searchTerm !== 'string') {
       return res.status(400).json({
         success: false,
-        message: 'Keyword parameter is required',
+        message: 'SearchTerm or keyword parameter is required',
       });
     }
 
-    // Parse TLDs from query string
-    const tldArray = tlds
-      ? (typeof tlds === 'string' ? tlds.split(',') : [])
-      : ['com', 'net', 'org', 'io', 'co'];
+    // Convert all additional query params to strings and pass them to NameSpinner
+    const params: Record<string, string> = {};
+    Object.keys(additionalParams).forEach((key) => {
+      const value = additionalParams[key];
+      if (value !== undefined && value !== null) {
+        params[key] = String(value);
+      }
+    });
 
-    const results = await enomService.searchDomains(keyword, tldArray);
+    const results = await enomService.searchDomains(searchTerm, params);
 
     res.status(200).json({
       success: true,
@@ -40,7 +49,8 @@ export const searchDomains = async (req: Request, res: Response) => {
 };
 
 /**
- * Check domain availability
+ * Check domain availability and get pricing
+ * GET /api/purchase-domains/check?sld=example&tld=com
  * POST /api/purchase-domains/check
  * Body: { sld: "example", tld: "com" }
  * or
@@ -48,7 +58,10 @@ export const searchDomains = async (req: Request, res: Response) => {
  */
 export const checkDomain = async (req: Request, res: Response) => {
   try {
-    const { sld, tld, domains } = req.body;
+    // Support both GET (query params) and POST (body)
+    const sld = (req.query.sld || req.body.sld) as string;
+    const tld = (req.query.tld || req.body.tld) as string;
+    const domains = req.body.domains;
 
     if (domains && Array.isArray(domains)) {
       // Check multiple domains
@@ -63,7 +76,7 @@ export const checkDomain = async (req: Request, res: Response) => {
     if (!sld || !tld) {
       return res.status(400).json({
         success: false,
-        message: 'sld and tld are required, or provide domains array',
+        message: 'sld and tld are required (as query params for GET or in body for POST), or provide domains array',
       });
     }
 
@@ -183,10 +196,17 @@ export const purchaseDomain = async (req: Request, res: Response) => {
     // Get pricing
     const pricing = await enomService.getDomainPricing(sld, tld, years);
 
-    // Purchase domain through Enom
+    // Get client IP from request
+    const clientIP = req.headers['x-forwarded-for']?.toString().split(',')[0].trim() ||
+                     req.ip || 
+                     req.socket.remoteAddress || 
+                     '0.0.0.0';
+
+    // Purchase domain through Enom using Purchase command with EndUserIP
     const purchaseResult = await enomService.purchaseDomain(
       sld,
       tld,
+      clientIP,
       years,
       registrantInfo
     );
@@ -340,4 +360,7 @@ export const getEnomBalance = async (req: Request, res: Response) => {
     });
   }
 };
+
+// Note: Cart operations (addToCart, deleteFromCart) have been moved to domainCartController
+// These functions used Enom cart APIs which have been removed
 

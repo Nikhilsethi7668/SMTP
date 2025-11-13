@@ -4,7 +4,10 @@ import dotenv from 'dotenv';
 import { getPricing } from '../services/pricingService.js';
 import { getCreditCost } from '../services/creditCostService.js';
 import { addCredits as addCreditCredits } from '../services/creditService.js';
-import { PreWarmedDomain } from '../models/unifiedDomainModel.js';
+import { PreWarmedDomain, PurchasedDomain } from '../models/unifiedDomainModel.js';
+import { DomainCart } from '../models/domainCartModel.js';
+import { RegistrantInfo } from '../models/registrantInfoModel.js';
+import { enomService } from '../services/enomService.js';
 import mongoose from 'mongoose';
 
 dotenv.config();
@@ -35,7 +38,15 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
     let productDescription = '';
     let creditsToPurchase = 0;
     
-    if (requestMetadata?.type === 'pre-warmed-domains') {
+    if (requestMetadata?.type === 'domain-cart') {
+      // For domain cart purchases
+      productName = 'Domain Registration';
+      productDescription = 'Purchase of domain names';
+      sessionMetadata.type = 'domain-cart';
+      if (requestMetadata.registrantInfo) {
+        sessionMetadata.registrantInfo = requestMetadata.registrantInfo;
+      }
+    } else if (requestMetadata?.type === 'pre-warmed-domains') {
       // For pre-warmed domains, don't calculate credits
       productName = 'Pre-warmed Domains & Emails';
       productDescription = 'Purchase of pre-warmed email accounts';
@@ -118,7 +129,174 @@ export const handleSuccessfulPayment = async (req: Request, res: Response) => {
 
       const userObjectId = new mongoose.Types.ObjectId(userId);
 
-      if (paymentType === 'pre-warmed-domains') {
+      if (paymentType === 'domain-cart') {
+        // Handle domain cart purchase
+        try {
+          // Get registrant info from metadata
+          const registrantInfoStr = session.metadata?.registrantInfo;
+          if (!registrantInfoStr) {
+            console.error('Missing registrantInfo in session metadata');
+            return res.redirect(`${process.env.CLIENT_URL}/payment-failed?error=missing_registrant_info`);
+          }
+
+          const registrantInfo = JSON.parse(registrantInfoStr);
+
+          // Get all active cart items for the user
+          const cartItems = await DomainCart.find({
+            user_id: userObjectId,
+            status: 'active',
+          });
+
+          if (cartItems.length === 0) {
+            console.error('No active cart items found');
+            return res.redirect(`${process.env.CLIENT_URL}/payment-failed?error=empty_cart`);
+          }
+
+          // Get client IP from request (for Enom API)
+          const clientIP = req.headers['x-forwarded-for']?.toString().split(',')[0].trim() ||
+                           req.ip || 
+                           req.socket.remoteAddress || 
+                           '0.0.0.0';
+
+          const purchaseResults = [];
+          const errors = [];
+
+          // Purchase each domain from cart using Enom API
+          console.log(`Starting Enom purchase for ${cartItems.length} domain(s) after successful Stripe payment`);
+          
+          for (const cartItem of cartItems) {
+            try {
+              console.log(`Purchasing domain ${cartItem.domain} (${cartItem.sld}.${cartItem.tld}) from Enom...`);
+              
+              // Purchase domain using Enom Purchase API
+              const purchaseResult = await enomService.purchaseDomain(
+                cartItem.sld,
+                cartItem.tld,
+                clientIP,
+                cartItem.years,
+                registrantInfo
+              );
+
+              console.log(`Successfully purchased ${cartItem.domain} from Enom. Order ID: ${purchaseResult.orderId}, Status: ${purchaseResult.status}`);
+
+              // Calculate expiration date
+              const expirationDate = new Date();
+              expirationDate.setFullYear(expirationDate.getFullYear() + cartItem.years);
+
+              // Save to PurchasedDomain model
+              const purchasedDomain = new PurchasedDomain({
+                user_id: userObjectId,
+                domain: cartItem.domain,
+                sld: cartItem.sld,
+                tld: cartItem.tld,
+                orderId: purchaseResult.orderId,
+                purchaseStatus: purchaseResult.status === 'pending' ? 'pending' : 'active',
+                domainType: 'purchased' as const,
+                years: cartItem.years,
+                expirationDate,
+                purchaseDate: new Date(),
+                price: cartItem.totalPrice,
+                registrantInfo: {
+                  firstName: registrantInfo.FirstName,
+                  lastName: registrantInfo.LastName,
+                  email: registrantInfo.EmailAddress,
+                  phone: registrantInfo.Phone,
+                  address1: registrantInfo.Address1,
+                  city: registrantInfo.City,
+                  stateProvince: registrantInfo.StateProvince,
+                  postalCode: registrantInfo.PostalCode,
+                  country: registrantInfo.Country,
+                  organizationName: registrantInfo.OrganizationName,
+                },
+                enomResponse: purchaseResult,
+              });
+
+              await purchasedDomain.save();
+              console.log(`Saved ${cartItem.domain} to PurchasedDomain model with user_id: ${userObjectId}`);
+
+              // Save registrant info for future use (if not already saved)
+              try {
+                const existingRegistrantInfo = await RegistrantInfo.findOne({
+                  user_id: userObjectId,
+                  email: registrantInfo.EmailAddress.toLowerCase(),
+                  firstName: registrantInfo.FirstName,
+                  lastName: registrantInfo.LastName,
+                });
+
+                if (!existingRegistrantInfo) {
+                  // Check if user has any registrant info
+                  const hasAnyRegistrantInfo = await RegistrantInfo.findOne({
+                    user_id: userObjectId,
+                  });
+
+                  const newRegistrantInfo = new RegistrantInfo({
+                    user_id: userObjectId,
+                    firstName: registrantInfo.FirstName,
+                    lastName: registrantInfo.LastName,
+                    email: registrantInfo.EmailAddress.toLowerCase(),
+                    phone: registrantInfo.Phone,
+                    address1: registrantInfo.Address1,
+                    city: registrantInfo.City,
+                    stateProvince: registrantInfo.StateProvince,
+                    postalCode: registrantInfo.PostalCode,
+                    country: registrantInfo.Country,
+                    organizationName: registrantInfo.OrganizationName,
+                    isDefault: !hasAnyRegistrantInfo, // Set as default if it's the first one
+                  });
+
+                  await newRegistrantInfo.save();
+                  console.log(`Saved registrant info for user ${userObjectId} for future use`);
+                }
+              } catch (error: any) {
+                // Don't fail the purchase if saving registrant info fails
+                console.error('Error saving registrant info:', error);
+              }
+
+              // Update cart item status to purchased
+              cartItem.status = 'purchased';
+              cartItem.purchasedAt = new Date();
+              await cartItem.save();
+              console.log(`Updated cart item ${cartItem.domain} status to purchased`);
+
+              purchaseResults.push({
+                domain: cartItem.domain,
+                orderId: purchaseResult.orderId,
+                status: purchaseResult.status,
+              });
+            } catch (error: any) {
+              console.error(`Error purchasing ${cartItem.domain} from Enom:`, error);
+              console.error(`Error details:`, {
+                domain: cartItem.domain,
+                sld: cartItem.sld,
+                tld: cartItem.tld,
+                error: error.message,
+                stack: error.stack,
+              });
+              errors.push({
+                domain: cartItem.domain,
+                error: error.message,
+              });
+            }
+          }
+
+          console.log(`Enom purchase process completed. Successfully purchased: ${purchaseResults.length}, Failed: ${errors.length}`);
+
+          if (purchaseResults.length === 0) {
+            console.error('Failed to purchase any domains');
+            return res.redirect(`${process.env.CLIENT_URL}/payment-failed?error=domain_purchase_failed`);
+          }
+
+          // Redirect to success page with purchase results
+          const successParams = new URLSearchParams({
+            purchased: purchaseResults.length.toString(),
+            failed: errors.length.toString(),
+          });
+          return res.redirect(`${process.env.CLIENT_URL}/app/purchase-domain/domain-cart?success=true&${successParams.toString()}`);
+        } catch (error: any) {
+          console.error('Error purchasing domains from cart:', error);
+          return res.redirect(`${process.env.CLIENT_URL}/payment-failed?error=domain_purchase_error`);
+        }
+      } else if (paymentType === 'pre-warmed-domains') {
         // Handle pre-warmed domain purchase
         try {
           const orderData = session.metadata?.orderData
@@ -138,7 +316,7 @@ export const handleSuccessfulPayment = async (req: Request, res: Response) => {
 
               if (domainDoc) {
                 // Filter emails to only include selected ones
-                const selectedEmails = domainDoc.emails.filter((email) =>
+                const selectedEmails = domainDoc.emails.filter((email: any) =>
                   domainOrder.selectedEmails.includes(email.email)
                 );
 

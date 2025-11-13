@@ -28,6 +28,8 @@ router.get('/pricing', authenticate, getDomainPricing);
 // Purchase domain
 router.post('/purchase', authenticate, purchaseDomain);
 
+// Note: Cart operations are now handled by /api/domain-cart routes
+
 // Get user's purchased domains
 router.get('/my-domains', authenticate, getMyPurchasedDomains);
 

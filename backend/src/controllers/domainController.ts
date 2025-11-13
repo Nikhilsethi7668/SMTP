@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { Domain } from '../models/domainModel.js';
+import { Domain } from '../models/unifiedDomainModel.js';
 import { generateDKIMKeys, generateDKIMDNSRecord } from '../services/dkimService.js';
 import { dnsService } from '../services/dnsService.js';
 export const createDomain = async (req: Request, res: Response) => {
@@ -14,6 +14,15 @@ export const createDomain = async (req: Request, res: Response) => {
     // Generate DKIM keys
     const { publicKey, privateKey } = await generateDKIMKeys(dkim_selector, domain_name);
 
+    // Remove PEM headers and footers from public key
+    const cleanPublicKey = publicKey
+      .replace(/-----BEGIN RSA PUBLIC KEY-----/g, "")
+      .replace(/-----END RSA PUBLIC KEY-----/g, "")
+      .replace(/-----BEGIN PUBLIC KEY-----/g, "")
+      .replace(/-----END PUBLIC KEY-----/g, "")
+      .replace(/\n/g, "")
+      .trim();
+
     // Generate SPF record (using environment variable or default)
     const mailServer = process.env.MAIL_SERVER_HOST || 'mail.yourplatform.com';
     const spfRecord = `v=spf1 include:${mailServer} ~all`;
@@ -23,15 +32,17 @@ export const createDomain = async (req: Request, res: Response) => {
 
     // Create domain with all DNS records
     const domainData = {
+      domain: domain_name, // Also set domain field for unified model
       domain_name,
       dkim_selector,
-      dkim_public_key: publicKey,
+      dkim_public_key: cleanPublicKey, // Store cleaned public key without PEM headers
       dkim_private_key: privateKey,
       spf_record: spfRecord,
       dmarc_record: dmarcRecord,
       user_id: req.user?.id,
       verified: false,
-      status: 'pending' as const,
+      verificationStatus: 'pending' as const, // Use verificationStatus for unified model
+      domainType: 'verified' as const, // Set domain type
     };
 
     const domain = new Domain(domainData);
@@ -103,7 +114,7 @@ export const getDomainById = async (req: Request, res: Response) => {
 export const updateDomain = async (req: Request, res: Response) => {
   try {
     const updates = Object.keys(req.body);
-    const allowedUpdates = ['dkim_selector', 'status'];
+    const allowedUpdates = ['dkim_selector', 'status', 'verificationStatus'];
     const isValidOperation = updates.every((update) =>
       allowedUpdates.includes(update)
     );
@@ -113,9 +124,16 @@ export const updateDomain = async (req: Request, res: Response) => {
       return 
     }
 
+    // Map status to verificationStatus if status is provided
+    const updateData: any = { ...req.body };
+    if (updateData.status && !updateData.verificationStatus) {
+      updateData.verificationStatus = updateData.status;
+      delete updateData.status;
+    }
+
     const domain = await Domain.findOneAndUpdate(
       { _id: req.params.id, user_id: req.user.id },
-      req.body,
+      updateData,
       { new: true, runValidators: true }
     );
 
@@ -185,7 +203,7 @@ export const verifyDomain = async (req: Request, res: Response) => {
 
     // Update domain status based on verification results
     domain.verified = allVerified;
-    domain.status = allVerified ? 'verified' : 'failed';
+    domain.verificationStatus = allVerified ? 'verified' : 'failed';
     domain.last_verified_at = new Date();
     await domain.save();
 

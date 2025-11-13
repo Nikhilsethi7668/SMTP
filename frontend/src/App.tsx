@@ -32,6 +32,9 @@ import EmailAccounts from "./pages/EmailAccounts";
 import { CreditsPage } from "./pages/CreditsPage";
 import { EmailWarmupPage } from "./pages/EmailWarmup";
 import DomainsPage from "./pages/domain/DomainsPage";
+import PurchaseDomainPage from "./pages/domain/PurchaseDomainPage";
+import PurchasedDomainsPage from "./pages/preWarmedDomains/PurchasedDomainsPage";
+import DomainDetailsPage from "./pages/preWarmedDomains/DomainDetailsPage";
 
 const queryClient = new QueryClient();
 
@@ -188,6 +191,14 @@ const App = () => (
             }
           />
           <Route
+            path="/app/purchase-domain"
+            element={
+              <ProtectedRoute>
+                <PurchaseDomainPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/app/email-accounts"
             element={
               <ProtectedRoute>
@@ -200,6 +211,22 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <Crm />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/dashboard/purchased-domains"
+            element={
+              <ProtectedRoute>
+                <PurchasedDomainsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/dashboard/purchased-domains/:id"
+            element={
+              <ProtectedRoute>
+                <DomainDetailsPage />
               </ProtectedRoute>
             }
           />

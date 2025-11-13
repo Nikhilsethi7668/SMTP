@@ -10,7 +10,6 @@ const EmailAccountSchema = new mongoose.Schema(
     provider: {
       type: String,
       enum: ["gmail", "outlook", "custom"],
-      required: true,
     },
     email: { type: String, required: true },
     name: { type: String },
@@ -34,6 +33,16 @@ const EmailAccountSchema = new mongoose.Schema(
     isPrimary: {
       type: Boolean,
       default: false,
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    verificationToken: {
+      type: String,
+    },
+    verificationTokenExpires: {
+      type: Date,
     },
     connectedAt: {
       type: Date,

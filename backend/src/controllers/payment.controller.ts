@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import { getPricing } from '../services/pricingService.js';
 import { getCreditCost } from '../services/creditCostService.js';
 import { addCredits as addCreditCredits } from '../services/creditService.js';
-import { PreWarmedDomain } from '../models/preWarmedDomainModel.js';
+import { PreWarmedDomain } from '../models/unifiedDomainModel.js';
 import mongoose from 'mongoose';
 
 dotenv.config();

@@ -24,6 +24,7 @@ import domainRoutes from "./routes/domainRoutes.js";
 import creditsRoutes from "./routes/creditsRoutes.js";
 import emailWarmupRoutes from "./routes/emailWarmupRoutes.js";
 import preWarmedDomainRoutes from "./routes/preWarmedDomainRoutes.js";
+import purchaseDomainRoutes from "./routes/purchaseDomainRoutes.js";
 const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
@@ -41,7 +42,12 @@ const startServer = async () => {
         await initCreditCostTable();
 
     app.get("/health", (req, res) => res.json({ status: "ok" }));
-    app.use("/api", apiRoutes);
+    
+    // Register MORE SPECIFIC routes FIRST (before less specific /api routes)
+    // This ensures /api/purchase-domains/search is matched before any catch-all /api/:id routes
+    app.use('/api/purchase-domains', purchaseDomainRoutes);
+    
+    // Now register other specific routes
     app.use("/api/auth", authRoutes);
     app.use("/api/", campaignRoutes);
     app.use("/api/payment", paymentRoutes);
@@ -52,6 +58,9 @@ const startServer = async () => {
     app.use('/api/incoming-emails', incomingEmailRoutes);
     app.use('/api/domains', domainRoutes);
     app.use('/api/credits', creditsRoutes);
+    
+    // Register less specific /api routes LAST (these may have catch-all patterns)
+    app.use("/api", apiRoutes);
     app.use('/api', googleOauthRoutes);
     app.use('/api', outlookAuthRoutes);
     app.use('/api', customConnectRoutes);

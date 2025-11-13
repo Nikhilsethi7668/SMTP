@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { PreWarmedDomain } from "../models/preWarmedDomainModel.js";
+import { PreWarmedDomain } from "../models/unifiedDomainModel.js";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -25,8 +25,12 @@ const importPreWarmedDomains = async () => {
     // await PreWarmedDomain.deleteMany({ status: "available" });
     // console.log("Cleared existing pre-warmed domains");
 
-    // Insert the data
-    const result = await PreWarmedDomain.insertMany(preWarmedDomainsData);
+    // Insert the data with domainType set
+    const dataWithType = preWarmedDomainsData.map((domain: any) => ({
+      ...domain,
+      domainType: 'preWarmed', // Set domain type for unified model
+    }));
+    const result = await PreWarmedDomain.insertMany(dataWithType);
     console.log(`✅ Successfully imported ${result.length} pre-warmed domains`);
 
     // Count total emails

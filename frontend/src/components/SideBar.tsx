@@ -21,6 +21,7 @@ const navigationItems = [
   { name: "Campaigns", icon: Mail, path: "/app/dashboard/campaigns" },
   { name: "Email Accounts", icon: UserCog, path: "/app/email-accounts" },
   { name: "Warmup", icon: Flame, path: "/app/dashboard/email-warmup" },
+  { name: "Prewarm Domains",icon:Globe,path:"/app/dashboard/purchased-domains"},
   { name: "UniBox", icon: Inbox, path: "/app/dashboard/unibox" },
   { name: "Analytics", icon: LineChart, path: "/app/analytics" },
   { name: "Domains", icon: Globe, path: "/app/domains" },

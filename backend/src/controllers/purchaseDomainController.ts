@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { enomService } from '../services/enomService.js';
+import { enomService, HostRecord } from '../services/enomService.js';
 import { PurchasedDomain } from '../models/unifiedDomainModel.js';
 
 /**
@@ -264,13 +264,117 @@ export const purchaseDomain = async (req: Request, res: Response) => {
 };
 
 /**
+ * Check the registration status of a purchased domain using Enom API
+ * POST /api/purchase-domains/my-domains/:id/check-status
+ */
+export const checkPurchasedDomainStatus = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.id;
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: 'Purchased domain ID is required',
+      });
+    }
+
+    const purchasedDomain = await PurchasedDomain.findOne({
+      _id: id,
+      user_id: userId,
+    });
+
+    if (!purchasedDomain) {
+      return res.status(404).json({
+        success: false,
+        message: 'Purchased domain not found',
+      });
+    }
+
+    if (!purchasedDomain.sld || !purchasedDomain.tld) {
+      return res.status(400).json({
+        success: false,
+        message: 'Purchased domain is missing SLD/TLD information',
+      });
+    }
+
+    const registrationStatus = await enomService.getDomainRegistrationStatus(
+      purchasedDomain.sld,
+      purchasedDomain.tld
+    );
+
+    // Update purchaseStatus in database based on exact registration status from Enom
+    let statusUpdated = false;
+    
+    if (registrationStatus.registered) {
+      // Domain is registered/active
+      if (purchasedDomain.purchaseStatus !== 'active') {
+        purchasedDomain.purchaseStatus = 'active';
+        purchasedDomain.enomResponse = registrationStatus.rawResponse;
+        statusUpdated = true;
+      }
+    } else if (registrationStatus.status === 'Failed') {
+      // Domain registration failed
+      if (purchasedDomain.purchaseStatus !== 'failed') {
+        purchasedDomain.purchaseStatus = 'failed';
+        purchasedDomain.enomResponse = registrationStatus.rawResponse;
+        statusUpdated = true;
+      }
+    } else if (registrationStatus.status === 'Expired') {
+      // Domain has expired
+      if (purchasedDomain.purchaseStatus !== 'expired') {
+        purchasedDomain.purchaseStatus = 'expired';
+        statusUpdated = true;
+      }
+    } else {
+      // Still pending registration
+      if (purchasedDomain.purchaseStatus !== 'pending') {
+        purchasedDomain.purchaseStatus = 'pending';
+        statusUpdated = true;
+      }
+    }
+
+    // Update expiration date if provided
+    if (registrationStatus.expirationDate) {
+      const newExpirationDate = new Date(registrationStatus.expirationDate);
+      if (!purchasedDomain.expirationDate || 
+          purchasedDomain.expirationDate.getTime() !== newExpirationDate.getTime()) {
+        purchasedDomain.expirationDate = newExpirationDate;
+        statusUpdated = true;
+      }
+    }
+
+    // Save only if status or expiration date was updated
+    if (statusUpdated) {
+      await purchasedDomain.save();
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {
+        domain: purchasedDomain.toObject(),
+        registrationStatus,
+        statusUpdated,
+      },
+    });
+  } catch (error: any) {
+    console.error('Error checking purchased domain status:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to check purchased domain status',
+      error: error.message,
+    });
+  }
+};
+
+/**
  * Get user's purchased domains
  * GET /api/purchase-domains/my-domains
  */
 export const getMyPurchasedDomains = async (req: Request, res: Response) => {
   try {
     const userId = req.user!.id;
-    const { search, status } = req.query;
+    const { search, status, purchaseStatus } = req.query;
 
     const query: any = { user_id: userId };
 
@@ -278,8 +382,11 @@ export const getMyPurchasedDomains = async (req: Request, res: Response) => {
       query.domain = { $regex: search, $options: 'i' };
     }
 
-    if (status) {
-      query.status = status;
+    // Support both status and purchaseStatus for backward compatibility
+    if (purchaseStatus) {
+      query.purchaseStatus = purchaseStatus;
+    } else if (status) {
+      query.purchaseStatus = status;
     }
 
     const domains = await PurchasedDomain.find(query)
@@ -356,6 +463,180 @@ export const getEnomBalance = async (req: Request, res: Response) => {
     res.status(500).json({
       success: false,
       message: 'Failed to fetch Enom account balance',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * Generic Enom API command endpoint
+ * POST /api/purchase-domains/enom-command
+ * Body: { command: 'GetDomainInfo', params: { SLD: 'example', TLD: 'com' }, responsetype: 'json' }
+ * 
+ * This allows calling any Enom API command with custom parameters.
+ * Format matches: https://resellertest.enom.com/interface.asp?command=nameofcommand&uid=yourloginid&pw=yourpassword&paramname=paramvalue
+ */
+export const callEnomCommand = async (req: Request, res: Response) => {
+  try {
+    const { command, params = {}, responsetype = 'json' } = req.body;
+
+    if (!command || typeof command !== 'string') {
+      return res.status(400).json({
+        success: false,
+        message: 'Command parameter is required and must be a string',
+      });
+    }
+
+    if (typeof params !== 'object' || Array.isArray(params)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Params must be an object with string key-value pairs',
+      });
+    }
+
+    // Convert all params to strings as Enom API expects string values
+    const stringParams: Record<string, string> = {};
+    Object.keys(params).forEach((key) => {
+      if (params[key] !== undefined && params[key] !== null) {
+        stringParams[key] = String(params[key]);
+      }
+    });
+
+    const response = await enomService.callEnomCommand(
+      command,
+      stringParams,
+      responsetype === 'xml' ? 'xml' : 'json'
+    );
+
+    res.status(200).json({
+      success: true,
+      data: response,
+    });
+  } catch (error: any) {
+    console.error('Error calling Enom command:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to call Enom API command',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * Set DNS records for a purchased domain using Enom SetHosts command
+ * POST /api/purchase-domains/my-domains/:id/set-dns
+ */
+export const setPurchasedDomainDNS = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.id;
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: 'Purchased domain ID is required',
+      });
+    }
+
+    // Get the purchased domain from database
+    const purchasedDomain = await PurchasedDomain.findOne({
+      _id: id,
+      user_id: userId,
+    });
+
+    if (!purchasedDomain) {
+      return res.status(404).json({
+        success: false,
+        message: 'Purchased domain not found',
+      });
+    }
+
+    if (!purchasedDomain.sld || !purchasedDomain.tld) {
+      return res.status(400).json({
+        success: false,
+        message: 'Purchased domain is missing SLD/TLD information',
+      });
+    }
+
+    // Check if DNS records exist in database
+    if (!purchasedDomain.spf_record || !purchasedDomain.dkim_public_key || !purchasedDomain.dmarc_record) {
+      return res.status(400).json({
+        success: false,
+        message: 'DNS records not found for this domain. Please ensure the domain has been properly configured.',
+      });
+    }
+
+    // Build host records array for Enom SetHosts command
+    const hostRecords: HostRecord[] = [];
+
+    // SPF Record - hostname is "@" for root domain
+    if (purchasedDomain.spf_record) {
+      hostRecords.push({
+        hostName: '@',
+        recordType: 'TXT',
+        address: purchasedDomain.spf_record,
+      });
+    }
+
+    // DKIM Record - hostname is "{selector}._domainkey"
+    if (purchasedDomain.dkim_public_key) {
+      const dkimSelector = purchasedDomain.dkim_selector || 'email';
+      // Format DKIM record: v=DKIM1; k=rsa; p={publicKey}
+      // The public key is already cleaned (no PEM headers) in the database
+      const dkimRecordValue = `v=DKIM1; k=rsa; p=${purchasedDomain.dkim_public_key}`;
+      hostRecords.push({
+        hostName: `${dkimSelector}._domainkey`,
+        recordType: 'TXT',
+        address: dkimRecordValue,
+      });
+    }
+
+    // DMARC Record - hostname is "_dmarc"
+    if (purchasedDomain.dmarc_record) {
+      hostRecords.push({
+        hostName: '_dmarc',
+        recordType: 'TXT',
+        address: purchasedDomain.dmarc_record,
+      });
+    }
+
+    if (hostRecords.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No DNS records to set',
+      });
+    }
+
+    // Call Enom SetHosts API
+    const result = await enomService.setHosts(
+      purchasedDomain.sld,
+      purchasedDomain.tld,
+      hostRecords,
+      'xml'
+    );
+
+    if (!result.success) {
+      return res.status(500).json({
+        success: false,
+        message: result.message || 'Failed to set DNS records',
+        errors: result.errors,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: result.message || 'DNS records set successfully',
+      data: {
+        domain: purchasedDomain.domain,
+        recordsSet: hostRecords.length,
+        result,
+      },
+    });
+  } catch (error: any) {
+    console.error('Error setting DNS records for purchased domain:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to set DNS records',
       error: error.message,
     });
   }

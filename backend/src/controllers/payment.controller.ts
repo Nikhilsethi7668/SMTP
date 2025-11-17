@@ -8,6 +8,8 @@ import { PreWarmedDomain, PurchasedDomain } from '../models/unifiedDomainModel.j
 import { DomainCart } from '../models/domainCartModel.js';
 import { RegistrantInfo } from '../models/registrantInfoModel.js';
 import { enomService } from '../services/enomService.js';
+import { generateDKIMKeys } from '../services/dkimService.js';
+import { dnsService } from '../services/dnsService.js';
 import mongoose from 'mongoose';
 
 dotenv.config();
@@ -211,8 +213,90 @@ export const handleSuccessfulPayment = async (req: Request, res: Response) => {
                 enomResponse: purchaseResult,
               });
 
-              await purchasedDomain.save();
-              console.log(`Saved ${cartItem.domain} to PurchasedDomain model with user_id: ${userObjectId}`);
+              // Generate DKIM keys and DNS records for the purchased domain
+              try {
+                const dkimSelector = 'email';
+                const { publicKey, privateKey } = await generateDKIMKeys(dkimSelector, cartItem.domain);
+
+                // Remove PEM headers and footers from public key
+                const cleanPublicKey = publicKey
+                  .replace(/-----BEGIN RSA PUBLIC KEY-----/g, "")
+                  .replace(/-----END RSA PUBLIC KEY-----/g, "")
+                  .replace(/-----BEGIN PUBLIC KEY-----/g, "")
+                  .replace(/-----END PUBLIC KEY-----/g, "")
+                  .replace(/\n/g, "")
+                  .trim();
+
+                // Generate SPF record (using environment variable or default)
+                const mailServer = process.env.MAIL_SERVER_HOST || 'mail.yourplatform.com';
+                const spfRecord = `v=spf1 include:${mailServer} ~all`;
+
+                // Generate DMARC record
+                const dmarcRecord = `v=DMARC1; p=none; rua=mailto:dmarc@${cartItem.domain}; ruf=mailto:dmarc@${cartItem.domain}; fo=1`;
+
+                // Update purchased domain with DNS records
+                purchasedDomain.dkim_selector = dkimSelector;
+                purchasedDomain.dkim_public_key = cleanPublicKey;
+                purchasedDomain.dkim_private_key = privateKey;
+                purchasedDomain.spf_record = spfRecord;
+                purchasedDomain.dmarc_record = dmarcRecord;
+                purchasedDomain.verified = false;
+                purchasedDomain.verificationStatus = 'pending';
+                purchasedDomain.domain_name = cartItem.domain; // Also set domain_name for consistency
+
+                await purchasedDomain.save();
+                console.log(`Saved ${cartItem.domain} to PurchasedDomain model with DNS records (DKIM, SPF, DMARC) for user_id: ${userObjectId}`);
+
+                // Try to automatically create DNS records via DNS service (if provider is configured)
+                // This is optional and won't fail the purchase if it errors
+                try {
+                  // Add DKIM record
+                  const dkimResult = await dnsService.addDKIMRecord(
+                    cartItem.domain,
+                    dkimSelector,
+                    publicKey
+                  );
+                  
+                  if (dkimResult.success) {
+                    console.log(`Successfully created DKIM DNS record for ${cartItem.domain} via ${dkimResult.provider}`);
+                  } else {
+                    console.log(`DKIM DNS record creation for ${cartItem.domain} requires manual setup: ${dkimResult.message}`);
+                  }
+
+                  // Add SPF record
+                  const spfResult = await dnsService.addSPFRecord(
+                    cartItem.domain,
+                    spfRecord
+                  );
+                  
+                  if (spfResult.success) {
+                    console.log(`Successfully created SPF DNS record for ${cartItem.domain} via ${spfResult.provider}`);
+                  } else {
+                    console.log(`SPF DNS record creation for ${cartItem.domain} requires manual setup: ${spfResult.message}`);
+                  }
+
+                  // Add DMARC record
+                  const dmarcResult = await dnsService.addDMARCRecord(
+                    cartItem.domain,
+                    dmarcRecord
+                  );
+                  
+                  if (dmarcResult.success) {
+                    console.log(`Successfully created DMARC DNS record for ${cartItem.domain} via ${dmarcResult.provider}`);
+                  } else {
+                    console.log(`DMARC DNS record creation for ${cartItem.domain} requires manual setup: ${dmarcResult.message}`);
+                  }
+                } catch (dnsError: any) {
+                  // Don't fail the purchase if DNS record creation fails
+                  console.log(`Could not automatically create DNS records for ${cartItem.domain} (manual setup required): ${dnsError.message}`);
+                }
+              } catch (dnsGenError: any) {
+                // Don't fail the purchase if DNS generation fails, but log it
+                console.error(`Error generating DNS records for ${cartItem.domain}:`, dnsGenError);
+                // Still save the domain without DNS records
+                await purchasedDomain.save();
+                console.log(`Saved ${cartItem.domain} to PurchasedDomain model without DNS records due to error`);
+              }
 
               // Save registrant info for future use (if not already saved)
               try {

@@ -219,6 +219,7 @@ const DomainCartPage: React.FC = () => {
             script.onload = () => {
               resolve((window as any).Stripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || ''));
             };
+            
             document.body.appendChild(script);
           });
         };

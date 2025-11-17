@@ -7,6 +7,9 @@ import {
   getMyPurchasedDomains,
   getPurchasedDomainById,
   getEnomBalance,
+  checkPurchasedDomainStatus,
+  callEnomCommand,
+  setPurchasedDomainDNS,
 } from '../controllers/purchaseDomainController.js';
 import { authenticate } from '../middleware/authMiddleware.js';
 
@@ -33,8 +36,17 @@ router.post('/purchase', authenticate, purchaseDomain);
 // Get user's purchased domains
 router.get('/my-domains', authenticate, getMyPurchasedDomains);
 
+// Check registration status for a purchased domain
+router.post('/my-domains/:id/check-status', authenticate, checkPurchasedDomainStatus);
+
+// Set DNS records for a purchased domain
+router.post('/my-domains/:id/set-dns', authenticate, setPurchasedDomainDNS);
+
 // Get Enom account balance (for testing/admin) - must come before /:id
 router.get('/balance', authenticate, getEnomBalance);
+
+// Generic Enom API command endpoint
+router.post('/enom-command', authenticate, callEnomCommand);
 
 // Get purchased domain by ID
 // router.get('/:id', authenticate, getPurchasedDomainById);

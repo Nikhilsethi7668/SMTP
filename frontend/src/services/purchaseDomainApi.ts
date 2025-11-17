@@ -40,6 +40,56 @@ export interface DomainCheckResponse {
   data: DomainCheckResult;
 }
 
+export interface PurchasedDomain {
+  _id: string;
+  domain: string;
+  sld: string;
+  tld: string;
+  orderId?: string;
+  purchaseStatus: 'pending' | 'active' | 'failed' | 'expired';
+  years?: number;
+  expirationDate?: string;
+  purchaseDate?: string;
+  price?: number;
+  dkim_selector?: string;
+  dkim_public_key?: string;
+  spf_record?: string;
+  dmarc_record?: string;
+  verificationStatus?: 'pending' | 'verified' | 'failed' | 'disabled';
+  registrantInfo?: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    address1: string;
+    city: string;
+    stateProvince: string;
+    postalCode: string;
+    country: string;
+    organizationName?: string;
+  };
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface PurchasedDomainsResponse {
+  success: boolean;
+  count: number;
+  data: PurchasedDomain[];
+}
+
+export interface PurchasedDomainStatusResponse {
+  success: boolean;
+  data: {
+    domain: PurchasedDomain;
+    registrationStatus: {
+      registered: boolean;
+      status?: string;
+      expirationDate?: string;
+    };
+  };
+}
+
 export const purchaseDomainApi = {
   // GET /api/purchase-domains/search?SearchTerm=example
   // Or with additional NameSpinner parameters: /api/purchase-domains/search?SearchTerm=example&MaxResults=50
@@ -76,6 +126,32 @@ export const purchaseDomainApi = {
       tld,
     });
     const response = await api.get(`/purchase-domains/check?${params.toString()}`);
+    return response.data;
+  },
+
+  // GET /api/purchase-domains/my-domains - list purchased domains
+  getMyPurchasedDomains: async (): Promise<PurchasedDomain[]> => {
+    const response = await api.get<PurchasedDomainsResponse>('/purchase-domains/my-domains');
+    return response.data.data;
+  },
+
+  // POST /api/purchase-domains/my-domains/:id/check-status - check registration status
+  checkPurchasedDomainStatus: async (id: string): Promise<PurchasedDomainStatusResponse> => {
+    const response = await api.post<PurchasedDomainStatusResponse>(`/purchase-domains/my-domains/${id}/check-status`);
+    return response.data;
+  },
+
+  // POST /api/purchase-domains/my-domains/:id/set-dns - set DNS records for purchased domain
+  setPurchasedDomainDNS: async (id: string): Promise<{
+    success: boolean;
+    message: string;
+    data: {
+      domain: string;
+      recordsSet: number;
+      result: any;
+    };
+  }> => {
+    const response = await api.post(`/purchase-domains/my-domains/${id}/set-dns`);
     return response.data;
   },
   

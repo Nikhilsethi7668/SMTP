@@ -8,7 +8,7 @@ export interface DomainResponse {
   dkim_private_key?: string;
   spf_record?: string;
   dmarc_record?: string;
-  verified: boolean;
+  verificationStatus: 'pending' | 'verified' | 'failed' | 'disabled';
   last_verified_at?: string;
   status: 'pending' | 'verified' | 'failed' | 'disabled';
   createdAt: string;

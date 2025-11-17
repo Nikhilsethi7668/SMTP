@@ -33,6 +33,7 @@ import { CreditsPage } from "./pages/CreditsPage";
 import { EmailWarmupPage } from "./pages/EmailWarmup";
 import DomainsPage from "./pages/domain/DomainsPage";
 import PurchaseDomainPage from "./pages/domain/PurchaseDomainPage";
+import DomainCartPage from "./pages/domain/DomainCartPage";
 import PurchasedDomainsPage from "./pages/preWarmedDomains/PurchasedDomainsPage";
 import DomainDetailsPage from "./pages/preWarmedDomains/DomainDetailsPage";
 
@@ -195,6 +196,14 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <PurchaseDomainPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/purchase-domain/domain-cart"
+            element={
+              <ProtectedRoute>
+                <DomainCartPage />
               </ProtectedRoute>
             }
           />

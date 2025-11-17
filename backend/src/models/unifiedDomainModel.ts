@@ -185,13 +185,7 @@ const UnifiedDomainSchema = new Schema<IUnifiedDomain>(
       type: Schema.Types.ObjectId,
       ref: "User",
       index: true,
-    },
-    userId: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      index: true,
-    },
-    
+    },    
     // Domain type discriminator
     domainType: {
       type: String,

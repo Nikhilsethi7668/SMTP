@@ -11,23 +11,33 @@ import {
   Globe,
   Flame,
   CreditCard,
+  ShoppingCart,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
+import { useUserStore } from "@/store/useUserStore";
 
-const navigationItems = [
-  { name: "Dashboard", icon: Home, path: "/app/dashboard/accounts" },
-  { name: "Campaigns", icon: Mail, path: "/app/dashboard/campaigns" },
-  { name: "Email Accounts", icon: UserCog, path: "/app/email-accounts" },
-  { name: "Warmup", icon: Flame, path: "/app/dashboard/email-warmup" },
-  { name: "Prewarm Domains",icon:Globe,path:"/app/dashboard/purchased-domains"},
-  { name: "UniBox", icon: Inbox, path: "/app/dashboard/unibox" },
-  { name: "Analytics", icon: LineChart, path: "/app/analytics" },
-  { name: "Domains", icon: Globe, path: "/app/domains" },
-  { name: "CRM", icon: BarChart3, path: "/app/crm" },
-  { name: "Credits", icon: CreditCard, path: "/app/dashboard/credits" },
-  { name: "Settings", icon: Settings, path: "/app/dashboard/settings" },
+const allNavigationItems = [
+  { name: "Dashboard", icon: Home, path: "/dashboard/accounts" },
+  { name: "Campaigns", icon: Mail, path: "/dashboard/campaigns" },
+  { name: "Email Accounts", icon: UserCog, path: "/dashboard/email-accounts" },
+  { name: "Warmup", icon: Flame, path: "/dashboard/email-warmup" },
+  { name: "Prewarm Domains", icon: Globe, path: "/dashboard/purchased-domains" },
+  { name: "Purchase Domain", icon: ShoppingCart, path: "/dashboard/purchase-domain" },
+  { name: "UniBox", icon: Inbox, path: "/dashboard/unibox" },
+  { name: "Analytics", icon: LineChart, path: "/dashboard/analytics" },
+  { name: "Domains", icon: Globe, path: "/dashboard/domains" },
+  { name: "CRM", icon: BarChart3, path: "/dashboard/crm" },
+  { name: "Credits", icon: CreditCard, path: "/dashboard/credits" },
+  { name: "Settings", icon: Settings, path: "/dashboard/settings" },
+];
+
+// Admin-only navigation items
+const adminNavigationItems = [
+  { name: "Dashboard", icon: Home, path: "/dashboard/accounts" },
+  { name: "Prewarm Domains", icon: Globe, path: "/dashboard/purchased-domains" },
+  { name: "Purchase Domain", icon: ShoppingCart, path: "/dashboard/purchase-domain" },
 ];
 
 interface SideBarProps {
@@ -35,6 +45,12 @@ interface SideBarProps {
 }
 
 export const SideBar = ({ collapsed }: SideBarProps) => {
+  const user = useUserStore((state) => state.user);
+  const isAdmin = user?.role === "admin";
+  
+  // Filter navigation items based on user role
+  const navigationItems = isAdmin ? adminNavigationItems : allNavigationItems;
+
   return (
     <aside
       className={cn(

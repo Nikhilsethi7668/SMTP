@@ -302,7 +302,7 @@ const DomainsPage = () => {
               registrar. It may take some time for DNS changes to propagate.
             </p>
             <Button
-              onClick={() => navigate('/app/purchase-domain')}
+              onClick={() => navigate('/dashboard/purchase-domain')}
               className="ml-4"
             >
               Buy Domain
@@ -662,7 +662,7 @@ const DomainsPage = () => {
               <Globe className="mx-auto h-12 w-12 mb-4 opacity-50" />
               <p>No purchased domains yet. Purchase a domain to get started.</p>
               <Button
-                onClick={() => navigate('/app/purchase-domain')}
+                onClick={() => navigate('/dashboard/purchase-domain')}
                 className="mt-4"
               >
                 Purchase Domain

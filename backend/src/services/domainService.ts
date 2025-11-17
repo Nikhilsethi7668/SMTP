@@ -12,9 +12,9 @@ export const addDomain = async (data: Partial<IDomain>): Promise<IDomain> => {
   return await domain.save();
 };
 
-/** ✅ Get all domains (optionally filtered by user_id) */
-export const getDomains = async (user_id?: string): Promise<IDomain[]> => {
-  const filter = user_id ? { user_id: new mongoose.Types.ObjectId(user_id) } : {};
+/** ✅ Get all domains (optionally filtered by userId) */
+export const getDomains = async (userId?: string): Promise<IDomain[]> => {
+  const filter = userId ? { userId: new mongoose.Types.ObjectId(userId) } : {};
   return await Domain.find(filter).sort({ _id: 1 });
 };
 

@@ -25,7 +25,7 @@ export default function CampaignSettings() {
         <div className="mb-3 flex flex-col md:flex-row md:items-center md:justify-between">
           <Label className="text-base font-medium">Accounts to use</Label>
           <a
-            href="http://localhost:8080/app/dashboard/accounts/connect"
+            href="http://localhost:8080/dashboard/accounts/connect"
             className="text-sm text-blue-600 hover:underline"
           >
             Connect new email account

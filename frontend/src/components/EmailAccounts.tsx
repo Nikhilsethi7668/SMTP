@@ -59,7 +59,7 @@ export const EmailAccounts = () => {
       });
       if (response.data.success) {
         toast.success("Warmup started successfully!");
-        navigate("/app/dashboard/email-warmup");
+        navigate("/dashboard/email-warmup");
       } else {
         toast.error(response.data.message || "Failed to start warmup");
       }
@@ -84,7 +84,7 @@ export const EmailAccounts = () => {
         </div>
         <div>
           <Button
-            onClick={() => navigate("/app/dashboard/accounts/connect")}
+            onClick={() => navigate("/dashboard/accounts/connect")}
             className="bg-gradient-primary"
           >
             + Add New

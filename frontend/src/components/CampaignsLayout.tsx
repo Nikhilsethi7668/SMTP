@@ -76,7 +76,7 @@ export const CampaignsLayout: React.FC = () => {
           {/* Import & Add New */}
           <div className="flex items-center gap-4 md:gap-6">
             <Button
-              onClick={() => navigate("/app/dashboard/campaigns/create")}
+              onClick={() => navigate("/dashboard/campaigns/create")}
               className="bg-gradient-primary text-white"
             >
               + Add New

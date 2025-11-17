@@ -97,7 +97,7 @@ const DomainDetailsPage = () => {
           <div className="p-6">
             <Button
               variant="ghost"
-              onClick={() => navigate('/app/dashboard/purchased-domains')}
+              onClick={() => navigate('/dashboard/purchased-domains')}
               className="mb-4"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -122,7 +122,7 @@ const DomainDetailsPage = () => {
           <div className="p-6">
             <Button
               variant="ghost"
-              onClick={() => navigate('/app/dashboard/purchased-domains')}
+              onClick={() => navigate('/dashboard/purchased-domains')}
               className="mb-4"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />

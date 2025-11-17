@@ -39,7 +39,7 @@ export const createDomain = async (req: Request, res: Response) => {
       dkim_private_key: privateKey,
       spf_record: spfRecord,
       dmarc_record: dmarcRecord,
-      user_id: req.user?.id,
+      userId: req.user?.id,
       verified: false,
       verificationStatus: 'pending' as const, // Use verificationStatus for unified model
       domainType: 'verified' as const, // Set domain type
@@ -86,7 +86,7 @@ export const createDomain = async (req: Request, res: Response) => {
 
 export const getDomains = async (req: Request, res: Response) => {
   try {
-    const domains = await UnifiedDomain.find({ user_id: req.user.id });
+    const domains = await UnifiedDomain.find({ userId: req.user.id });
     if (!domains) {
       res.status(404).json({ message: 'Domains not found' });
       return;
@@ -101,7 +101,7 @@ export const getDomainById = async (req: Request, res: Response) => {
   try {
     const domain = await UnifiedDomain.findOne({
       _id: req.params.id,
-      user_id: req.user.id,
+      userId: req.user.id,
     });
 
     if (!domain) {
@@ -156,7 +156,7 @@ export const deleteDomain = async (req: Request, res: Response) => {
   try {
     const domain = await UnifiedDomain.findOneAndDelete({
       _id: req.params.id,
-      user_id: req.user.id,
+      userId: req.user.id,
     });
 
     if (!domain) {
@@ -174,7 +174,7 @@ export const verifyDomain = async (req: Request, res: Response) => {
   try {
     const domain = await UnifiedDomain.findOne({
       _id: req.params.id,
-      user_id: req.user.id,
+      userId: req.user.id,
     });
 
     if (!domain) {

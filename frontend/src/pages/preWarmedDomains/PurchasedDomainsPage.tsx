@@ -33,7 +33,7 @@ const PurchasedDomainsPage = () => {
   }, [searchQuery]);
 
   const handleDomainClick = (domainId: string) => {
-    navigate(`/app/dashboard/purchased-domains/${domainId}`);
+    navigate(`/dashboard/purchased-domains/${domainId}`);
   };
 
   useEffect(() => {

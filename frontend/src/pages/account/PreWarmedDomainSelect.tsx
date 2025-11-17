@@ -65,7 +65,7 @@ export const PreWarmedDomainSelect: React.FC = () => {
       return;
     }
     // Reserve domains and navigate to order page
-    navigate("/app/dashboard/accounts/pre-warmed/order", {
+    navigate("/dashboard/accounts/pre-warmed/order", {
       state: { selectedDomains },
     });
   };

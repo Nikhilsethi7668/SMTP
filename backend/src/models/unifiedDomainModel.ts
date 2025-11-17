@@ -18,8 +18,7 @@ export interface IUnifiedDomain extends Document {
   // Common fields
   domain: string; // Main domain name (used by all types)
   domain_name?: string; // Alternative name field (from Domain model)
-  user_id?: mongoose.Types.ObjectId; // User reference (from Domain and PurchasedDomain)
-  userId?: mongoose.Types.ObjectId; // Alternative user reference (from PreWarmedDomain)
+  userId?: mongoose.Types.ObjectId; // User reference
   
   // Domain type discriminator
   domainType: "preWarmed" | "verified" | "purchased";
@@ -89,7 +88,7 @@ export interface IPreWarmedDomain extends Document {
 }
 
 export interface IDomain extends Document {
-  user_id: mongoose.Types.ObjectId;
+  userId: mongoose.Types.ObjectId;
   domain_name: string;
   dkim_selector: string;
   dkim_public_key?: string;
@@ -104,7 +103,7 @@ export interface IDomain extends Document {
 }
 
 export interface IPurchasedDomain extends Document {
-  user_id: mongoose.Types.ObjectId;
+  userId: mongoose.Types.ObjectId;
   domain: string;
   sld: string;
   tld: string;
@@ -181,7 +180,7 @@ const UnifiedDomainSchema = new Schema<IUnifiedDomain>(
       trim: true,
       index: true,
     },
-    user_id: {
+    userId: {
       type: Schema.Types.ObjectId,
       ref: "User",
       index: true,
@@ -304,7 +303,6 @@ const UnifiedDomainSchema = new Schema<IUnifiedDomain>(
 UnifiedDomainSchema.index({ domainType: 1, domain: 1 });
 UnifiedDomainSchema.index({ domainType: 1, status: 1 });
 UnifiedDomainSchema.index({ domainType: 1, userId: 1 });
-UnifiedDomainSchema.index({ domainType: 1, user_id: 1 });
 UnifiedDomainSchema.index({ orderId: 1 });
 UnifiedDomainSchema.index({ domainType: 1, verificationStatus: 1 });
 UnifiedDomainSchema.index({ domainType: 1, purchaseStatus: 1 });

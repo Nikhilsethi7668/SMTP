@@ -43,7 +43,7 @@ export const PreWarmedOrder: React.FC = () => {
   useEffect(() => {
     const selectedDomains = location.state?.selectedDomains || [];
     if (selectedDomains.length === 0) {
-      navigate("/app/dashboard/accounts/pre-warmed/select");
+      navigate("/dashboard/accounts/pre-warmed/select");
       return;
     }
     fetchDomainEmails(selectedDomains);
@@ -60,7 +60,7 @@ export const PreWarmedOrder: React.FC = () => {
         if (prev <= 1) {
           clearInterval(interval);
           toast.error("Reservation expired. Please select domains again.");
-          navigate("/app/dashboard/accounts/pre-warmed/select");
+          navigate("/dashboard/accounts/pre-warmed/select");
           return 0;
         }
         return prev - 1;

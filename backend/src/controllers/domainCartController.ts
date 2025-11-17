@@ -386,6 +386,7 @@ export const updateCartItem = async (req: Request, res: Response) => {
 export const purchaseFromCart = async (req: Request, res: Response) => {
   try {
     const userId = req.user!.id;
+    const userRole = req.user!.role;
     const { registrantInfo, endUserIP } = req.body;
 
     if (!registrantInfo) {
@@ -459,8 +460,9 @@ export const purchaseFromCart = async (req: Request, res: Response) => {
         expirationDate.setFullYear(expirationDate.getFullYear() + cartItem.years);
 
         // Save to PurchasedDomain model
+        // Don't set userId if user is admin
         const purchasedDomain = new PurchasedDomain({
-          user_id: userId,
+          ...(userRole !== 'admin' && { userId: userId }),
           domain: cartItem.domain,
           sld: cartItem.sld,
           tld: cartItem.tld,

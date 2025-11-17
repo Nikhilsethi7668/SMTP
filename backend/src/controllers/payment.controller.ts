@@ -11,6 +11,7 @@ import { enomService } from '../services/enomService.js';
 import { generateDKIMKeys } from '../services/dkimService.js';
 import { dnsService } from '../services/dnsService.js';
 import mongoose from 'mongoose';
+import { User } from '../models/userModel.js';
 
 dotenv.config();
 
@@ -130,6 +131,10 @@ export const handleSuccessfulPayment = async (req: Request, res: Response) => {
       }
 
       const userObjectId = new mongoose.Types.ObjectId(userId);
+      
+      // Fetch user to check role
+      const user = await User.findById(userId);
+      const isAdmin = user?.role === 'admin';
 
       if (paymentType === 'domain-cart') {
         // Handle domain cart purchase
@@ -186,8 +191,9 @@ export const handleSuccessfulPayment = async (req: Request, res: Response) => {
               expirationDate.setFullYear(expirationDate.getFullYear() + cartItem.years);
 
               // Save to PurchasedDomain model
+              // Don't set userId if user is admin
               const purchasedDomain = new PurchasedDomain({
-                user_id: userObjectId,
+                ...(isAdmin ? {} : { userId: userObjectId }),
                 domain: cartItem.domain,
                 sld: cartItem.sld,
                 tld: cartItem.tld,
@@ -245,7 +251,7 @@ export const handleSuccessfulPayment = async (req: Request, res: Response) => {
                 purchasedDomain.domain_name = cartItem.domain; // Also set domain_name for consistency
 
                 await purchasedDomain.save();
-                console.log(`Saved ${cartItem.domain} to PurchasedDomain model with DNS records (DKIM, SPF, DMARC) for user_id: ${userObjectId}`);
+                console.log(`Saved ${cartItem.domain} to PurchasedDomain model with DNS records (DKIM, SPF, DMARC) for userId: ${userObjectId}`);
 
                 // Try to automatically create DNS records via DNS service (if provider is configured)
                 // This is optional and won't fail the purchase if it errors

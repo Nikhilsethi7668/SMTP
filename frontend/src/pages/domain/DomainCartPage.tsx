@@ -246,7 +246,7 @@ const DomainCartPage: React.FC = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => navigate('/app/purchase-domain')}
+                onClick={() => navigate('/dashboard/purchase-domain')}
                 className="flex items-center gap-2"
               >
                 <ArrowLeft className="h-4 w-4" />
@@ -279,7 +279,7 @@ const DomainCartPage: React.FC = () => {
                 <p className="text-muted-foreground mb-6">
                   Start by searching for domains to add to your cart.
                 </p>
-                <Button onClick={() => navigate('/app/purchase-domain')}>
+                <Button onClick={() => navigate('/dashboard/purchase-domain')}>
                   Search Domains
                 </Button>
               </div>

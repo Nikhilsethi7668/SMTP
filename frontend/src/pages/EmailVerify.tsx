@@ -52,7 +52,7 @@ export default function EmailVerify() {
       });
       if (response.data.success) {
         toast.success("Email verified successfully! You can now log in.");
-        navigate("/app/dashboard/accounts");
+        navigate("/dashboard/accounts");
       } else {
         toast.error(`Verification failed: ${response?.data?.message}`);
       }

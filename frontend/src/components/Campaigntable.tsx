@@ -82,7 +82,7 @@ export const CampaignTable: React.FC<CampaignTableProps> = ({ campaigns, onActio
                 <TableCell
                   onClick={() =>
                     navigate(
-                      `/app/dashboard/campaigns/details?campaignName=${encodeURIComponent(c.name)}&campaignId=${encodeURIComponent(c._id)}`
+                      `/dashboard/campaigns/details?campaignName=${encodeURIComponent(c.name)}&campaignId=${encodeURIComponent(c._id)}`
                     )
                   }
                   className="cursor-pointer font-medium"

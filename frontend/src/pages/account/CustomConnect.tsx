@@ -26,7 +26,7 @@ const CustomConnect: React.FC = () => {
   const [smtpPassword, setSmtpPassword] = useState("");
 
   const handleBack = () => {
-    navigate("/app/dashboard/accounts/connect");
+    navigate("/dashboard/accounts/connect");
   };
 
   const handleNext = async () => {
@@ -69,7 +69,7 @@ const CustomConnect: React.FC = () => {
       const response = await api.post("/connect/custom", payload);
       if (response.data) {
         alert("✅ " + response.data.message);
-        navigate("/app/dashboard/accounts");
+        navigate("/dashboard/accounts");
       }
     } catch (error: any) {
       console.error("Error connecting custom account:", error);

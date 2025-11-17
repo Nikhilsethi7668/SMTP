@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { DomainResponse, VerifyDomainResponse } from '@/services/domainApi';
-import { Globe, Clipboard, CheckCircle, Clock, Trash2, AlertCircle, XCircle } from 'lucide-react';
+import { purchaseDomainApi, type PurchasedDomain } from '@/services/purchaseDomainApi';
+import { Globe, Clipboard, CheckCircle, Clock, Trash2, AlertCircle, XCircle, RefreshCw } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -10,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle, DialogHeader, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { domainApi } from '@/services/domainApi';
 import { DashboardLayout } from '@/components/DashboardLayout';
 
@@ -28,6 +30,13 @@ const DomainsPage = () => {
   const [isVerificationModalOpen, setVerificationModalOpen] = useState(false);
   const [selectedDomain, setSelectedDomain] = useState<DomainResponse | null>(null);
   const [verificationResults, setVerificationResults] = useState<VerifyDomainResponse | null>(null);
+  const [purchasedDomains, setPurchasedDomains] = useState<PurchasedDomain[]>([]);
+  const [loadingPurchased, setLoadingPurchased] = useState(true);
+  const [checkingPurchaseId, setCheckingPurchaseId] = useState<string | null>(null);
+  const [settingDnsId, setSettingDnsId] = useState<string | null>(null);
+  const [isDetailDialogOpen, setDetailDialogOpen] = useState(false);
+  const [selectedDomainForDetail, setSelectedDomainForDetail] = useState<DomainResponse | PurchasedDomain | null>(null);
+  const [selectedDomainType, setSelectedDomainType] = useState<'verified' | 'purchased' | null>(null);
 
   const fetchDomains = useCallback(async () => {
     try {
@@ -51,9 +60,26 @@ const DomainsPage = () => {
     }
   }, []);
 
+  const fetchPurchasedDomains = useCallback(async () => {
+    try {
+      setLoadingPurchased(true);
+      const data = await purchaseDomainApi.getMyPurchasedDomains();
+      setPurchasedDomains(Array.isArray(data) ? data : []);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to fetch purchased domains.');
+      setPurchasedDomains([]);
+    } finally {
+      setLoadingPurchased(false);
+    }
+  }, []);
+
   useEffect(() => {
     fetchDomains();
   }, [fetchDomains]);
+
+  useEffect(() => {
+    fetchPurchasedDomains();
+  }, [fetchPurchasedDomains]);
 
   const handleAddDomain = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -127,9 +153,61 @@ const DomainsPage = () => {
     }
   };
 
+  const handleCheckPurchaseStatus = async (domainId: string) => {
+    setCheckingPurchaseId(domainId);
+    setError('');
+    setSuccess('');
+
+    try {
+      const statusResponse = await purchaseDomainApi.checkPurchasedDomainStatus(domainId);
+      const updatedDomain = statusResponse.data.domain;
+      const registrationStatus = statusResponse.data.registrationStatus;
+
+      setPurchasedDomains(prev =>
+        prev.map((domain) => (domain._id === updatedDomain._id ? updatedDomain : domain))
+      );
+
+      if (registrationStatus?.registered) {
+        setSuccess(`Domain ${updatedDomain.domain} is now active.`);
+      } else {
+        const statusText = registrationStatus?.status
+          ? ` (${registrationStatus.status})`
+          : '';
+        setError(`Domain ${updatedDomain.domain} is still pending registration${statusText}.`);
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to check domain registration status.');
+      console.error('Error checking purchased domain status:', err);
+    } finally {
+      setCheckingPurchaseId(null);
+    }
+  };
+
+  const handleSetDNS = async (domainId: string) => {
+    setSettingDnsId(domainId);
+    setError('');
+    setSuccess('');
+
+    try {
+      const response = await purchaseDomainApi.setPurchasedDomainDNS(domainId);
+      setSuccess(response.message || `DNS records set successfully for ${response.data.domain}`);
+    } catch (err: any) {
+      setError(err.response?.data?.message || err.response?.data?.error || 'Failed to set DNS records.');
+      console.error('Error setting DNS records:', err);
+    } finally {
+      setSettingDnsId(null);
+    }
+  };
+
   const showRecords = (domain: DomainResponse) => {
     setSelectedDomain(domain);
     setRecordsModalOpen(true);
+  };
+
+  const showDomainDetail = (domain: DomainResponse | PurchasedDomain, type: 'verified' | 'purchased') => {
+    setSelectedDomainForDetail(domain);
+    setSelectedDomainType(type);
+    setDetailDialogOpen(true);
   };
 
   const DnsRecordRow = ({ type, host, value, instructions }: { type: string; host: string; value: string; instructions?: string }) => {
@@ -224,7 +302,7 @@ const DomainsPage = () => {
               registrar. It may take some time for DNS changes to propagate.
             </p>
             <Button
-              onClick={() => navigate('/app/purchase-domain')}
+              onClick={() => navigate('/dashboard/purchase-domain')}
               className="ml-4"
             >
               Buy Domain
@@ -291,7 +369,11 @@ const DomainsPage = () => {
               </TableHeader>
               <TableBody>
                 {domains.map((d) => (
-                  <TableRow key={d._id}>
+                  <TableRow 
+                    key={d._id}
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => showDomainDetail(d, 'verified')}
+                  >
                     <TableCell>
                       <span className="font-medium">{d.domain_name}</span>
                     </TableCell>
@@ -311,7 +393,7 @@ const DomainsPage = () => {
                         {d.status === 'verified' && <CheckCircle className="h-3 w-3" />}
                         {d.status === 'pending' && <Clock className="h-3 w-3" />}
                         {d.status === 'failed' && <XCircle className="h-3 w-3" />}
-                        <span className="capitalize">{d.status}</span>
+                        <span className="capitalize">{d.verificationStatus}</span>
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -321,7 +403,7 @@ const DomainsPage = () => {
                           : 'Never'}
                       </span>
                     </TableCell>
-                    <TableCell>
+                    <TableCell onClick={(e) => e.stopPropagation()}>
                       <div className="flex gap-2">
                         <Button size="sm" variant="outline" onClick={() => showRecords(d)}>
                           View Records
@@ -553,6 +635,689 @@ const DomainsPage = () => {
             </Button>
           </DialogFooter>
           </DialogContent>
+      </Dialog>
+
+      {/* Purchased Domains Section */}
+      <Card>
+        <div className="p-6">
+          <h2 className="text-2xl font-semibold mb-4 flex items-center">
+            <Globe className="mr-3 h-6 w-6" /> Purchased Domains
+          </h2>
+          <p className="text-muted-foreground mb-6">
+            Domains you've purchased through our platform. Check the status to verify registration.
+          </p>
+
+          {loadingPurchased ? (
+            <div className="space-y-4">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="flex items-center justify-between p-4 border rounded">
+                  <Skeleton className="h-4 w-48" />
+                  <Skeleton className="h-6 w-24 rounded-full" />
+                  <Skeleton className="h-8 w-20 rounded-md" />
+                </div>
+              ))}
+            </div>
+          ) : purchasedDomains.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">
+              <Globe className="mx-auto h-12 w-12 mb-4 opacity-50" />
+              <p>No purchased domains yet. Purchase a domain to get started.</p>
+              <Button
+                onClick={() => navigate('/dashboard/purchase-domain')}
+                className="mt-4"
+              >
+                Purchase Domain
+              </Button>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Domain</TableHead>
+                  <TableHead>Purchase Status</TableHead>
+                  <TableHead>Order ID</TableHead>
+                  <TableHead>Purchase Date</TableHead>
+                  <TableHead>Expiration Date</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {purchasedDomains.map((domain) => (
+                  <TableRow 
+                    key={domain._id}
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => showDomainDetail(domain, 'purchased')}
+                  >
+                    <TableCell>
+                      <span className="font-medium">{domain.domain}</span>
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={
+                          domain.purchaseStatus === 'active'
+                            ? 'default'
+                            : domain.purchaseStatus === 'pending'
+                            ? 'secondary'
+                            : domain.purchaseStatus === 'failed'
+                            ? 'destructive'
+                            : 'outline'
+                        }
+                        className="inline-flex items-center gap-1.5"
+                      >
+                        {domain.purchaseStatus === 'active' && <CheckCircle className="h-3 w-3" />}
+                        {domain.purchaseStatus === 'pending' && <Clock className="h-3 w-3" />}
+                        {domain.purchaseStatus === 'failed' && <XCircle className="h-3 w-3" />}
+                        <span className="capitalize">{domain.purchaseStatus}</span>
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm font-mono text-muted-foreground">
+                        {domain.orderId || '-'}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm text-muted-foreground">
+                        {domain.purchaseDate
+                          ? new Date(domain.purchaseDate).toLocaleDateString()
+                          : '-'}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm text-muted-foreground">
+                        {domain.expirationDate
+                          ? new Date(domain.expirationDate).toLocaleDateString()
+                          : '-'}
+                      </span>
+                    </TableCell>
+                    <TableCell onClick={(e) => e.stopPropagation()}>
+                      <div className="flex gap-2">
+                        {domain.purchaseStatus === 'pending' && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleCheckPurchaseStatus(domain._id)}
+                            disabled={checkingPurchaseId === domain._id}
+                          >
+                            {checkingPurchaseId === domain._id ? (
+                              <>
+                                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                                Checking...
+                              </>
+                            ) : (
+                              <>
+                                <RefreshCw className="h-4 w-4 mr-2" />
+                                Check Status
+                              </>
+                            )}
+                          </Button>
+                        )}
+                        {domain.purchaseStatus === 'active' && (
+                          <>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleSetDNS(domain._id)}
+                              disabled={settingDnsId === domain._id}
+                            >
+                              {settingDnsId === domain._id ? (
+                                <>
+                                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                                  Setting DNS...
+                                </>
+                              ) : (
+                                'Set DNS'
+                              )}
+                            </Button>
+                            <Badge variant="default" className="inline-flex items-center gap-1.5">
+                              <CheckCircle className="h-3 w-3" />
+                              Active
+                            </Badge>
+                          </>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </div>
+      </Card>
+
+      {/* Domain Detail Dialog */}
+      <Dialog
+        open={isDetailDialogOpen && selectedDomainForDetail !== null}
+        onOpenChange={(open) => {
+          setDetailDialogOpen(open);
+          if (!open) {
+            setSelectedDomainForDetail(null);
+            setSelectedDomainType(null);
+          }
+        }}
+      >
+        {selectedDomainForDetail && selectedDomainType && (
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>
+                {selectedDomainType === 'verified' 
+                  ? (selectedDomainForDetail as DomainResponse).domain_name 
+                  : (selectedDomainForDetail as PurchasedDomain).domain}
+              </DialogTitle>
+              <DialogDescription>
+                {selectedDomainType === 'verified' 
+                  ? 'Domain details and DNS configuration'
+                  : 'Purchased domain information and settings'}
+              </DialogDescription>
+            </DialogHeader>
+
+            <Tabs defaultValue="overview" className="w-full">
+              <TabsList className={`grid w-full ${selectedDomainType === 'purchased' ? 'grid-cols-4' : 'grid-cols-3'}`}>
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="dns">DNS Records</TabsTrigger>
+                {selectedDomainType === 'purchased' && (
+                  <TabsTrigger value="registrant">Registrant</TabsTrigger>
+                )}
+                {selectedDomainType === 'purchased' ? (
+                  <TabsTrigger value="registration">Registration Info</TabsTrigger>
+                ) : (
+                  <TabsTrigger value="actions">Actions</TabsTrigger>
+                )}
+              </TabsList>
+
+              {/* Overview Tab */}
+              <TabsContent value="overview" className="space-y-4 mt-4">
+                {selectedDomainType === 'verified' ? (
+                  <>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-muted-foreground">Domain Name</label>
+                        <p className="text-sm font-medium">{(selectedDomainForDetail as DomainResponse).domain_name}</p>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-muted-foreground">Status</label>
+                        <div>
+                          <Badge
+                            variant={
+                              (selectedDomainForDetail as DomainResponse).status === 'verified'
+                                ? 'default'
+                                : (selectedDomainForDetail as DomainResponse).status === 'pending'
+                                ? 'secondary'
+                                : (selectedDomainForDetail as DomainResponse).status === 'failed'
+                                ? 'destructive'
+                                : 'outline'
+                            }
+                            className="inline-flex items-center gap-1.5"
+                          >
+                            {(selectedDomainForDetail as DomainResponse).status === 'verified' && <CheckCircle className="h-3 w-3" />}
+                            {(selectedDomainForDetail as DomainResponse).status === 'pending' && <Clock className="h-3 w-3" />}
+                            {(selectedDomainForDetail as DomainResponse).status === 'failed' && <XCircle className="h-3 w-3" />}
+                            <span className="capitalize">{(selectedDomainForDetail as DomainResponse).verificationStatus}</span>
+                          </Badge>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-muted-foreground">DKIM Selector</label>
+                        <p className="text-sm">{(selectedDomainForDetail as DomainResponse).dkim_selector || 'email'}</p>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-muted-foreground">Last Verified</label>
+                        <p className="text-sm">
+                          {(selectedDomainForDetail as DomainResponse).last_verified_at
+                            ? new Date((selectedDomainForDetail as DomainResponse).last_verified_at!).toLocaleString()
+                            : 'Never'}
+                        </p>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-muted-foreground">Created At</label>
+                        <p className="text-sm">
+                          {new Date((selectedDomainForDetail as DomainResponse).createdAt).toLocaleString()}
+                        </p>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-muted-foreground">Updated At</label>
+                        <p className="text-sm">
+                          {new Date((selectedDomainForDetail as DomainResponse).updatedAt).toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-muted-foreground">Domain Name</label>
+                        <p className="text-sm font-medium">{(selectedDomainForDetail as PurchasedDomain).domain}</p>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-muted-foreground">Purchase Status</label>
+                        <div>
+                          <Badge
+                            variant={
+                              (selectedDomainForDetail as PurchasedDomain).purchaseStatus === 'active'
+                                ? 'default'
+                                : (selectedDomainForDetail as PurchasedDomain).purchaseStatus === 'pending'
+                                ? 'secondary'
+                                : (selectedDomainForDetail as PurchasedDomain).purchaseStatus === 'failed'
+                                ? 'destructive'
+                                : 'outline'
+                            }
+                            className="inline-flex items-center gap-1.5"
+                          >
+                            {(selectedDomainForDetail as PurchasedDomain).purchaseStatus === 'active' && <CheckCircle className="h-3 w-3" />}
+                            {(selectedDomainForDetail as PurchasedDomain).purchaseStatus === 'pending' && <Clock className="h-3 w-3" />}
+                            {(selectedDomainForDetail as PurchasedDomain).purchaseStatus === 'failed' && <XCircle className="h-3 w-3" />}
+                            <span className="capitalize">{(selectedDomainForDetail as PurchasedDomain).purchaseStatus}</span>
+                          </Badge>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-muted-foreground">Order ID</label>
+                        <p className="text-sm font-mono">{(selectedDomainForDetail as PurchasedDomain).orderId || '-'}</p>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-muted-foreground">Registration Period</label>
+                        <p className="text-sm">{(selectedDomainForDetail as PurchasedDomain).years || 1} year(s)</p>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-muted-foreground">Purchase Date</label>
+                        <p className="text-sm">
+                          {(selectedDomainForDetail as PurchasedDomain).purchaseDate
+                            ? new Date((selectedDomainForDetail as PurchasedDomain).purchaseDate!).toLocaleString()
+                            : '-'}
+                        </p>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-muted-foreground">Expiration Date</label>
+                        <p className="text-sm">
+                          {(selectedDomainForDetail as PurchasedDomain).expirationDate
+                            ? new Date((selectedDomainForDetail as PurchasedDomain).expirationDate!).toLocaleString()
+                            : '-'}
+                        </p>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-muted-foreground">Price</label>
+                        <p className="text-sm">${(selectedDomainForDetail as PurchasedDomain).price?.toFixed(2) || '-'}</p>
+                      </div>
+                      {(selectedDomainForDetail as PurchasedDomain).verificationStatus && (
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium text-muted-foreground">Verification Status</label>
+                          <Badge variant="outline" className="capitalize">
+                            {(selectedDomainForDetail as PurchasedDomain).verificationStatus}
+                          </Badge>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+              </TabsContent>
+
+              {/* DNS Records Tab */}
+              <TabsContent value="dns" className="space-y-4 mt-4">
+                {selectedDomainType === 'verified' ? (
+                  <>
+                    {(selectedDomainForDetail as DomainResponse).dnsRecords ? (
+                      <>
+                        <div>
+                          <h4 className="font-semibold text-lg mb-3">SPF Record</h4>
+                          <DnsRecordRow
+                            type="TXT"
+                            host={(selectedDomainForDetail as DomainResponse).dnsRecords!.spf.host}
+                            value={(selectedDomainForDetail as DomainResponse).dnsRecords!.spf.value}
+                            instructions={(selectedDomainForDetail as DomainResponse).dnsRecords!.spf.instructions}
+                          />
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-lg mb-3">DKIM Record</h4>
+                          <DnsRecordRow
+                            type="TXT"
+                            host={(selectedDomainForDetail as DomainResponse).dnsRecords!.dkim.host}
+                            value={(selectedDomainForDetail as DomainResponse).dnsRecords!.dkim.value}
+                            instructions={(selectedDomainForDetail as DomainResponse).dnsRecords!.dkim.instructions}
+                          />
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-lg mb-3">DMARC Record</h4>
+                          <DnsRecordRow
+                            type="TXT"
+                            host={(selectedDomainForDetail as DomainResponse).dnsRecords!.dmarc.host}
+                            value={(selectedDomainForDetail as DomainResponse).dnsRecords!.dmarc.value}
+                            instructions={(selectedDomainForDetail as DomainResponse).dnsRecords!.dmarc.instructions}
+                          />
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        {(selectedDomainForDetail as DomainResponse).spf_record && (
+                          <div>
+                            <h4 className="font-semibold text-lg mb-3">SPF Record</h4>
+                            <DnsRecordRow
+                              type="TXT"
+                              host={(selectedDomainForDetail as DomainResponse).domain_name}
+                              value={(selectedDomainForDetail as DomainResponse).spf_record}
+                              instructions="Add this TXT record at the root (@) of your domain"
+                            />
+                          </div>
+                        )}
+                        {(selectedDomainForDetail as DomainResponse).dkim_public_key && (
+                          <div>
+                            <h4 className="font-semibold text-lg mb-3">DKIM Record</h4>
+                            <DnsRecordRow
+                              type="TXT"
+                              host={`${(selectedDomainForDetail as DomainResponse).dkim_selector}._domainkey.${(selectedDomainForDetail as DomainResponse).domain_name}`}
+                              value={`v=DKIM1; k=rsa; p=${(selectedDomainForDetail as DomainResponse).dkim_public_key}`}
+                              instructions={`Add this TXT record at ${(selectedDomainForDetail as DomainResponse).dkim_selector}._domainkey.${(selectedDomainForDetail as DomainResponse).domain_name}`}
+                            />
+                          </div>
+                        )}
+                        {(selectedDomainForDetail as DomainResponse).dmarc_record && (
+                          <div>
+                            <h4 className="font-semibold text-lg mb-3">DMARC Record</h4>
+                            <DnsRecordRow
+                              type="TXT"
+                              host={`_dmarc.${(selectedDomainForDetail as DomainResponse).domain_name}`}
+                              value={(selectedDomainForDetail as DomainResponse).dmarc_record}
+                              instructions={`Add this TXT record at _dmarc.${(selectedDomainForDetail as DomainResponse).domain_name}`}
+                            />
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {(selectedDomainForDetail as PurchasedDomain).spf_record && (
+                      <div>
+                        <h4 className="font-semibold text-lg mb-3">SPF Record</h4>
+                        <DnsRecordRow
+                          type="TXT"
+                          host={(selectedDomainForDetail as PurchasedDomain).domain}
+                          value={(selectedDomainForDetail as PurchasedDomain).spf_record!}
+                          instructions="Add this TXT record at the root (@) of your domain"
+                        />
+                      </div>
+                    )}
+                    {(selectedDomainForDetail as PurchasedDomain).dkim_public_key && (
+                      <div>
+                        <h4 className="font-semibold text-lg mb-3">DKIM Record</h4>
+                        <DnsRecordRow
+                          type="TXT"
+                          host={`${(selectedDomainForDetail as PurchasedDomain).dkim_selector || 'email'}._domainkey.${(selectedDomainForDetail as PurchasedDomain).domain}`}
+                          value={`v=DKIM1; k=rsa; p=${(selectedDomainForDetail as PurchasedDomain).dkim_public_key}`}
+                          instructions={`Add this TXT record at ${(selectedDomainForDetail as PurchasedDomain).dkim_selector || 'email'}._domainkey.${(selectedDomainForDetail as PurchasedDomain).domain}`}
+                        />
+                      </div>
+                    )}
+                    {(selectedDomainForDetail as PurchasedDomain).dmarc_record && (
+                      <div>
+                        <h4 className="font-semibold text-lg mb-3">DMARC Record</h4>
+                        <DnsRecordRow
+                          type="TXT"
+                          host={`_dmarc.${(selectedDomainForDetail as PurchasedDomain).domain}`}
+                          value={(selectedDomainForDetail as PurchasedDomain).dmarc_record!}
+                          instructions={`Add this TXT record at _dmarc.${(selectedDomainForDetail as PurchasedDomain).domain}`}
+                        />
+                      </div>
+                    )}
+                    {!((selectedDomainForDetail as PurchasedDomain).spf_record || (selectedDomainForDetail as PurchasedDomain).dkim_public_key || (selectedDomainForDetail as PurchasedDomain).dmarc_record) && (
+                      <p className="text-muted-foreground text-center py-8">DNS records not yet configured for this domain.</p>
+                    )}
+                  </>
+                )}
+              </TabsContent>
+
+              {/* Registrant Info Tab (Purchased domains only) */}
+              {selectedDomainType === 'purchased' && (
+                <TabsContent value="registrant" className="space-y-4 mt-4">
+                  {(selectedDomainForDetail as PurchasedDomain).registrantInfo ? (
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-muted-foreground">First Name</label>
+                        <p className="text-sm">{(selectedDomainForDetail as PurchasedDomain).registrantInfo!.firstName}</p>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-muted-foreground">Last Name</label>
+                        <p className="text-sm">{(selectedDomainForDetail as PurchasedDomain).registrantInfo!.lastName}</p>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-muted-foreground">Email</label>
+                        <p className="text-sm">{(selectedDomainForDetail as PurchasedDomain).registrantInfo!.email}</p>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-muted-foreground">Phone</label>
+                        <p className="text-sm">{(selectedDomainForDetail as PurchasedDomain).registrantInfo!.phone}</p>
+                      </div>
+                      {(selectedDomainForDetail as PurchasedDomain).registrantInfo!.organizationName && (
+                        <div className="space-y-2 col-span-2">
+                          <label className="text-sm font-medium text-muted-foreground">Organization</label>
+                          <p className="text-sm">{(selectedDomainForDetail as PurchasedDomain).registrantInfo!.organizationName}</p>
+                        </div>
+                      )}
+                      <div className="space-y-2 col-span-2">
+                        <label className="text-sm font-medium text-muted-foreground">Address</label>
+                        <p className="text-sm">
+                          {(selectedDomainForDetail as PurchasedDomain).registrantInfo!.address1}
+                        </p>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-muted-foreground">City</label>
+                        <p className="text-sm">{(selectedDomainForDetail as PurchasedDomain).registrantInfo!.city}</p>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-muted-foreground">State/Province</label>
+                        <p className="text-sm">{(selectedDomainForDetail as PurchasedDomain).registrantInfo!.stateProvince}</p>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-muted-foreground">Postal Code</label>
+                        <p className="text-sm">{(selectedDomainForDetail as PurchasedDomain).registrantInfo!.postalCode}</p>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-muted-foreground">Country</label>
+                        <p className="text-sm">{(selectedDomainForDetail as PurchasedDomain).registrantInfo!.country}</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-muted-foreground text-center py-8">Registrant information not available.</p>
+                  )}
+                </TabsContent>
+              )}
+
+              {/* Registration Info Tab (Purchased domains only) */}
+              {selectedDomainType === 'purchased' && (
+                <TabsContent value="registration" className="space-y-4 mt-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-muted-foreground">Order ID</label>
+                      <p className="text-sm font-mono">{(selectedDomainForDetail as PurchasedDomain).orderId || '-'}</p>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-muted-foreground">Registration Period</label>
+                      <p className="text-sm">{(selectedDomainForDetail as PurchasedDomain).years || 1} year(s)</p>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-muted-foreground">Purchase Date</label>
+                      <p className="text-sm">
+                        {(selectedDomainForDetail as PurchasedDomain).purchaseDate
+                          ? new Date((selectedDomainForDetail as PurchasedDomain).purchaseDate!).toLocaleString()
+                          : '-'}
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-muted-foreground">Expiration Date</label>
+                      <p className="text-sm">
+                        {(selectedDomainForDetail as PurchasedDomain).expirationDate
+                          ? new Date((selectedDomainForDetail as PurchasedDomain).expirationDate!).toLocaleString()
+                          : '-'}
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-muted-foreground">Purchase Price</label>
+                      <p className="text-sm font-semibold">${(selectedDomainForDetail as PurchasedDomain).price?.toFixed(2) || '-'}</p>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-muted-foreground">Purchase Status</label>
+                      <div>
+                        <Badge
+                          variant={
+                            (selectedDomainForDetail as PurchasedDomain).purchaseStatus === 'active'
+                              ? 'default'
+                              : (selectedDomainForDetail as PurchasedDomain).purchaseStatus === 'pending'
+                              ? 'secondary'
+                              : (selectedDomainForDetail as PurchasedDomain).purchaseStatus === 'failed'
+                              ? 'destructive'
+                              : 'outline'
+                          }
+                          className="inline-flex items-center gap-1.5"
+                        >
+                          {(selectedDomainForDetail as PurchasedDomain).purchaseStatus === 'active' && <CheckCircle className="h-3 w-3" />}
+                          {(selectedDomainForDetail as PurchasedDomain).purchaseStatus === 'pending' && <Clock className="h-3 w-3" />}
+                          {(selectedDomainForDetail as PurchasedDomain).purchaseStatus === 'failed' && <XCircle className="h-3 w-3" />}
+                          <span className="capitalize">{(selectedDomainForDetail as PurchasedDomain).purchaseStatus}</span>
+                        </Badge>
+                      </div>
+                    </div>
+                    {(selectedDomainForDetail as PurchasedDomain).verificationStatus && (
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-muted-foreground">DNS Verification Status</label>
+                        <Badge variant="outline" className="capitalize">
+                          {(selectedDomainForDetail as PurchasedDomain).verificationStatus}
+                        </Badge>
+                      </div>
+                    )}
+                    <div className="space-y-2 col-span-2">
+                      <label className="text-sm font-medium text-muted-foreground">Domain Components</label>
+                      <div className="flex gap-4 text-sm">
+                        <div>
+                          <span className="text-muted-foreground">SLD: </span>
+                          <span className="font-mono">{(selectedDomainForDetail as PurchasedDomain).sld}</span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">TLD: </span>
+                          <span className="font-mono">{(selectedDomainForDetail as PurchasedDomain).tld}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Action Buttons */}
+                  <div className="pt-4 border-t space-y-3">
+                    <h4 className="font-semibold text-sm mb-3">Quick Actions</h4>
+                    {(selectedDomainForDetail as PurchasedDomain).purchaseStatus === 'pending' && (
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start"
+                        onClick={() => {
+                          setDetailDialogOpen(false);
+                          handleCheckPurchaseStatus((selectedDomainForDetail as PurchasedDomain)._id);
+                        }}
+                        disabled={checkingPurchaseId === (selectedDomainForDetail as PurchasedDomain)._id}
+                      >
+                        {checkingPurchaseId === (selectedDomainForDetail as PurchasedDomain)._id ? (
+                          <>
+                            <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                            Checking Status...
+                          </>
+                        ) : (
+                          <>
+                            <RefreshCw className="h-4 w-4 mr-2" />
+                            Check Registration Status
+                          </>
+                        )}
+                      </Button>
+                    )}
+                    {(selectedDomainForDetail as PurchasedDomain).purchaseStatus === 'active' && (
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start"
+                        onClick={() => {
+                          setDetailDialogOpen(false);
+                          handleSetDNS((selectedDomainForDetail as PurchasedDomain)._id);
+                        }}
+                        disabled={settingDnsId === (selectedDomainForDetail as PurchasedDomain)._id}
+                      >
+                        {settingDnsId === (selectedDomainForDetail as PurchasedDomain)._id ? (
+                          <>
+                            <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                            Setting DNS...
+                          </>
+                        ) : (
+                          <>
+                            <Globe className="h-4 w-4 mr-2" />
+                            Set DNS Records
+                          </>
+                        )}
+                      </Button>
+                    )}
+                  </div>
+                </TabsContent>
+              )}
+
+              {/* Actions Tab (Verified domains only) */}
+              {selectedDomainType === 'verified' && (
+                <TabsContent value="actions" className="space-y-4 mt-4">
+                  <div className="space-y-3">
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start"
+                      onClick={() => {
+                        setDetailDialogOpen(false);
+                        showRecords(selectedDomainForDetail as DomainResponse);
+                      }}
+                    >
+                      <Clipboard className="h-4 w-4 mr-2" />
+                      View DNS Records
+                    </Button>
+                    {(selectedDomainForDetail as DomainResponse).status !== 'verified' && (
+                      <Button
+                        className="w-full justify-start"
+                        onClick={() => {
+                          setDetailDialogOpen(false);
+                          handleVerifyDomain((selectedDomainForDetail as DomainResponse)._id);
+                        }}
+                        disabled={verifyingId === (selectedDomainForDetail as DomainResponse)._id}
+                      >
+                        {verifyingId === (selectedDomainForDetail as DomainResponse)._id ? (
+                          <>
+                            <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                            Verifying...
+                          </>
+                        ) : (
+                          <>
+                            <CheckCircle className="h-4 w-4 mr-2" />
+                            Verify Domain
+                          </>
+                        )}
+                      </Button>
+                    )}
+                    <Button
+                      variant="destructive"
+                      className="w-full justify-start"
+                      onClick={() => {
+                        setDetailDialogOpen(false);
+                        handleDeleteDomain((selectedDomainForDetail as DomainResponse)._id);
+                      }}
+                      disabled={deletingId === (selectedDomainForDetail as DomainResponse)._id}
+                    >
+                      {deletingId === (selectedDomainForDetail as DomainResponse)._id ? (
+                        <>
+                          <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                          Deleting...
+                        </>
+                      ) : (
+                        <>
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete Domain
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </TabsContent>
+              )}
+            </Tabs>
+
+            <DialogFooter>
+              <Button onClick={() => setDetailDialogOpen(false)}>Close</Button>
+            </DialogFooter>
+          </DialogContent>
+        )}
       </Dialog>
     </div>
     </DashboardLayout>

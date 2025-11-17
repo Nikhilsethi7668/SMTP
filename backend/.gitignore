@@ -11,8 +11,19 @@ node_modules
 dist
 dist-ssr
 *.local
+
+# Environment variables
 .env
-backend/.env
+.env.*
+!.env.example
+*.env
+*.env.local
+*.env.development
+*.env.production
+*.env.test
+**/.env
+**/.env.*
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -23,6 +34,3 @@ backend/.env
 *.njsproj
 *.sln
 *.sw?
-.env
-backend/.env
-backend/.env.development

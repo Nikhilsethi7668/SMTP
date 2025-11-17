@@ -1,0 +1,42 @@
+# Environment variables
+.env
+.env.*
+!.env.example
+*.env
+*.env.local
+*.env.development
+*.env.production
+*.env.test
+
+# Backend .env files
+backend/.env
+backend/.env.*
+backend/**/.env
+backend/**/.env.*
+
+# Frontend .env files
+frontend/.env
+frontend/.env.*
+frontend/**/.env
+frontend/**/.env.*
+
+# Node modules
+node_modules/
+**/node_modules/
+
+# Build outputs
+dist/
+build/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+!.gitignore

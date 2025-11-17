@@ -15,7 +15,7 @@ export const CreateCampaignForm: React.FC = () => {
       if (response.data.success) {
         toast.success(`Campaign Created: ${campaignName}`);
         navigate(
-          `/app/dashboard/campaigns/details?campaignName=${encodeURIComponent(campaignName)}`
+          `/dashboard/campaigns/details?campaignName=${encodeURIComponent(campaignName)}`
         ); // Navigate to campaign details page;
       }
     } catch (error) {

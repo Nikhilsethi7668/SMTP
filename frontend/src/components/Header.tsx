@@ -88,7 +88,7 @@ export const Header = ({ onToggleSidebar }: HeaderProps) => {
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem>Profile</DropdownMenuItem>
-              <DropdownMenuItem onClick={()=> navigate("/app/dashboard/settings")}>Settings</DropdownMenuItem>
+              <DropdownMenuItem onClick={()=> navigate("/dashboard/settings")}>Settings</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
             </DropdownMenuContent>

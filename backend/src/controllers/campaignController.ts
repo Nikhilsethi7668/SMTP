@@ -50,10 +50,12 @@ export const getCampaign = async (req: Request, res: any) => {
 // Update campaign
 export const updateCampaignHandler = async (req: Request, res: any) => {
   try {
-    const id = Number(req.params.id);
+    const id = req.params.id;
     const updates = req.body;
-    if (!id) return res.status(400).json({ success: false, message: 'Invalid campaign id' });
-    const updated = await campaignModel.updateCampaign(id?.toString(), updates);
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid campaign id' });
+    }
+    const updated = await campaignModel.updateCampaign(id, updates);
     return res.status(200).json({ success: true, campaign: updated });
   } catch (error: any) {
     console.error('Error updating campaign:', error);
@@ -64,10 +66,12 @@ export const updateCampaignHandler = async (req: Request, res: any) => {
 // Change campaign status
 export const setCampaignStatus = async (req: Request, res: any) => {
   try {
-    const id = Number(req.params.id);
+    const id = req.params.id;
     const { status } = req.body;
-    if (!id || !status) return res.status(400).json({ success: false, message: 'Invalid id or status' });
-    await campaignModel.markCampaignStatus(id?.toString(), status);
+    if (!id || !mongoose.Types.ObjectId.isValid(id) || !status) {
+      return res.status(400).json({ success: false, message: 'Invalid id or status' });
+    }
+    await campaignModel.markCampaignStatus(id, status);
     return res.status(200).json({ success: true, message: 'Status updated' });
   } catch (error: any) {
     console.error('Error updating status:', error);
@@ -78,10 +82,12 @@ export const setCampaignStatus = async (req: Request, res: any) => {
 // Increment a metric
 export const incrementCampaignMetric = async (req: Request, res: any) => {
   try {
-    const id = Number(req.params.id);
+    const id = req.params.id;
     const { metric, by } = req.body;
-    if (!id || !metric) return res.status(400).json({ success: false, message: 'Invalid id or metric' });
-    const result = await campaignModel.incrementMetric(id?.toString(), metric, by || 1);
+    if (!id || !mongoose.Types.ObjectId.isValid(id) || !metric) {
+      return res.status(400).json({ success: false, message: 'Invalid id or metric' });
+    }
+    const result = await campaignModel.incrementMetric(id, metric, by || 1);
     return res.status(200).json({ success: true, result });
   } catch (error: any) {
     console.error('Error incrementing metric:', error);
@@ -92,10 +98,12 @@ export const incrementCampaignMetric = async (req: Request, res: any) => {
 // Archive or unarchive campaign
 export const archiveCampaignHandler = async (req: Request, res: any) => {
   try {
-    const id = Number(req.params.id);
+    const id = req.params.id;
     const { archived } = req.body;
-    if (!id) return res.status(400).json({ success: false, message: 'Invalid id' });
-    await campaignModel.archiveCampaign(id?.toString(), archived === undefined ? true : Boolean(archived));
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid id' });
+    }
+    await campaignModel.archiveCampaign(id, archived === undefined ? true : Boolean(archived));
     return res.status(200).json({ success: true, message: 'Campaign archived state updated' });
   } catch (error: any) {
     console.error('Error archiving campaign:', error);
@@ -106,9 +114,11 @@ export const archiveCampaignHandler = async (req: Request, res: any) => {
 // Delete campaign
 export const deleteCampaignHandler = async (req: Request, res: any) => {
   try {
-    const id = Number(req.params.id);
-    if (!id) return res.status(400).json({ success: false, message: 'Invalid id' });
-    await campaignModel.deleteCampaign(id?.toString());
+    const id = req.params.id;
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid id' });
+    }
+    await campaignModel.deleteCampaign(id);
     return res.status(200).json({ success: true, message: 'Campaign deleted' });
   } catch (error: any) {
     console.error('Error deleting campaign:', error);

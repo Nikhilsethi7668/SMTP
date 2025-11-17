@@ -25,6 +25,8 @@ import creditsRoutes from "./routes/creditsRoutes.js";
 import emailWarmupRoutes from "./routes/emailWarmupRoutes.js";
 import preWarmedDomainRoutes from "./routes/preWarmedDomainRoutes.js";
 import purchaseDomainRoutes from "./routes/purchaseDomainRoutes.js";
+import domainCartRoutes from "./routes/domainCartRoutes.js";
+import registrantInfoRoutes from "./routes/registrantInfoRoutes.js";
 const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
@@ -46,6 +48,8 @@ const startServer = async () => {
     // Register MORE SPECIFIC routes FIRST (before less specific /api routes)
     // This ensures /api/purchase-domains/search is matched before any catch-all /api/:id routes
     app.use('/api/purchase-domains', purchaseDomainRoutes);
+    app.use('/api/domain-cart', domainCartRoutes);
+    app.use('/api/registrant-info', registrantInfoRoutes);
     
     // Now register other specific routes
     app.use("/api/auth", authRoutes);

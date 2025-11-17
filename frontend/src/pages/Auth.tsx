@@ -62,7 +62,7 @@ const Auth = () => {
           used_month: data.used_month,
           rate_limit: data.rate_limit,
         });
-        navigate("/app/dashboard/accounts");
+        navigate("/dashboard/accounts");
       }
     } catch (error: any) {
       console.log(error);

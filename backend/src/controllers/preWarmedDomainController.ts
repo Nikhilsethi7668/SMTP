@@ -122,6 +122,7 @@ export const getDomainEmails = async (req: Request, res: Response) => {
 export const purchaseDomain = async (req: Request, res: Response) => {
   try {
     const userId = req.user!.id;
+    const userRole = req.user!.role;
     const { domain, selectedEmails, forwarding } = req.body;
 
     if (!domain || !selectedEmails || !Array.isArray(selectedEmails)) {
@@ -159,7 +160,10 @@ export const purchaseDomain = async (req: Request, res: Response) => {
     }
 
     // Update domain ownership
-    domainDoc.userId = new mongoose.Types.ObjectId(userId);
+    // Don't set userId if user is admin
+    if (userRole !== 'admin') {
+      domainDoc.userId = new mongoose.Types.ObjectId(userId);
+    }
     domainDoc.forwarding = forwarding || undefined;
     domainDoc.status = "purchased";
     domainDoc.reservedUntil = undefined;

@@ -47,7 +47,10 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
       productDescription = 'Purchase of domain names';
       sessionMetadata.type = 'domain-cart';
       if (requestMetadata.registrantInfo) {
-        sessionMetadata.registrantInfo = requestMetadata.registrantInfo;
+        // Stringify the object before assigning to metadata (Stripe only accepts strings)
+        sessionMetadata.registrantInfo = typeof requestMetadata.registrantInfo === 'string' 
+          ? requestMetadata.registrantInfo 
+          : JSON.stringify(requestMetadata.registrantInfo);
       }
     } else if (requestMetadata?.type === 'pre-warmed-domains') {
       // For pre-warmed domains, don't calculate credits
@@ -55,7 +58,10 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
       productDescription = 'Purchase of pre-warmed email accounts';
       sessionMetadata.type = 'pre-warmed-domains';
       if (requestMetadata.orderData) {
-        sessionMetadata.orderData = requestMetadata.orderData;
+        // Stringify the object before assigning to metadata (Stripe only accepts strings)
+        sessionMetadata.orderData = typeof requestMetadata.orderData === 'string'
+          ? requestMetadata.orderData
+          : JSON.stringify(requestMetadata.orderData);
       }
     } else {
       // For credits purchase, calculate credits

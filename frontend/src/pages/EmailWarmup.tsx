@@ -237,9 +237,9 @@ export const EmailWarmupPage = () => {
           </Table>
         </div>
       ) : (
-        <div className="flex flex-col justify-center items-center h-64">
+        <div className="flex flex-col justify-center items-center h-auto">
           <img
-            className="h-1/2 w-1/2 max-w-md"
+            className="max-w-md"
             src="https://app.instantly.ai/_next/static/images/pixeltrue-welcome_compressed-de11c441d5eab8a212aff473eef7558c.svg"
             alt="No warmups"
           />
@@ -253,4 +253,5 @@ export const EmailWarmupPage = () => {
     </DashboardLayout>
   );
 };
+
 

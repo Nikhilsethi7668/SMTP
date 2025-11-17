@@ -1,8 +1,6 @@
 
 import { CampaignsLayout } from "@/components/CampaignsLayout";
-import { Header } from "@/components/Header";
-import { SideBar } from "@/components/SideBar";
-import React from "react";
+import { DashboardLayout } from "@/components/DashboardLayout";
 
 // Main Dashboard component
 export const Campaigns = () => {

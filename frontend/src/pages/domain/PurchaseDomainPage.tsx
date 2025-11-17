@@ -162,7 +162,7 @@ const PurchaseDomainPage: React.FC = () => {
       // Clear selection after successful addition
       setSelectedDomains(new Set());
       setDomainPricing({});
-      navigate('/app/purchase-domain/domain-cart')
+      navigate('/dashboard/purchase-domain/domain-cart')
       // Show success toast
       toast.success(
         `Successfully added ${domainsToAdd.length} domain${domainsToAdd.length > 1 ? 's' : ''} to cart!`,
@@ -170,7 +170,7 @@ const PurchaseDomainPage: React.FC = () => {
           description: 'You can view your cart to proceed with checkout.',
           action: {
             label: 'View Cart',
-            onClick: () => navigate('/app/purchase-domain/domain-cart'),
+            onClick: () => navigate('/dashboard/purchase-domain/domain-cart'),
           },
         }
       );
@@ -218,7 +218,7 @@ const PurchaseDomainPage: React.FC = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => navigate('/app/domains')}
+                onClick={() => navigate('/dashboard/domains')}
                 className="flex items-center gap-2"
               >
                 <ArrowLeft className="h-4 w-4" />
@@ -227,7 +227,7 @@ const PurchaseDomainPage: React.FC = () => {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => navigate('/app/purchase-domain/domain-cart')}
+                onClick={() => navigate('/dashboard/purchase-domain/domain-cart')}
                 className="flex items-center gap-2"
               >
                 <ShoppingCart className="h-4 w-4" />

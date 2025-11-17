@@ -40,7 +40,7 @@ const AccountConnect: React.FC = () => {
   };
 
   const handleCustomProvider = () => {
-    navigate("/app/dashboard/accounts/connect/custom");
+    navigate("/dashboard/accounts/connect/custom");
   };
 
   return (
@@ -88,7 +88,7 @@ const AccountConnect: React.FC = () => {
                 </div>
               </div>
               <Button
-                onClick={() => navigate("/app/purchase-domain")}
+                onClick={() => navigate("/dashboard/purchase-domain")}
                 className="w-full p-4 md:p-8"
                 size="lg"
               >
@@ -137,7 +137,7 @@ const AccountConnect: React.FC = () => {
                 <p>{availableDomainsCount} domains remaining</p>
               </div>
               <Button
-                onClick={() => navigate("/app/dashboard/accounts/pre-warmed/select")}
+                onClick={() => navigate("/dashboard/accounts/pre-warmed/select")}
                   className="w-full p-4 md:p-8"
                   size="lg"
               >

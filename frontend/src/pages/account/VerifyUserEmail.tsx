@@ -23,7 +23,7 @@ export const VerifyUserEmail: React.FC = () => {
         if (response.data.success) {
           setStatus("success");
           // redirect after short delay
-          setTimeout(() => navigate("/app/dashboard/accounts"), 2000);
+          setTimeout(() => navigate("/dashboard/accounts"), 2000);
         } else {
           setStatus("error");
         }
@@ -60,7 +60,7 @@ export const VerifyUserEmail: React.FC = () => {
           <h2 className="mb-1 text-2xl font-semibold text-red-600">Verification Failed</h2>
           <p className="text-gray-500">Your link may have expired or is invalid.</p>
           <button
-            onClick={() => navigate("/app/dashboard/accounts")}
+            onClick={() => navigate("/dashboard/accounts")}
             className="mt-4 rounded-lg bg-primaryColor px-6 py-2 text-white"
           >
             Go to Dashboard

@@ -37,11 +37,11 @@ export const Dashboard = () => {
   const accent = "#3b82f6";
   const navigate = useNavigate();
   const handleNavigation = (option: string, name: string = "", id: string = "") => {
-    if (option === "create") navigate("/app/dashboard/campaigns/create");
-    else if (option === "campaign") navigate("/app/dashboard/campaigns");
+    if (option === "create") navigate("/dashboard/campaigns/create");
+    else if (option === "campaign") navigate("/dashboard/campaigns");
     else if (option === "detail")
       navigate(
-        `/app/dashboard/campaigns/details?campaignName=${encodeURIComponent(name)}&campaignId=${encodeURIComponent(id)}`
+        `/dashboard/campaigns/details?campaignName=${encodeURIComponent(name)}&campaignId=${encodeURIComponent(id)}`
       );
   };
   // State to control the sidebar's collapsed status
@@ -160,7 +160,7 @@ export const Dashboard = () => {
                 <p className="mt-1 text-gray-500">
                   Greetings on <span className="font-medium text-blue-600">InboxMail</span>!
                   Generate your
-                  <Link to={"/app/dashboard/campaigns"} className="ml-1 text-blue-600 underline">
+                  <Link to={"/dashboard/campaigns"} className="ml-1 text-blue-600 underline">
                     Email Campaign
                   </Link>{" "}
                   effortlessly with just a single click.
@@ -218,7 +218,7 @@ export const Dashboard = () => {
                               className="cursor-pointer font-medium text-blue-600 hover:underline"
                               onClick={() =>
                                 navigate(
-                                  `/app/dashboard/campaigns/details?campaignName=${encodeURIComponent(c.name)}&campaignId=${encodeURIComponent(c._id)}`
+                                  `/dashboard/campaigns/details?campaignName=${encodeURIComponent(c.name)}&campaignId=${encodeURIComponent(c._id)}`
                                 )
                               }
                             >

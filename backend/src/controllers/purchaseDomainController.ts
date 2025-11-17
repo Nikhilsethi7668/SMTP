@@ -144,6 +144,7 @@ export const getDomainPricing = async (req: Request, res: Response) => {
 export const purchaseDomain = async (req: Request, res: Response) => {
   try {
     const userId = req.user!.id;
+    const userRole = req.user!.role;
     const { sld, tld, years = 1, registrantInfo } = req.body;
 
     if (!sld || !tld) {
@@ -216,8 +217,9 @@ export const purchaseDomain = async (req: Request, res: Response) => {
     expirationDate.setFullYear(expirationDate.getFullYear() + years);
 
     // Save purchase record to database
+    // Don't set userId if user is admin
     const purchasedDomain = new PurchasedDomain({
-      user_id: userId,
+      ...(userRole !== 'admin' && { userId: userId }),
       domain: `${sld}.${tld}`,
       sld,
       tld,
@@ -281,7 +283,7 @@ export const checkPurchasedDomainStatus = async (req: Request, res: Response) =>
 
     const purchasedDomain = await PurchasedDomain.findOne({
       _id: id,
-      user_id: userId,
+      userId: userId,
     });
 
     if (!purchasedDomain) {
@@ -376,7 +378,7 @@ export const getMyPurchasedDomains = async (req: Request, res: Response) => {
     const userId = req.user!.id;
     const { search, status, purchaseStatus } = req.query;
 
-    const query: any = { user_id: userId };
+    const query: any = { userId: userId };
 
     if (search) {
       query.domain = { $regex: search, $options: 'i' };
@@ -419,7 +421,7 @@ export const getPurchasedDomainById = async (req: Request, res: Response) => {
 
     const domain = await PurchasedDomain.findOne({
       _id: id,
-      user_id: userId,
+      userId: userId,
     }).lean();
 
     if (!domain) {
@@ -541,7 +543,7 @@ export const setPurchasedDomainDNS = async (req: Request, res: Response) => {
     // Get the purchased domain from database
     const purchasedDomain = await PurchasedDomain.findOne({
       _id: id,
-      user_id: userId,
+      userId: userId,
     });
 
     if (!purchasedDomain) {

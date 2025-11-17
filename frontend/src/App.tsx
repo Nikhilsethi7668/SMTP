@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useUserStore } from "./store/useUserStore";
 
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -39,63 +40,30 @@ import DomainDetailsPage from "./pages/preWarmedDomains/DomainDetailsPage";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner position="top-center" richColors />
-      <BrowserRouter>
-        <Routes>
+const AppRoutes = () => {
+  const user = useUserStore((state) => state.user);
+  const isAdmin = user?.role === "admin";
+
+  return (
+    <Routes>
           {/* PUBLIC ROUTES */}
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/verify-email" element={<EmailVerify />} />
-          <Route path="/keys" element={<ApiKeysPage />} />
+          <Route
+            path="/keys"
+            element={
+              <ProtectedRoute>
+                <ApiKeysPage />
+              </ProtectedRoute>
+            }
+          />
 
           {/* ✅ PROTECTED ROUTES */}
+          {/* Routes accessible to both admin and regular users */}
           <Route
-            path="/app/dashboard/accounts/verify"
-            element={
-              <ProtectedRoute>
-                <VerifyUserEmail />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/app/dashboard/accounts/connect"
-            element={
-              <ProtectedRoute>
-                <AccountConnect />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/app/dashboard/accounts/connect/custom"
-            element={
-              <ProtectedRoute>
-                <CustomConnect />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/app/dashboard/accounts/pre-warmed/select"
-            element={
-              <ProtectedRoute>
-                <PreWarmedDomainSelect />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/app/dashboard/accounts/pre-warmed/order"
-            element={
-              <ProtectedRoute>
-                <PreWarmedOrder />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/app/dashboard/accounts"
+            path="/dashboard/accounts"
             element={
               <ProtectedRoute>
                 <Dashboard />
@@ -103,96 +71,7 @@ const App = () => (
             }
           />
           <Route
-            path="/app/dashboard/contacts"
-            element={
-              <ProtectedRoute>
-                <ContactsPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/app/dashboard/templates"
-            element={
-              <ProtectedRoute>
-                <Template />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/app/dashboard/settings"
-            element={
-              <ProtectedRoute>
-                <SettingsPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/app/dashboard/unibox"
-            element={
-              <ProtectedRoute>
-                <UniBox />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/app/dashboard/campaigns"
-            element={
-              <ProtectedRoute>
-                <Campaigns />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/app/dashboard/campaigns/details"
-            element={
-              <ProtectedRoute>
-                <CampaignDetails />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/app/dashboard/campaigns/create"
-            element={
-              <ProtectedRoute>
-                <CreateCampaignForm />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/app/dashboard/credits"
-            element={
-              <ProtectedRoute>
-                <CreditsPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/app/dashboard/email-warmup"
-            element={
-              <ProtectedRoute>
-                <EmailWarmupPage />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/app/analytics"
-            element={
-              <ProtectedRoute>
-                <Analytics />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/app/domains"
-            element={
-              <ProtectedRoute>
-                <DomainsPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/app/purchase-domain"
+            path="/dashboard/purchase-domain"
             element={
               <ProtectedRoute>
                 <PurchaseDomainPage />
@@ -200,7 +79,7 @@ const App = () => (
             }
           />
           <Route
-            path="/app/purchase-domain/domain-cart"
+            path="/dashboard/purchase-domain/domain-cart"
             element={
               <ProtectedRoute>
                 <DomainCartPage />
@@ -208,23 +87,7 @@ const App = () => (
             }
           />
           <Route
-            path="/app/email-accounts"
-            element={
-              <ProtectedRoute>
-                <EmailAccounts />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/app/crm"
-            element={
-              <ProtectedRoute>
-                <Crm />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/app/dashboard/purchased-domains"
+            path="/dashboard/purchased-domains"
             element={
               <ProtectedRoute>
                 <PurchasedDomainsPage />
@@ -232,7 +95,7 @@ const App = () => (
             }
           />
           <Route
-            path="/app/dashboard/purchased-domains/:id"
+            path="/dashboard/purchased-domains/:id"
             element={
               <ProtectedRoute>
                 <DomainDetailsPage />
@@ -240,9 +103,177 @@ const App = () => (
             }
           />
 
+          {/* Routes hidden for admin users */}
+          {!isAdmin && (
+            <>
+              <Route
+                path="/dashboard/accounts/verify"
+                element={
+                  <ProtectedRoute>
+                    <VerifyUserEmail />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/accounts/connect"
+                element={
+                  <ProtectedRoute>
+                    <AccountConnect />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/accounts/connect/custom"
+                element={
+                  <ProtectedRoute>
+                    <CustomConnect />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/accounts/pre-warmed/select"
+                element={
+                  <ProtectedRoute>
+                    <PreWarmedDomainSelect />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/accounts/pre-warmed/order"
+                element={
+                  <ProtectedRoute>
+                    <PreWarmedOrder />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/accounts"
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/contacts"
+                element={
+                  <ProtectedRoute>
+                    <ContactsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/templates"
+                element={
+                  <ProtectedRoute>
+                    <Template />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/settings"
+                element={
+                  <ProtectedRoute>
+                    <SettingsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/unibox"
+                element={
+                  <ProtectedRoute>
+                    <UniBox />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/campaigns"
+                element={
+                  <ProtectedRoute>
+                    <Campaigns />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/campaigns/details"
+                element={
+                  <ProtectedRoute>
+                    <CampaignDetails />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/campaigns/create"
+                element={
+                  <ProtectedRoute>
+                    <CreateCampaignForm />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/credits"
+                element={
+                  <ProtectedRoute>
+                    <CreditsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/email-warmup"
+                element={
+                  <ProtectedRoute>
+                    <EmailWarmupPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/analytics"
+                element={
+                  <ProtectedRoute>
+                    <Analytics />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/domains"
+                element={
+                  <ProtectedRoute>
+                    <DomainsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/email-accounts"
+                element={
+                  <ProtectedRoute>
+                    <EmailAccounts />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/crm"
+                element={
+                  <ProtectedRoute>
+                    <Crm />
+                  </ProtectedRoute>
+                }
+              />
+            </>
+          )}
+
           {/* CATCH-ALL */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+  );
+};
+
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner position="top-center" richColors />
+      <BrowserRouter>
+        <AppRoutes />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

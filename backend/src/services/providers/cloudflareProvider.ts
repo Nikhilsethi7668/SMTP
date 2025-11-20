@@ -178,7 +178,15 @@ export class CloudflareProvider implements IDNSProvider {
     expectedValue?: string
   ): Promise<{ verified: boolean; recordValue?: string; message?: string }> {
     try {
-      const fullName = name.includes(domain) ? name : `${name}.${domain}`;
+      // Handle root domain (@) - query the domain directly
+      let fullName: string;
+      if (name === '@' || name === '' || name === domain) {
+        fullName = domain;
+      } else if (name.includes(domain)) {
+        fullName = name;
+      } else {
+        fullName = `${name}.${domain}`;
+      }
       const records = await dns.resolveTxt(fullName);
 
       // Flatten array of arrays (DNS can return multiple TXT records)

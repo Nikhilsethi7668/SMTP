@@ -309,7 +309,7 @@ export class DNSService {
   }> {
     try {
       // SPF record is at root domain (@)
-      const recordName = '@';
+      const recordName = domain;
       
       // Detect provider
       const provider = await detectProvider(domain);

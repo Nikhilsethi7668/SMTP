@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { Domain, UnifiedDomain } from '../models/unifiedDomainModel.js';
 import { generateDKIMKeys, generateDKIMDNSRecord } from '../services/dkimService.js';
 import { dnsService } from '../services/dnsService.js';
+import axios from 'axios';
+
 export const createDomain = async (req: Request, res: Response) => {
   try {
     console.log('createDomain', req.user);
@@ -11,8 +13,39 @@ export const createDomain = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Domain name is required' });
     }
 
+    // Fetch PMTA server IP
+    const pmtaBaseUrl = process.env.PMTA_SERVICE_BASE_URL || 'http://107.175.67.25:3000';
+    let pmtaServerIp: string;
+    
+    try {
+      const ipResponse = await axios.get(`${pmtaBaseUrl}/get-ip`);
+      if (ipResponse.data?.status === 'success' && ipResponse.data?.ip) {
+        pmtaServerIp = ipResponse.data.ip;
+      } else {
+        throw new Error('Invalid response from PMTA service');
+      }
+    } catch (error: any) {
+      console.error('Error fetching PMTA server IP:', error.message);
+      return res.status(500).json({ 
+        message: 'Failed to fetch PMTA server IP', 
+        error: error.message 
+      });
+    }
+
     // Generate DKIM keys
     const { publicKey, privateKey } = await generateDKIMKeys(dkim_selector, domain_name);
+
+    // Store DKIM private key in PMTA server
+    try {
+      await axios.post(`${pmtaBaseUrl}/update-dkim`, {
+        domain: domain_name,
+        dkim_value: privateKey
+      });
+      console.log(`DKIM private key stored in PMTA server for domain: ${domain_name}`);
+    } catch (error: any) {
+      console.error('Error storing DKIM private key in PMTA server:', error.message);
+      // Continue even if this fails, as the domain can still be created
+    }
 
     // Remove PEM headers and footers from public key
     const cleanPublicKey = publicKey
@@ -23,9 +56,8 @@ export const createDomain = async (req: Request, res: Response) => {
       .replace(/\n/g, "")
       .trim();
 
-    // Generate SPF record (using environment variable or default)
-    const mailServer = process.env.MAIL_SERVER_HOST || 'mail.yourplatform.com';
-    const spfRecord = `v=spf1 include:${mailServer} ~all`;
+    // Generate SPF record using PMTA server IP
+    const spfRecord = `v=spf1 ip4:${pmtaServerIp} ~all`;
 
     // Generate DMARC record
     const dmarcRecord = `v=DMARC1; p=none; rua=mailto:dmarc@${domain_name}; ruf=mailto:dmarc@${domain_name}; fo=1`;
@@ -198,6 +230,7 @@ export const verifyDomain = async (req: Request, res: Response) => {
         domain.dmarc_record || ''
       ),
     };
+console.log(verificationResults);
 
     // Check if all records are verified
     const allVerified =

@@ -1,8 +1,16 @@
 import api from '../axiosInstance';
 
+export interface IPreWarmedEmail {
+  email: string;
+  persona: string;
+  status: "available" | "warmingup" | "warmingup_failed" | "warmingup_completed";
+  provider: "gmail" | "outlook" | "custom";
+  price: number;
+}
 export interface DomainResponse {
   _id: string;
   domain_name: string;
+  emails: [];
   dkim_selector: string;
   dkim_public_key?: string;
   dkim_private_key?: string;

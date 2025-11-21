@@ -51,7 +51,6 @@ const DomainsPage = () => {
   const [isAdding, setIsAdding] = useState(false);
   const [error, setError] = useState("");
   const [emailName, setEmailName] = useState("");
-  const [persona, setPersona] = useState("");
   const [success, setSuccess] = useState("");
   const [isEmailCreate, setIsEmailCreate] = useState(false);
   const [isViewEmailsOpen, setIsViewEmailsOpen] = useState(false);
@@ -60,6 +59,7 @@ const DomainsPage = () => {
   const [isRecordsModalOpen, setRecordsModalOpen] = useState(false);
   const [isVerificationModalOpen, setVerificationModalOpen] = useState(false);
   const [selectedDomain, setSelectedDomain] = useState<DomainResponse | null>(null);
+  const [emailAccounts, setEmailAccounts] = useState<String[]>([]);
   const [verificationResults, setVerificationResults] = useState<VerifyDomainResponse | null>(null);
   const [purchasedDomains, setPurchasedDomains] = useState<PurchasedDomain[]>([]);
   const [loadingPurchased, setLoadingPurchased] = useState(true);
@@ -146,9 +146,20 @@ const DomainsPage = () => {
       setIsAdding(false);
     }
   };
-  const handleViewEmails = (domain: DomainResponse) => {
+  const handleViewEmails = async (domain: DomainResponse) => {
+    try {
     setSelectedDomain(domain);
     setIsViewEmailsOpen(true);
+    const emails = await api.get(`/${domain.domain_name}/domain-emails`);
+    if(emails.data.success){
+      setEmailAccounts(emails.data.data);
+    }else{
+      toast.error("Failed to fetch emails for this domain."); 
+    }
+    } catch (error) {
+      console.error("Error fetching domain emails:", error);
+      toast.error("Failed to fetch emails for this domain.");
+    }
   };
   const handleEmailCreate = (domain: DomainResponse) => {
     setIsEmailCreate(true);
@@ -208,7 +219,6 @@ const DomainsPage = () => {
     try {
       const res = await api.post(`/domains/${selectedDomain?._id}/add-email`, {
         email: `${emailName}@${selectedDomain.domain_name}`,
-        persona: persona,
       });
       if (res.data && res.status === 200) {
         toast.success("Email created successfully!");
@@ -1626,14 +1636,10 @@ const DomainsPage = () => {
             </DialogHeader>
 
             <div className="mt-4 flex max-h-80 flex-col gap-3 overflow-y-auto pr-2">
-              {selectedDomain?.emails?.length ? (
-                selectedDomain.emails.map((emailObj: IPreWarmedEmail, index) => (
+              {emailAccounts.length > 0 ? (
+                emailAccounts.map((email, index) => (
                   <div key={index} className="flex flex-col gap-1 rounded-xl border p-3 shadow-sm">
-                    <span className="text-base font-medium">{emailObj.email}</span>
-                    <span className="text-sm text-gray-600">Persona: {emailObj.persona}</span>
-                    <span className="text-sm capitalize text-gray-600">
-                      Status: {emailObj.status}
-                    </span>
+                    <span className="text-base font-medium">{email}</span>
                   </div>
                 ))
               ) : (
@@ -1661,18 +1667,10 @@ const DomainsPage = () => {
               />
               <span className="text-gray-600">@{selectedDomain?.domain_name}</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Input
-                placeholder="Enter email persona"
-                value={persona}
-                onChange={(e) => setPersona(e.target.value)}
-                className="flex-1"
-              />
-            </div>
 
             <Button
               onClick={handleSubmit}
-              disabled={loading || !emailName || !persona}
+              disabled={loading || !emailName}
               className="w-full rounded-2xl p-3"
             >
               {loading ? <Spinner className="h-5 w-5 animate-spin" /> : "Add Email"}

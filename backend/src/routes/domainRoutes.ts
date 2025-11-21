@@ -12,5 +12,5 @@ router.get('/:id', domainController.getDomainById);
 // router.patch('/:id', domainController.updateDomain);
 router.delete('/:id', domainController.deleteDomain);
 router.post('/:id/verify', domainController.verifyDomain);
-
+router.post("/:id/add-email", domainController.addEmailToDomain);
 export default router;

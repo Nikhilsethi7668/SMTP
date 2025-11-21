@@ -4,6 +4,50 @@ import { generateDKIMKeys, generateDKIMDNSRecord } from '../services/dkimService
 import { dnsService } from '../services/dnsService.js';
 import axios from 'axios';
 
+export const addEmailToDomain = async (req: Request, res: Response) => {
+  try {
+    const { email, persona, provider, price } = req.body;
+    const domainId = req.params.id;
+
+    if (!email || !persona) {
+      return res.status(400).json({ message: "Email and persona are required" });
+    }
+
+    // Find domain for this user
+    const domain = await UnifiedDomain.findOne({
+      _id: domainId,
+      userId: req.user.id,
+    });
+
+    if (!domain) {
+      return res.status(404).json({ message: "Domain not found" });
+    }
+
+    // Create prewarmed email object
+    const newEmail = {
+      email,
+      persona,
+      provider: provider || "custom",   // default provider
+      price: price || domain.emailPrice || 0,
+      status: "available" as "available", // default warm-up status, explicitly typed
+    };
+
+    // Push into domain emails
+    domain.emails = domain.emails || [];
+    domain.emails.push(newEmail);
+
+    await domain.save();
+
+    return res.status(200).json({
+      message: "Email added to domain successfully",
+      domain,
+    });
+  } catch (error) {
+    console.error("Error adding email to domain:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export const createDomain = async (req: Request, res: Response) => {
   try {
     console.log('createDomain', req.user);

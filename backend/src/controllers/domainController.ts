@@ -3,17 +3,17 @@ import { Domain, UnifiedDomain } from '../models/unifiedDomainModel.js';
 import { generateDKIMKeys, generateDKIMDNSRecord } from '../services/dkimService.js';
 import { dnsService } from '../services/dnsService.js';
 import axios from 'axios';
+import EmailAccount from '../models/EmailAccount.js';
 
 export const addEmailToDomain = async (req: Request, res: Response) => {
   try {
-    const { email, persona, provider, price } = req.body;
+    const { email } = req.body;
     const domainId = req.params.id;
 
-    if (!email || !persona) {
-      return res.status(400).json({ message: "Email and persona are required" });
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
     }
 
-    // Find domain for this user
     const domain = await UnifiedDomain.findOne({
       _id: domainId,
       userId: req.user.id,
@@ -23,18 +23,22 @@ export const addEmailToDomain = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Domain not found" });
     }
 
-    // Create prewarmed email object
-    const newEmail = {
+    // 1️⃣ Create EmailAccount first
+    const newEmailAccount = await EmailAccount.create({
+      userId: req.user.id,
       email,
-      persona,
-      provider: provider || "custom",   // default provider
-      price: price || domain.emailPrice || 0,
-      status: "available" as "available", // default warm-up status, explicitly typed
-    };
+      provider: "domain",        // NEW provider type
+      isVerified: false,
+      isPrimary: false,
+      smtp: {},
+      imap: {},
+    });
 
-    // Push into domain emails
-    domain.emails = domain.emails || [];
-    domain.emails.push(newEmail);
+    // 2️⃣ Ensure domain.emails is initialized and push EmailAccount reference into domain
+    if (!Array.isArray((domain as any).emails)) {
+      (domain as any).emails = [];
+    }
+    (domain as any).emails.push(newEmailAccount._id);
 
     await domain.save();
 
@@ -42,11 +46,13 @@ export const addEmailToDomain = async (req: Request, res: Response) => {
       message: "Email added to domain successfully",
       domain,
     });
+
   } catch (error) {
     console.error("Error adding email to domain:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
 
 export const createDomain = async (req: Request, res: Response) => {
   try {

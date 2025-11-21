@@ -39,7 +39,41 @@ router.post("/connect/custom", async (req, res) => {
     });
   }
 });
+router.get("/:domain/domain-emails", async (req, res) => {
+  try {
+    console.log("Fetching emails for domain:", req.params.domain);
+    const domain = req.params.domain;
+  const emailDocs = await EmailAccount.find(
+  {
+    provider: "domain",
+    userId: req.user!.id,
+    email: { $regex: `@${domain}$`, $options: "i" }
+  },
+  { email: 1, _id: 0 }
+);
 
+const emails = emailDocs.map(e => e.email);
+
+    console.log("Retrieved emails for domain:", emails);
+    if (emails.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No emails found for this domain"
+      });
+    }
+    res.json({
+      success: true,
+      data: emails,
+      message: "Emails retrieved successfully"
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to retrieve emails",
+      error: error instanceof Error ? error.message : "Unknown error"
+    });
+  }
+});
 router.get("/accounts", async (req, res) => {
   try {
     const userId = req.user!.id;

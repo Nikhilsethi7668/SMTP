@@ -194,10 +194,10 @@ const UnifiedDomainSchema = new Schema<IUnifiedDomain>(
     },
     
     // PreWarmed Domain fields
-    emails: {
-      type: [PreWarmedEmailSchema],
-      default: [],
-    },
+    emails: [{
+      type: Schema.Types.ObjectId,
+    ref: "EmailAccount",
+    }],
     forwarding: {
       type: String,
       trim: true,

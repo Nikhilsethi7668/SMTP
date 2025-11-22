@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  # Redis Service
+  redis:
+    image: redis:7-alpine
+    container_name: mailing_redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Scheduler Service (Cron-based warmup email scheduler)
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mailing_scheduler
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - REDIS_URL=redis://redis:6379
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    env_file:
+      - .env
+    depends_on:
+      redis:
+        condition: service_healthy
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    command: sh -c "sleep 5 && npm start"
+    healthcheck:
+      test: ["CMD", "node", "-e", "process.exit(0)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # BullMQ Worker
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mailing_worker
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - REDIS_URL=redis://redis:6379
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    env_file:
+      - .env
+    depends_on:
+      redis:
+        condition: service_healthy
+      scheduler:
+        condition: service_started
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    command: sh -c "sleep 5 && npm run worker"
+    healthcheck:
+      test: ["CMD", "node", "-e", "process.exit(0)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  redis_data:
+    driver: local
+

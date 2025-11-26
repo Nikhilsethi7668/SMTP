@@ -7,7 +7,7 @@ const getRecipientList = () => {
   // TODO: Implement recipient list logic
   // This could come from a database, API, or configuration
   // For now, returning a placeholder
-  return ['itsadarsh33@gmail.com', 'pofihes346@izeao.com'];
+  return ['itsadarsh33@gmail.com', 'pofihes346@izeao.com','vivekpatel1374@gmail.com'];
 };
 
 /**

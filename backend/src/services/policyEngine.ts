@@ -29,7 +29,7 @@ const handleRequest = async (data: string) => {
   const sender = request.sender;
 
   // --- Step 1: Lookup user ---
-  const user = await UserService.getUserByUsername(username);
+  const user = await getUserByUsername(username);
   if (!user || !user.is_active) {
     return `action=REJECT User not found or inactive\n\n`;
   }

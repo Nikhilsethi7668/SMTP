@@ -93,7 +93,7 @@ export const CampaignDetails = () => {
           <CampaignLeads campaignId={prefilledCampaignId} campaignName={prefilledCampaignName} />
         );
       case "sequences":
-        return <CampaignSequences />;
+        return <CampaignSequences campaignId={prefilledCampaignId} />;
       case "schedules":
         return <ScheduleManager />;
       case "options":

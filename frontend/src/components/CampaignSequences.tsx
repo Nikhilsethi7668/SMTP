@@ -1,130 +1,298 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus, Eye, Zap, Trash2 } from "lucide-react";
+import { Plus, Trash2, Save, Zap } from "lucide-react";
+import { campaignSequenceApi } from "@/services/campaignSequenceApi";
 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+
+import { Input } from "@/components/ui/input";
+import api from "@/axiosInstance";
+import { toast } from "sonner";
 interface Variant {
-  id: string;
+  _id: string;
   subject: string;
   body: string;
 }
 
 interface Step {
-  id: string;
+  _id: string;
   name: string;
+  order: number;
   variants: Variant[];
 }
 
-export const CampaignSequences = () => {
-  const [steps, setSteps] = useState<Step[]>([
-    {
-      id: "step-1",
-      name: "Step 1",
-      variants: [
-        {
-          id: "variant-1",
-          subject: "Welcome to the campaign",
-          body: "Hey there 👋\nJust checking in to see how things are going.",
-        },
-      ],
-    },
-  ]);
-
+export const CampaignSequences = ({ campaignId }: { campaignId: string }) => {
+  const [steps, setSteps] = useState<Step[]>([]);
   const [selected, setSelected] = useState<{ stepId: string; variantId: string }>({
-    stepId: "step-1",
-    variantId: "variant-1",
+    stepId: "",
+    variantId: "",
   });
 
-  const selectedStep = steps.find((s) => s.id === selected.stepId);
-  const selectedVariant = selectedStep?.variants.find((v) => v.id === selected.variantId);
+  const [editorState, setEditorState] = useState<{ subject: string; body: string }>({
+    subject: "",
+    body: "",
+  });
 
-  const addStep = () => {
-    const newStep: Step = {
-      id: `step-${steps.length + 1}`,
-      name: `Step ${steps.length + 1}`,
-      variants: [],
-    };
-    setSteps([...steps, newStep]);
-  };
+  const debounceTimer = useRef<NodeJS.Timeout | null>(null);
 
-  const addVariant = (stepId: string) => {
-    setSteps((prev) =>
-      prev.map((s) =>
-        s.id === stepId
-          ? {
-              ...s,
-              variants: [
-                ...s.variants,
-                {
-                  id: `variant-${s.variants.length + 1}`,
-                  subject: "New Variant",
-                  body: "Start typing your email content here...",
-                },
-              ],
-            }
-          : s
-      )
+  // ---------- TEST EMAIL STATES ----------
+  const [testDialogOpen, setTestDialogOpen] = useState(false);
+  const [fromEmail, setFromEmail] = useState("");
+  const [toEmail, setToEmail] = useState("");
+  const [sendingTest, setSendingTest] = useState(false);
+
+  
+  useEffect(() => {
+    if(testDialogOpen === true){
+      handleGetData();
+    }
+  }, [testDialogOpen]);
+  // Demo FROM dropdown list (replace with API list if needed)
+
+
+  // ---------- SELECTED ----------
+  const selectedStep = steps.find((s) => s._id === selected.stepId);
+  const selectedVariant = selectedStep?.variants.find((v) => v._id === selected.variantId);
+
+  // ---------- LOAD DATA ----------
+  const loadData = async () => {
+    const res = await campaignSequenceApi.getSteps(campaignId);
+    const stepsList = res.steps;
+
+    const stepsWithVariants = await Promise.all(
+      stepsList.map(async (step) => {
+        const varRes = await campaignSequenceApi.getVariants(step._id);
+        return { ...step, variants: varRes.variants };
+      })
     );
+
+    setSteps(stepsWithVariants);
+
+    // Auto-select first variant
+    if (stepsWithVariants.length > 0) {
+      const first = stepsWithVariants[0];
+      const v = first.variants[0];
+
+      setSelected({
+        stepId: first._id,
+        variantId: v?._id || "",
+      });
+
+      if (v) {
+        setEditorState({ subject: v.subject, body: v.body });
+      }
+    }
   };
 
-  const deleteStep = (stepId: string) => {
-    setSteps((prev) => prev.filter((s) => s.id !== stepId));
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  useEffect(() => {
+    if (selectedVariant) {
+      setEditorState({
+        subject: selectedVariant.subject,
+        body: selectedVariant.body,
+      });
+    }
+  }, [selectedVariant?._id]);
+
+  // ---------- ADD STEP ----------
+  const addStep = async () => {
+    const newOrder = steps.length + 1;
+
+    const res = await campaignSequenceApi.createStep({
+      campaign_id: campaignId,
+      name: `Step ${newOrder}`,
+      order: newOrder,
+    });
+
+    setSteps((prev) => [...prev, { ...res.step, variants: [] }]);
+  };
+
+  // ---------- DELETE STEP ----------
+  const deleteStep = async (stepId: string) => {
+    await campaignSequenceApi.deleteStep(stepId);
+    setSteps((prev) => prev.filter((s) => s._id !== stepId));
+
     if (selected.stepId === stepId) {
       setSelected({ stepId: "", variantId: "" });
     }
   };
 
-  const deleteVariant = (stepId: string, variantId: string) => {
+  // ---------- ADD VARIANT ----------
+  const addVariant = async (stepId: string) => {
+    const res = await campaignSequenceApi.createVariant({
+      step_id: stepId,
+      campaign_id: campaignId,
+      subject: "New Variant",
+      body: "Start typing...",
+    });
+
     setSteps((prev) =>
       prev.map((s) =>
-        s.id === stepId
-          ? {
-              ...s,
-              variants: s.variants.filter((v) => v.id !== variantId),
-            }
+        s._id === stepId ? { ...s, variants: [...s.variants, res.variant] } : s
+      )
+    );
+  };
+
+  // ---------- DELETE VARIANT ----------
+  const deleteVariant = async (stepId: string, variantId: string) => {
+    await campaignSequenceApi.deleteVariant(variantId);
+
+    setSteps((prev) =>
+      prev.map((s) =>
+        s._id === stepId
+          ? { ...s, variants: s.variants.filter((v) => v._id !== variantId) }
           : s
       )
     );
-
-    if (selected.variantId === variantId) {
-      setSelected({
-        stepId,
-        variantId: steps.find((s) => s.id === stepId)?.variants[0]?.id || "",
-      });
-    }
   };
 
-  const updateVariant = (key: "subject" | "body", value: string) => {
+  // ---------- SUBJECT DEBOUNCED UPDATE ----------
+  const updateSubjectDebounced = (value: string) => {
+    setEditorState((prev) => ({ ...prev, subject: value }));
+
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+
+    debounceTimer.current = setTimeout(async () => {
+      if (!selectedVariant) return;
+
+      const updated = await campaignSequenceApi.updateVariant(selectedVariant._id, {
+        subject: value,
+      });
+
+      setSteps((prev) =>
+        prev.map((s) =>
+          s._id === selected.stepId
+            ? {
+                ...s,
+                variants: s.variants.map((v) =>
+                  v._id === selected.variantId ? updated.variant : v
+                ),
+              }
+            : s
+        )
+      );
+    }, 2000);
+  };
+
+  // ---------- SAVE BODY ----------
+  const saveBody = async () => {
+    if (!selectedVariant) return;
+
+    const updated = await campaignSequenceApi.updateVariant(selectedVariant._id, {
+      body: editorState.body,
+    });
+
     setSteps((prev) =>
       prev.map((s) =>
-        s.id === selected.stepId
+        s._id === selected.stepId
           ? {
               ...s,
               variants: s.variants.map((v) =>
-                v.id === selected.variantId ? { ...v, [key]: value } : v
+                v._id === selected.variantId ? updated.variant : v
               ),
             }
           : s
       )
     );
+
+    toast.success("Saved!");
+  };
+
+   const [isLoading, setIsLoading] = useState(false);
+    const [emailsData, setEmailsData] = useState([]);
+const extractDomainProviderEmails = (accounts: any[]): string[] => {
+  if (!Array.isArray(accounts)) return [];
+
+  return accounts
+    .filter(acc => acc.provider === "domain") // only domain provider
+    .map(acc => acc.email)
+    .filter(email => typeof email === "string" && email.trim() !== "");
+};
+
+    const handleGetData = async () => {
+      try {
+        setIsLoading(true)
+        const response = await api.get('/accounts');
+        if(response.data.success){
+          setIsLoading(false);
+          const emails = extractDomainProviderEmails(response.data.data);
+          setEmailsData(emails);
+        }
+      } catch (error) {
+         setIsLoading(false);
+        toast.error(error?.response?.data?.message || error as string)
+      }finally{
+         setIsLoading(false);
+      }
+  };
+  // ---------- SEND TEST EMAIL ----------
+  const submitTestEmail = async () => {
+    if (!fromEmail || !toEmail) {
+      toast.warning("Please select FROM and enter TO email");
+      return;
+    }
+
+    setSendingTest(true);
+
+    try {
+      const res = await campaignSequenceApi.testVariantEmail(
+        selected.variantId,
+        fromEmail,
+        toEmail
+      );
+
+      if (res.success) {
+        toast.success("Test email sent!");
+        setTestDialogOpen(false);
+        setToEmail("");
+        setSendingTest(false);
+      } else {
+        toast.error("Failed to send test email");
+      }
+    } catch (err) {
+      toast.error("Error sending test email.");
+    }finally{
+      setSendingTest(false);
+    }
+
   };
 
   return (
     <div className="flex h-[calc(100vh-80px)] bg-gray-50">
-      {/* Left Panel */}
+
+      {/* ---------- LEFT PANEL ---------- */}
       <div className="w-1/3 overflow-y-auto border-r bg-white p-4">
         {steps.map((step) => (
           <Card
-            key={step.id}
+            key={step._id}
             className={`mb-4 cursor-pointer border-2 transition-all ${
-              step.id === selected.stepId
+              step._id === selected.stepId
                 ? "border-blue-500 shadow-md"
                 : "border-transparent hover:border-gray-300"
             }`}
             onClick={() =>
               setSelected({
-                stepId: step.id,
-                variantId: step.variants[0]?.id || "",
+                stepId: step._id,
+                variantId: step.variants[0]?._id || "",
               })
             }
           >
@@ -136,24 +304,25 @@ export const CampaignSequences = () => {
                   size="icon"
                   onClick={(e) => {
                     e.stopPropagation();
-                    deleteStep(step.id);
+                    deleteStep(step._id);
                   }}
                 >
                   <Trash2 className="h-4 w-4 text-red-500" />
                 </Button>
               </div>
+
               <div className="mt-2 space-y-2">
                 {step.variants.map((v) => (
                   <div
-                    key={v.id}
+                    key={v._id}
                     className={`flex cursor-pointer items-center justify-between truncate rounded-md border p-2 text-sm ${
-                      v.id === selected.variantId
+                      v._id === selected.variantId
                         ? "border-blue-500 bg-blue-50 text-blue-700"
                         : "border-gray-200 hover:bg-gray-100"
                     }`}
                     onClick={(e) => {
                       e.stopPropagation();
-                      setSelected({ stepId: step.id, variantId: v.id });
+                      setSelected({ stepId: step._id, variantId: v._id });
                     }}
                   >
                     <span className="truncate">{v.subject}</span>
@@ -162,17 +331,18 @@ export const CampaignSequences = () => {
                       size="icon"
                       onClick={(e) => {
                         e.stopPropagation();
-                        deleteVariant(step.id, v.id);
+                        deleteVariant(step._id, v._id);
                       }}
                     >
                       <Trash2 className="h-4 w-4 text-red-500" />
                     </Button>
                   </div>
                 ))}
+
                 <Button
                   onClick={(e) => {
                     e.stopPropagation();
-                    addVariant(step.id);
+                    addVariant(step._id);
                   }}
                   variant="ghost"
                   size="sm"
@@ -194,7 +364,7 @@ export const CampaignSequences = () => {
         </Button>
       </div>
 
-      {/* Right Preview Panel */}
+      {/* ---------- RIGHT PANEL ---------- */}
       <div className="flex-1 bg-white p-8 shadow-inner">
         {selectedVariant ? (
           <div>
@@ -202,24 +372,83 @@ export const CampaignSequences = () => {
               <div className="flex-1">
                 <input
                   type="text"
-                  value={selectedVariant.subject}
-                  onChange={(e) => updateVariant("subject", e.target.value)}
+                  value={editorState.subject}
+                  onChange={(e) => updateSubjectDebounced(e.target.value)}
                   className="mb-2 w-full rounded-md border p-2"
                   placeholder="Subject"
                 />
+
                 <textarea
-                  value={selectedVariant.body}
-                  onChange={(e) => updateVariant("body", e.target.value)}
+                  value={editorState.body}
+                  onChange={(e) =>
+                    setEditorState((prev) => ({ ...prev, body: e.target.value }))
+                  }
                   className="h-64 w-full rounded-md border p-2"
                   placeholder="Start typing your email content here..."
                 />
               </div>
-              <div className="ml-4 flex gap-2">
-                <Button variant="ghost" size="sm">
-                  <Eye className="mr-1 h-4 w-4" /> Preview
-                </Button>
-                <Button variant="ghost" size="sm">
-                  <Zap className="mr-1 h-4 w-4" /> Test
+
+              {/* RIGHT SIDE BUTTONS */}
+              <div className="ml-4 flex flex-col gap-2">
+                {/* TEST EMAIL DIALOG */}
+                <Dialog open={testDialogOpen} onOpenChange={setTestDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="secondary" size="sm">
+                      <Zap className="mr-1 h-4 w-4" /> Test
+                    </Button>
+                  </DialogTrigger>
+
+                  <DialogContent className="max-w-sm">
+                    <DialogHeader>
+                      <DialogTitle>Send Test Email</DialogTitle>
+                    </DialogHeader>
+
+                    <div className="mt-4 space-y-4">
+
+                      {/* FROM EMAIL DROPDOWN */}
+                      <div>
+                        <label className="text-sm font-medium">From Email</label>
+                        <Select onValueChange={(v) => setFromEmail(v)}>
+                          <SelectTrigger className="w-full mt-2">
+                            <SelectValue placeholder="Select From Email" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {emailsData.map((email) => (
+                              <SelectItem key={email} value={email}>
+                                {email}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* TO EMAIL INPUT */}
+                      <div>
+                        <label className="text-sm font-medium">To Email</label>
+                        <Input
+                          type="email"
+                          value={toEmail}
+                          onChange={(e) => setToEmail(e.target.value)}
+                          placeholder="recipient@example.com"
+                          className="mt-2"
+                        />
+                      </div>
+                    </div>
+
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => {setTestDialogOpen(false); setToEmail("")}}>
+                        Cancel
+                      </Button>
+                      <Button onClick={submitTestEmail} disabled={sendingTest}>
+                        {sendingTest ? "Sending..." : "Send Test"}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+
+                {/* SAVE BUTTON */}
+                <Button variant="default" size="sm" onClick={saveBody}>
+                  <Save className="mr-1 h-4 w-4" /> Save
                 </Button>
               </div>
             </div>

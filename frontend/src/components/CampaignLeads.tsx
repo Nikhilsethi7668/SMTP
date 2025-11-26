@@ -99,7 +99,7 @@ export const CampaignLeads = ({
 
   return (
     <div className="space-y-4 p-6">
-      {leadsData.length < 0 && (
+      {leadsData.length <= 0 && (
         <div className="flex justify-end gap-4">
           <Button onClick={() => setShowDialog(true)}>+ Add Leads</Button>
           <CsvUploader campaignId={campaignId} onSuccess={() => handleGetData()} />

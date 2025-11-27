@@ -110,28 +110,59 @@ const processor = async (job) => {
   if (data.campaignId) {
     try {
       console.log(`📨 Campaign flow triggered for job ${job.id}`);
+      console.log(`   Campaign ID: ${data.campaignId}`);
+      console.log(`   Lead ID: ${data.leadId}`);
+      console.log(`   Step ID: ${data.stepId || 'N/A'}`);
+      console.log(`   Variant ID: ${data.variantId || 'N/A'}`);
 
       // Fetch lead + campaign
       const lead = await Lead.findById(data.leadId);
       const campaign = await Campaign.findById(data.campaignId);
 
-      if (!lead) throw new Error("Lead not found");
-      if (!campaign) throw new Error("Campaign not found");
+      if (!lead) {
+        console.error(`   ❌ Lead not found: ${data.leadId}`);
+        throw new Error("Lead not found");
+      }
+      if (!campaign) {
+        console.error(`   ❌ Campaign not found: ${data.campaignId}`);
+        throw new Error("Campaign not found");
+      }
 
+      console.log(`   📧 Lead: ${lead.email}`);
+      console.log(`   📋 Campaign: ${campaign.name}`);
+      console.log(`   📍 Lead status: ${lead.status}`);
+      console.log(`   📍 Lead current_step: ${lead.current_step || 0}`);
+
+      // Skip leads that are not in "Not yet contacted" status
+      if (lead.status !== "Not yet contacted") {
+        console.log(`   ⚠️ Lead status is "${lead.status}", not "Not yet contacted" — skipping.`);
+        return { skipped: true, reason: `Lead status is ${lead.status}` };
+      }
+
+      // Skip bounced leads
+      if (lead.status === "bounced") {
+        console.log("   ⚠️ Lead bounced — skipping.");
+        return { skipped: true, reason: "Lead bounced" };
+      }
+
+      // Skip if lead already replied (this check is redundant now but kept for safety)
       if (lead.status === "replied") {
-        console.log("⚠️ Lead already replied — skipping.");
+        console.log("   ⚠️ Lead already replied — skipping.");
         return { skipped: true, reason: "Already replied" };
       }
 
-      if (campaign.stop_on_reply && lead.status === "replied") {
-        console.log("⚠️ Stop on reply enabled — skipping.");
-        return { skipped: true, reason: "Stop on reply" };
-      }
+      console.log(`   📨 Preparing to send email...`);
+      console.log(`      From: ${data.fromEmail || 'N/A'}`);
+      console.log(`      To: ${lead.email}`);
+      console.log(`      Subject: ${data.subject || 'N/A'}`);
+      console.log(`      Text only: ${data.sendTextOnly ? 'Yes' : 'No'}`);
+      console.log(`      Is first email: ${data.isFirstEmail ? 'Yes' : 'No'}`);
 
       // SCHEDULE DELAY
       await waitRandomDelay();
 
       // SEND EMAIL
+      console.log(`   📤 Sending email...`);
       const res = await sendEmail({
         from: data.fromEmail,
         to: lead.email,
@@ -140,27 +171,36 @@ const processor = async (job) => {
         html: data.bodyHtml,
       });
 
-      // UPDATE LEAD
+      console.log(`   ✅ Email sent successfully`);
+      console.log(`      Message ID: ${res.messageId}`);
+      console.log(`      Response: ${res.response || 'N/A'}`);
+
+      // UPDATE LEAD - Mark as contacted after sending email
       await Lead.findByIdAndUpdate(lead._id, {
-        $set: { status: "sent", last_sent_at: new Date() },
+        $set: { status: "contacted", last_sent_at: new Date() },
         $inc: { sent_count: 1 },
       });
+      console.log(`   ✅ Lead updated: status -> "contacted", sent_count incremented`);
 
       // UPDATE CAMPAIGN METRICS
       await Campaign.findByIdAndUpdate(campaign._id, {
         $inc: { metrics_sent: 1 },
       });
+      console.log(`   ✅ Campaign metrics updated: metrics_sent incremented`);
 
-      console.log(`📬 Campaign email sent -> ${lead.email}`);
+      console.log(`   📬 Campaign email successfully sent to ${lead.email}`);
 
       return {
         campaign: true,
         success: true,
         lead: lead.email,
+        campaign: campaign.name,
         messageId: res.messageId,
+        sentAt: res.sentAt,
       };
     } catch (err) {
-      console.error("❌ Campaign job failed:", err.message);
+      console.error(`   ❌ Campaign job failed: ${err.message}`);
+      console.error(`   Stack:`, err.stack);
       throw err;
     }
   }

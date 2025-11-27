@@ -18,6 +18,11 @@ const StepSchema = new Schema(
       type: Number,
       required: true, // Step order: 1, 2, 3...
     },
+
+    // Optional fallback content (variants are primary source)
+    subject: { type: String, default: null },
+    body: { type: String, default: null }, // HTML content
+    text: { type: String, default: null }, // Plain text content
   },
   { timestamps: true }
 );

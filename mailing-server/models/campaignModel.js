@@ -43,6 +43,17 @@ const CampaignSchema = new Schema(
     send_text_only: { type: Boolean, default: false },
     first_email_text_only: { type: Boolean, default: false },
     daily_limit: { type: Number, default: null },
+
+    // INTERNAL FIELDS FOR ROUND-ROBIN LOGIC
+    variant_counters: {
+      type: Map,
+      of: Number,
+      default: {}, // Map of stepId -> counter for round-robin variant selection
+    },
+    _sender_rotate_index: {
+      type: Number,
+      default: 0, // Counter for round-robin sender email rotation
+    },
   },
   { timestamps: true }
 );

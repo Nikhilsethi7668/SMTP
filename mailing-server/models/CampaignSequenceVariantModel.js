@@ -16,7 +16,8 @@ const VariantSchema = new Schema(
     },
 
     subject: { type: String, required: true },
-    body: { type: String, required: true },
+    body: { type: String, required: true }, // HTML content
+    text: { type: String, default: null }, // Plain text content (optional, falls back to body if not provided)
   },
   { timestamps: true }
 );

@@ -47,7 +47,27 @@ const LeadSchema = new Schema(
 
         status: {
             type: String,
-            required: true, // e.g., "sending_mails", "replied", "bounced"
+            required: true, // e.g., "sending_mails", "replied", "bounced", "sent"
+        },
+
+        current_step: {
+            type: Number,
+            default: 0, // Track which step in the sequence the lead is at
+        },
+
+        last_scheduled_at: {
+            type: Date,
+            default: null,
+        },
+
+        last_sent_at: {
+            type: Date,
+            default: null,
+        },
+
+        sent_count: {
+            type: Number,
+            default: 0,
         },
     },
     { timestamps: true }

@@ -1,15 +1,14 @@
 // src/services/dkimService.ts
-import crypto from "crypto";
+import forge from "node-forge";
 import { Domain, IDomain } from "../models/unifiedDomainModel.js";
 import mongoose from "mongoose";
 
 export const generateDKIMKeys = async (selector: string, domain: string) => {
-  const { publicKey, privateKey } = crypto.generateKeyPairSync("rsa", {
-    modulusLength: 2048,
-    publicKeyEncoding: { type: "pkcs1", format: "pem" },
-    privateKeyEncoding: { type: "pkcs1", format: "pem" },
-  });
-
+  const keyPair = forge.pki.rsa.generateKeyPair(1024);
+  const publicKey = forge.pki.publicKeyToPem(keyPair.publicKey);
+  const privateKey = forge.pki.privateKeyToPem(keyPair.privateKey);
+  console.log('publicKey', publicKey);
+  console.log('privateKey', privateKey);
   return { selector, domain, publicKey, privateKey };
 };
 

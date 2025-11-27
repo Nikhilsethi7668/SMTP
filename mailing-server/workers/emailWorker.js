@@ -155,6 +155,8 @@ const processor = async (job) => {
       console.log(`      From: ${data.fromEmail || 'N/A'}`);
       console.log(`      To: ${lead.email}`);
       console.log(`      Subject: ${data.subject || 'N/A'}`);
+      console.log(`      Body Text: ${data.bodyText ? `${data.bodyText.substring(0, 50)}...` : 'MISSING'}`);
+      console.log(`      Body HTML: ${data.bodyHtml ? `${data.bodyHtml.substring(0, 50)}...` : 'N/A'}`);
       console.log(`      Text only: ${data.sendTextOnly ? 'Yes' : 'No'}`);
       console.log(`      Is first email: ${data.isFirstEmail ? 'Yes' : 'No'}`);
 
@@ -163,11 +165,41 @@ const processor = async (job) => {
 
       // SEND EMAIL
       console.log(`   📤 Sending email...`);
+      
+      // Ensure text content exists - required by email service
+      // If bodyText is missing but bodyHtml exists, use a simple text version
+      let emailText = data.bodyText;
+      if (!emailText || emailText.trim() === "") {
+        if (data.bodyHtml) {
+          // Strip HTML tags for a basic text version
+          emailText = data.bodyHtml
+            .replace(/<[^>]*>/g, "") // Remove HTML tags
+            .replace(/&nbsp;/g, " ") // Replace &nbsp; with space
+            .replace(/&amp;/g, "&") // Replace &amp; with &
+            .replace(/&lt;/g, "<") // Replace &lt; with <
+            .replace(/&gt;/g, ">") // Replace &gt; with >
+            .replace(/&quot;/g, '"') // Replace &quot; with "
+            .trim();
+        }
+        // If still empty, use a default message
+        if (!emailText || emailText.trim() === "") {
+          emailText = data.bodyHtml || "Email content";
+        }
+      }
+      
+      // Validate required fields before sending
+      if (!data.fromEmail) {
+        throw new Error("From email address is required");
+      }
+      if (!data.subject) {
+        throw new Error("Email subject is required");
+      }
+      
       const res = await sendEmail({
         from: data.fromEmail,
         to: lead.email,
         subject: data.subject,
-        text: data.bodyText,
+        text: emailText,
         html: data.bodyHtml,
       });
 

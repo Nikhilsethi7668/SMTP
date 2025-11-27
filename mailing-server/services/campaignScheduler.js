@@ -322,10 +322,30 @@ const scheduleStepForCampaign = async (campaign, schedule, step, variants) => {
       const bodyHtml = sendTextOnly
         ? undefined
         : variant?.body || step.body || "";
-      const bodyText =
+      
+      // Ensure bodyText always has a value - required by email service
+      let bodyText =
         variant?.text ||
         step.text ||
         (bodyHtml ? undefined : variant?.body || step.body || "");
+      
+      // If bodyText is still empty/undefined but bodyHtml exists, create a text version
+      if ((!bodyText || bodyText.trim() === "") && bodyHtml) {
+        // Strip HTML tags for a basic text version
+        bodyText = bodyHtml
+          .replace(/<[^>]*>/g, "") // Remove HTML tags
+          .replace(/&nbsp;/g, " ") // Replace &nbsp; with space
+          .replace(/&amp;/g, "&") // Replace &amp; with &
+          .replace(/&lt;/g, "<") // Replace &lt; with <
+          .replace(/&gt;/g, ">") // Replace &gt; with >
+          .replace(/&quot;/g, '"') // Replace &quot; with "
+          .trim();
+      }
+      
+      // Final fallback - ensure bodyText is never empty
+      if (!bodyText || bodyText.trim() === "") {
+        bodyText = bodyHtml || "Email content";
+      }
 
       const tracking = { openTracking: !!campaign.open_tracking };
 

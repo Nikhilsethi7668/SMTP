@@ -1,32 +1,34 @@
-import dotenv from 'dotenv';
-import { connectDB } from './config/db.js';
-import { startScheduler } from './services/warmupScheduler.js';
+import dotenv from "dotenv";
+import { connectDB } from "./config/db.js";
 
-// Load environment variables
+import { startScheduler as startWarmupScheduler } from "./services/warmupScheduler.js";
+import { startCampaignScheduler } from "./services/campaignScheduler.js";
+
 dotenv.config();
 
-// Connect to MongoDB
-connectDB().catch((error) => {
-  console.error('Failed to connect to MongoDB:', error);
+// Connect DB
+connectDB().catch((err) => {
+  console.error("MongoDB connection failed:", err);
   process.exit(1);
 });
 
-// Start the warmup email scheduler with cron
-console.log('🚀 Starting Mailing Server Scheduler...');
-console.log(`📡 MongoDB URI: ${process.env.MONGO_URI ? 'Connected' : 'Not configured'}`);
+console.log("🚀 Mailing Server Started");
 
-// Start the cron scheduler
-// Default: runs every 15 minutes to check for active warmup emails
-const cronSchedule = process.env.CRON_SCHEDULE || '*/15 * * * *'; // Every 15 minutes
-startScheduler(cronSchedule);
+// Warmup Scheduler (every 15 mins)
+const warmupCron = process.env.WARMUP_CRON || "*/15 * * * *";
+startWarmupScheduler(warmupCron);
+
+// Campaign Scheduler (every 5 mins)
+const campaignCron = process.env.CAMPAIGN_CRON || "*/5 * * * *";
+startCampaignScheduler(campaignCron);
 
 // Graceful shutdown
-process.on('SIGTERM', async () => {
-  console.log('SIGTERM signal received: shutting down scheduler');
+process.on("SIGTERM", () => {
+  console.log("⛔ SIGTERM received, shutting down...");
   process.exit(0);
 });
 
-process.on('SIGINT', async () => {
-  console.log('SIGINT signal received: shutting down scheduler');
+process.on("SIGINT", () => {
+  console.log("⛔ SIGINT received, shutting down...");
   process.exit(0);
 });

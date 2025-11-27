@@ -183,9 +183,19 @@ const processor = async (job) => {
       console.log(`   ✅ Lead updated: status -> "contacted", sent_count incremented`);
 
       // UPDATE CAMPAIGN METRICS
-      await Campaign.findByIdAndUpdate(campaign._id, {
-        $inc: { metrics_sent: 1 },
-      });
+      // Handle null values: if metrics_sent is null, set it to 1, otherwise increment
+      const currentMetricsSent = campaign.metrics_sent;
+      if (currentMetricsSent === null || currentMetricsSent === undefined) {
+        // Initialize to 1 if null/undefined
+        await Campaign.findByIdAndUpdate(campaign._id, {
+          $set: { metrics_sent: 1 },
+        });
+      } else {
+        // Increment if it's already a number
+        await Campaign.findByIdAndUpdate(campaign._id, {
+          $inc: { metrics_sent: 1 },
+        });
+      }
       console.log(`   ✅ Campaign metrics updated: metrics_sent incremented`);
 
       console.log(`   📬 Campaign email successfully sent to ${lead.email}`);

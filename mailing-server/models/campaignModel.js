@@ -24,12 +24,12 @@ const CampaignSchema = new Schema(
     rate_limit: { type: Number, default: null },
     daily_quota: { type: Number, default: null },
 
-    metrics_sent: { type: Number, default: null },
-    metrics_delivered: { type: Number, default: null },
-    metrics_opened: { type: Number, default: null },
-    metrics_clicked: { type: Number, default: null },
-    metrics_bounced: { type: Number, default: null },
-    metrics_complaints: { type: Number, default: null },
+    metrics_sent: { type: Number, default: 0 },
+    metrics_delivered: { type: Number, default: 0 },
+    metrics_opened: { type: Number, default: 0 },
+    metrics_clicked: { type: Number, default: 0 },
+    metrics_bounced: { type: Number, default: 0 },
+    metrics_complaints: { type: Number, default: 0 },
 
     status: { type: String, default: "draft" },
     priority: { type: Number, default: null },

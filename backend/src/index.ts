@@ -28,6 +28,7 @@ import purchaseDomainRoutes from "./routes/purchaseDomainRoutes.js";
 import domainCartRoutes from "./routes/domainCartRoutes.js";
 import registrantInfoRoutes from "./routes/registrantInfoRoutes.js";
 import campaignSequenceRoutes from "./routes/campaignSequence.routes.js";
+import campaignScheduleRoutes from "./routes/campaignScheduleRoutes.js";
 const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
@@ -64,6 +65,7 @@ const startServer = async () => {
     app.use('/api/domains', domainRoutes);
     app.use('/api/credits', creditsRoutes);
     app.use('/api/sequences', campaignSequenceRoutes);
+    app.use('/api/schedules', campaignScheduleRoutes);
     
     // Register less specific /api routes LAST (these may have catch-all patterns)
     app.use("/api", apiRoutes);

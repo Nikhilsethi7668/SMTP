@@ -13,20 +13,9 @@ import api from "@/axiosInstance";
 import ScheduleManager from "@/components/ScheduleManager";
 import CampaignSettings from "@/components/CampaignSettings";
 import { toast } from "sonner";
+import { campaignApi } from "@/services/campaignApi";
 
 export const CampaignDetails = () => {
-  const campaigns = {
-    _id: "68fe46721bc24c007cda8e59",
-    name: "Welcome Series",
-    status: "running" as "running" | "draft" | "paused" | "completed",
-    metrics_sent: 2000,
-    metrics_delivered: 1800,
-    metrics_opened: 900,
-    metrics_clicked: 400,
-    metrics_bounced: 50,
-    metrics_complaints: 10,
-    updatedAt: "2025-10-26T16:05:45.103Z",
-  };
   const navigate = useNavigate();
   const query = new URLSearchParams(useLocation().search);
   const [isCampaignPause, setIsCampaignPause] = useState(false);
@@ -65,6 +54,29 @@ export const CampaignDetails = () => {
       toast.error(error?.response?.data?.message);
     }
   };
+  const updateCampaignStatus = async () => {
+  if (!prefilledCampaignId) return;
+
+  try {
+    const newStatus = isCampaignPause ? "running" : "paused";
+
+    const res = await campaignApi.updateCampaignStatus(prefilledCampaignId, newStatus);
+
+    if (res.success) {
+      setIsCampaignPause(!isCampaignPause);
+
+      setCampaignDetails((prev) => ({
+        ...prev,
+        status: newStatus,
+      }));
+
+      toast.success(`Campaign ${newStatus === "paused" ? "paused" : "resumed"} successfully`);
+    }
+  } catch (error: any) {
+    toast.error(error?.response?.data?.message || "Failed to update status");
+  }
+};
+
   const renderTabContent = () => {
     switch (activeTab) {
       case "analytics":
@@ -95,9 +107,9 @@ export const CampaignDetails = () => {
       case "sequences":
         return <CampaignSequences campaignId={prefilledCampaignId} />;
       case "schedules":
-        return <ScheduleManager />;
+        return <ScheduleManager campaignId={prefilledCampaignId} />;
       case "options":
-        return <CampaignSettings />;
+        return <CampaignSettings campaignId={prefilledCampaignId} />;
       default:
         return null;
     }
@@ -139,21 +151,22 @@ export const CampaignDetails = () => {
             </div>
 
             {/* Pause/Play Button */}
-            <Button
-              variant="outline"
-              onClick={() => setIsCampaignPause(!isCampaignPause)}
-              className="flex items-center gap-2"
-            >
-              {isCampaignPause ? (
-                <>
-                  <Play className="h-4 w-4" /> Resume
-                </>
-              ) : (
-                <>
-                  <Pause className="h-4 w-4" /> Pause
-                </>
-              )}
-            </Button>
+           <Button
+  variant="outline"
+  onClick={updateCampaignStatus}
+  className="flex items-center gap-2"
+>
+  {isCampaignPause ? (
+    <>
+      <Play className="h-4 w-4" /> Resume
+    </>
+  ) : (
+    <>
+      <Pause className="h-4 w-4" /> Pause
+    </>
+  )}
+</Button>
+
           </div>
 
           {/* Tab Content */}

@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document } from "mongoose";
 
 export interface ICampaign extends Document {
   user_id: mongoose.Types.ObjectId;
@@ -6,7 +6,10 @@ export interface ICampaign extends Document {
 
   type?: string;
   from_name?: string;
-  from_email?: string;
+
+  // UPDATED → Array of strings
+  from_email?: string[];
+
   reply_to?: string;
   subject?: string;
 
@@ -32,18 +35,28 @@ export interface ICampaign extends Document {
 
   delivery_log_collection?: string;
 
+  // NEW FIELDS
+  stop_on_reply?: boolean;           // Stop sending emails on reply
+  open_tracking?: boolean;           // Open tracking
+  send_text_only?: boolean;          // Send emails as text-only
+  first_email_text_only?: boolean;   // First email text-only
+  daily_limit?: number;              // Daily sending limit
+
   createdAt: Date;
   updatedAt: Date;
 }
 
 const CampaignSchema = new Schema<ICampaign>(
   {
-    user_id: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    user_id: { type: Schema.Types.ObjectId, ref: "User", required: true },
     name: { type: String, required: true },
 
     type: { type: String, default: null },
     from_name: { type: String, default: null },
-    from_email: { type: String, default: null },
+
+    // UPDATED → array of strings
+    from_email: { type: [String], default: [] },
+
     reply_to: { type: String, default: null },
     subject: { type: String, default: null },
 
@@ -68,8 +81,16 @@ const CampaignSchema = new Schema<ICampaign>(
     archived: { type: Boolean, default: null },
 
     delivery_log_collection: { type: String, default: null },
+
+    // NEW FIELDS
+    stop_on_reply: { type: Boolean, default: false },
+    open_tracking: { type: Boolean, default: true },
+    send_text_only: { type: Boolean, default: false },
+    first_email_text_only: { type: Boolean, default: false },
+    daily_limit: { type: Number, default: null },
   },
   { timestamps: true }
 );
 
-export const Campaign = mongoose.model<ICampaign>('Campaign', CampaignSchema);
+export const Campaign =
+  mongoose.models.Campaign || mongoose.model<ICampaign>("Campaign", CampaignSchema);

@@ -33,6 +33,10 @@ export const CampaignsLayout: React.FC = () => {
       toast.error(error?.response?.data?.message || (error as string));
     }
   };
+  const filteredCampaigns = campaignsData.filter((c: any) =>
+  c.name?.toLowerCase().trim().includes(search.toLowerCase().trim())
+);
+
   useEffect(() => {
     handleGetData();
   }, []);
@@ -40,7 +44,6 @@ export const CampaignsLayout: React.FC = () => {
   const handleAction = (val: string, campaign: any) => {
     switch (val) {
       case "edit":
-        console.log("edit called", campaign);
         setSelectedCampaign(campaign);
         setOpen(true);
         break;
@@ -50,7 +53,6 @@ export const CampaignsLayout: React.FC = () => {
     }
   };
   const handleSave = () => {
-    console.log("Saving changes for:", selectedCampaign);
     setOpen(false);
   };
   return (
@@ -87,24 +89,24 @@ export const CampaignsLayout: React.FC = () => {
 
       {/* Campaigns Table Placeholder */}
       <div className="rounded p-4 text-center text-gray-500">
-        {campaignsData.length > 0 ? (
-          <Card>
-            <CardHeader>
-              <CardTitle>Campaign Overview</CardTitle>
-              <CardDescription>Manage and monitor all your email campaigns</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <CampaignTable
-                onAction={handleAction}
-                campaigns={campaignsData.filter((c: any) =>
-                  c.name.toLowerCase().includes(search.toLowerCase())
-                )}
-              />
-            </CardContent>
-          </Card>
-        ) : (
-          <p>No campaigns created yet</p>
-        )}
+       {filteredCampaigns.length > 0 ? (
+  <Card>
+    <CardHeader>
+      <CardTitle>Campaign Overview</CardTitle>
+      <CardDescription>Manage and monitor all your email campaigns</CardDescription>
+    </CardHeader>
+
+    <CardContent>
+      <CampaignTable
+        onAction={handleAction}
+        campaigns={filteredCampaigns}
+      />
+    </CardContent>
+  </Card>
+) : (
+  <p>No campaigns match your search.</p>
+)}
+
       </div>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>

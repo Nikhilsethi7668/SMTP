@@ -12,6 +12,10 @@ import NotFound from "./pages/NotFound";
 import EmailVerify from "./pages/EmailVerify";
 import { Dashboard } from "./pages/Dashboard";
 import AccountConnect from "./pages/account/AccountConnect";
+import GoogleConnect from "./pages/account/GoogleConnect";
+import GoogleOAuth from "./pages/account/GoogleOAuth";
+import GoogleAppPassword from "./pages/account/GoogleAppPassword";
+import MicrosoftConnect from "./pages/account/MicrosoftConnect";
 import { Campaigns } from "./pages/Campaigns";
 import { CreateCampaignForm } from "./pages/campaigns/CreateCampaign";
 import { CampaignDetails } from "./pages/campaigns/CampaignDetails";
@@ -127,6 +131,38 @@ const AppRoutes = () => {
                 element={
                   <ProtectedRoute>
                     <CustomConnect />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/accounts/connect/google"
+                element={
+                  <ProtectedRoute>
+                    <GoogleConnect />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/accounts/connect/google/oauth"
+                element={
+                  <ProtectedRoute>
+                    <GoogleOAuth />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/accounts/connect/google/app-password"
+                element={
+                  <ProtectedRoute>
+                    <GoogleAppPassword />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/accounts/connect/microsoft"
+                element={
+                  <ProtectedRoute>
+                    <MicrosoftConnect />
                   </ProtectedRoute>
                 }
               />

@@ -18,6 +18,7 @@ import leadsRoutes from "./routes/leadsRoutes.js";
 import emailTemplateRoutes from "./routes/emailTemplateRoutes.js";
 import incomingEmailRoutes from "./routes/incomingEmailRoutes.js";
 import googleOauthRoutes from "./routes/googleOauth.js";
+import googleAppPasswordRoutes from "./routes/googleAppPassword.js";
 import outlookAuthRoutes from "./routes/outlookAuth.js";
 import customConnectRoutes from "./routes/customConnect.js";
 import domainRoutes from "./routes/domainRoutes.js";
@@ -66,6 +67,7 @@ const startServer = async () => {
     // Register less specific /api routes LAST (these may have catch-all patterns)
     app.use("/api", apiRoutes);
     app.use('/api', googleOauthRoutes);
+    app.use('/api', googleAppPasswordRoutes);
     app.use('/api', outlookAuthRoutes);
     app.use('/api', customConnectRoutes);
     app.use('/api', emailWarmupRoutes);

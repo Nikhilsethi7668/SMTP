@@ -27,6 +27,42 @@ async function parseXML(xml: string): Promise<any> {
 }
 
 /**
+ * Handle Enom API errors with helpful guidance
+ */
+function handleEnomError(errorMessage: string, errCode?: string): never {
+  // Provide helpful guidance for specific error types
+  if (errorMessage.toLowerCase().includes('ip address') || 
+      errorMessage.toLowerCase().includes('not permitted from this ip') ||
+      errorMessage.toLowerCase().includes('whitelist')) {
+    console.error('🔒 IP Whitelist Error Detected!');
+    console.error('   Your IP address needs to be whitelisted in your Enom account.');
+    console.error('   Steps to fix:');
+    console.error('   1. Log in to your Enom reseller account');
+    console.error('   2. Go to Account Settings > API Access > IP Whitelist');
+    console.error('   3. Add your current IP address to the whitelist');
+    console.error('   4. Wait a few minutes for changes to propagate');
+    const ipMatch = errorMessage.match(/\d+\.\d+\.\d+\.\d+/);
+    if (ipMatch) {
+      console.error(`   Current IP from error: ${ipMatch[0]}`);
+    }
+    console.error('   For more info: http://enom.help/whitelist');
+  } else if (errorMessage.toLowerCase().includes('bad user') || 
+             errorMessage.toLowerCase().includes('password') ||
+             errorMessage.toLowerCase().includes('authentication')) {
+    console.error('🔐 Authentication Error Detected!');
+    console.error('   Please verify your Enom API credentials:');
+    console.error('   - ENOM_RESELLER_ID environment variable');
+    console.error('   - ENOM_API_TOKEN environment variable');
+    console.error('   - Check if credentials are correct and account is active');
+    console.error('   - For test environment, set ENOM_USE_TEST=true');
+  }
+  
+  throw new Error(
+    `Enom API Error: ${errorMessage} (Code: ${errCode || 'Unknown'})`
+  );
+}
+
+/**
  * Make API call to Enom
  * This is the central function that all Enom API calls go through
  */
@@ -106,12 +142,10 @@ export async function makeApiCall(command: string, params: Record<string, string
       }
       
       if (errors.length > 0) {
-        throw new Error(
-          `Enom API Error: ${errors.join(', ')} (Code: ${interfaceResponse.ErrCode || 'Unknown'})`
-        );
+        handleEnomError(errors.join(', '), interfaceResponse.ErrCode);
       }
     }
-
+    
     return interfaceResponse;
   } catch (error: any) {
     if (error.response) {
@@ -276,9 +310,7 @@ export async function searchDomains(
       }
       
       if (errors.length > 0) {
-        throw new Error(
-          `Enom API Error: ${errors.join(', ')} (Code: ${interfaceResponse.ErrCode || 'Unknown'})`
-        );
+        handleEnomError(errors.join(', '), interfaceResponse.ErrCode);
       }
     }
     
@@ -530,7 +562,7 @@ export async function purchaseDomain(
     }
     
     if (errors.length > 0) {
-      throw new Error(`Enom API Error: ${errors.join(', ')}`);
+      handleEnomError(errors.join(', '));
     }
   }
 

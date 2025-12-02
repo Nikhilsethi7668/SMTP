@@ -48,6 +48,10 @@ const EmailAccountSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    useServiceAccount: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

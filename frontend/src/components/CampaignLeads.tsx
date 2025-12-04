@@ -46,15 +46,21 @@ export const CampaignLeads = ({
   const [loading, setLoading] = useState(false);
 
   const handleGetData = async () => {
-    try {
-      const response = await api.get("/leads");
-      if (response.data.success) {
-        setLeadsData(response.data.data);
+  try {
+    const response = await api.get("/leads", {
+      params: {
+        campaign: campaignId   
       }
-    } catch (error) {
-      toast.error(error?.response?.data?.message);
+    });
+
+    if (response.data.success) {
+      setLeadsData(response.data.data);
     }
-  };
+  } catch (error) {
+    toast.error(error?.response?.data?.message);
+  }
+};
+
 
   useEffect(() => {
     handleGetData();
@@ -99,7 +105,7 @@ export const CampaignLeads = ({
 
   return (
     <div className="space-y-4 p-6">
-      {leadsData.length < 0 && (
+      {leadsData.length <= 0 && (
         <div className="flex justify-end gap-4">
           <Button onClick={() => setShowDialog(true)}>+ Add Leads</Button>
           <CsvUploader campaignId={campaignId} onSuccess={() => handleGetData()} />

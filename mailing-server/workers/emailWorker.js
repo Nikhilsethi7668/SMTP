@@ -1,252 +1,297 @@
-import { Worker } from 'bullmq';
-import dotenv from 'dotenv';
-import mongoose from 'mongoose';
-import { EmailWarmup } from '../models/WarmupEmailModel.js';
-import { sendEmail } from '../services/emailService.js';
+// mailing-server/workers/emailWorker.js
+import dotenv from "dotenv";
+import mongoose from "mongoose";
+import { Worker } from "bullmq";
 
 dotenv.config();
 
-// Redis connection configuration
-// Use connection URL if provided, otherwise use host/port
-const getRedisConnection = () => {
-  if (process.env.REDIS_URL) {
-    return {
-      url: process.env.REDIS_URL,
-      retryStrategy: (times) => {
-        const delay = Math.min(times * 100, 3000);
-        if (times <= 5) {
-          console.log(`🔄 Redis reconnection attempt ${times}, waiting ${delay}ms...`);
-        }
-        return delay;
-      },
-      maxRetriesPerRequest: null, // Retry indefinitely
-      enableReadyCheck: true,
-      lazyConnect: false,
-      connectTimeout: 10000,
-      keepAlive: 30000,
-      family: 4, // Force IPv4
-    };
-  }
-  
-  return {
-    host: process.env.REDIS_HOST || 'redis',
-    port: parseInt(process.env.REDIS_PORT) || 6379,
+// -----------------------------
+// MODELS
+// -----------------------------
+import { EmailWarmup } from "../models/WarmupEmailModel.js";
+import Lead from "../models/leadModel.js";
+import { Campaign } from "../models/campaignModel.js";
+
+// -----------------------------
+// EMAIL SERVICE
+// -----------------------------
+import { sendEmail } from "../services/emailService.js";
+
+// -----------------------------
+// REDIS CONNECTION
+// -----------------------------
+const redisConnection = process.env.REDIS_URL
+  ? { url: process.env.REDIS_URL }
+  : {
+    host: process.env.REDIS_HOST || "localhost",
+    port: parseInt(process.env.REDIS_PORT || "6379"),
     password: process.env.REDIS_PASSWORD || undefined,
-    retryStrategy: (times) => {
-      const delay = Math.min(times * 100, 3000);
-      if (times <= 5) {
-        console.log(`🔄 Redis reconnection attempt ${times}, waiting ${delay}ms...`);
-      }
-      return delay;
-    },
-    maxRetriesPerRequest: null, // Retry indefinitely
-    enableReadyCheck: true,
-    lazyConnect: false,
-    connectTimeout: 10000,
-    keepAlive: 30000,
-    family: 4, // Force IPv4
   };
+
+console.log("📡 Email Worker connecting to Redis:", redisConnection);
+
+// -----------------------------
+// HELPER: RANDOM SEND DELAY
+// -----------------------------
+const waitRandomDelay = async () => {
+  const min = parseInt(process.env.EMAIL_DELAY_MIN_SECONDS || "5", 10);
+  const max = parseInt(process.env.EMAIL_DELAY_MAX_SECONDS || "25", 10);
+  const sec = Math.floor(Math.random() * (max - min + 1)) + min;
+
+  console.log(`⏳ Waiting ${sec}s before sending email...`);
+  await new Promise((resolve) => setTimeout(resolve, sec * 1000));
 };
 
-const connection = getRedisConnection();
-const connectionInfo = process.env.REDIS_URL || `${process.env.REDIS_HOST || 'redis'}:${process.env.REDIS_PORT || 6379}`;
-console.log(`📡 Worker connecting to Redis at ${connectionInfo}`);
+// -----------------------------
+// HELPER: ENSURE MONGO CONNECTION
+// -----------------------------
+const connectMongo = async () => {
+  if (mongoose.connection.readyState === 1) return;
 
-/**
- * Generate a random delay in milliseconds
- * @param {number} minSeconds - Minimum delay in seconds
- * @param {number} maxSeconds - Maximum delay in seconds
- * @returns {number} Random delay in milliseconds
- */
-const getRandomDelay = (minSeconds, maxSeconds) => {
-  const min = minSeconds || parseInt(process.env.EMAIL_DELAY_MIN_SECONDS) || 5;
-  const max = maxSeconds || parseInt(process.env.EMAIL_DELAY_MAX_SECONDS) || 30;
-  const delaySeconds = Math.floor(Math.random() * (max - min + 1)) + min;
-  return delaySeconds * 1000; // Convert to milliseconds
+  console.log("📡 Connecting MongoDB...");
+  await mongoose.connect(process.env.MONGO_URI);
+  console.log("✅ MongoDB connected");
 };
 
-/**
- * Wait for a random delay
- * @param {number} minSeconds - Minimum delay in seconds
- * @param {number} maxSeconds - Maximum delay in seconds
- */
-const waitRandomDelay = async (minSeconds, maxSeconds) => {
-  const delayMs = getRandomDelay(minSeconds, maxSeconds);
-  const delaySeconds = delayMs / 1000;
-  console.log(`⏳ Waiting ${delaySeconds.toFixed(1)} seconds before sending email...`);
-  await new Promise((resolve) => setTimeout(resolve, delayMs));
-};
+// -----------------------------
+// WORKER PROCESSOR (ROUTER)
+// -----------------------------
+const processor = async (job) => {
+  const data = job.data;
 
-// Email worker processor
-const emailProcessor = async (job) => {
-  const { warmupEmailId, to, subject, body, from } = job.data;
-  
-  console.log(`Processing email job ${job.id}:`, {
-    warmupEmailId,
-    to,
-    subject,
-    from: from,
-  });
+  console.log(`\n---------------------------`);
+  console.log(`🎯 Processing job ${job.id}`);
+  console.log(`Payload =>`, data);
 
-  try {
-    // Ensure MongoDB connection
-    if (mongoose.connection.readyState !== 1) {
-      console.warn('MongoDB not connected, attempting to connect...');
-      const mongoURI = process.env.MONGO_URI;
-      if (mongoURI) {
-        await mongoose.connect(mongoURI);
-      } else {
-        throw new Error('MONGO_URI is not defined');
-      }
-    }
+  await connectMongo();
 
-    // If warmupEmailId is provided, fetch from database
-    let warmupEmail = null;
-    if (warmupEmailId) {
-      warmupEmail = await EmailWarmup.findById(warmupEmailId);
-      
-      if (!warmupEmail) {
-        throw new Error(`WarmupEmail with id ${warmupEmailId} not found`);
-      }
+  // ——————————————————————————————————————————
+  // 1️⃣ WARMUP EMAIL PROCESSING
+  // ——————————————————————————————————————————
+  if (data.warmupEmailId) {
+    try {
+      console.log(`🔥 Warmup flow triggered for job ${job.id}`);
 
-      // Check if warmup is active
-      if (warmupEmail.status !== 'active') {
-        throw new Error(`WarmupEmail status is ${warmupEmail.status}, not active`);
-      }
+      const warmup = await EmailWarmup.findById(data.warmupEmailId);
+      if (!warmup) throw new Error("Warmup Email not found");
+      if (warmup.status !== "active")
+        throw new Error(`Warmup status is ${warmup.status}, not active`);
 
-      if (!from || !to || !body) {
-        throw new Error('Email from, to, and body are required');
-      }
-      // Use email from model if not provided in job data
-      const emailFrom = from || warmupEmail.email;
-      const emailTo = to; // You may want to get this from a recipient list
-      const emailSubject = subject || 'Warmup Email';
-      const emailBody = body || 'This is a warmup email';
-
-      // Add random delay before sending email
-      await waitRandomDelay();
-
-      // Send email using nodemailer
-      const result = await sendEmail({
-        from: emailFrom,
-        to: emailTo,
-        subject: emailSubject,
-        text: emailBody,
-      });
-
-      // Update warmup email stats
-      warmupEmail.stats.emailsSent += 1;
-      warmupEmail.stats.lastActivity = new Date();
-      await warmupEmail.save();
-
-      console.log(`✅ Email sent successfully to ${emailTo} for warmup ${warmupEmailId}`);
-      
-      return {
-        success: true,
-        messageId: result.messageId,
-        warmupEmailId: warmupEmail._id.toString(),
-        sentAt: result.sentAt,
-      };
-    } else {
-      // Direct email sending without warmup model
-      if (!to) {
-        throw new Error('Recipient email (to) is required');
-      }
-
-      // Add random delay before sending email
       await waitRandomDelay();
 
       const result = await sendEmail({
-        from: from || 'admin@zeusbull.com',
-        to,
-        subject: subject || 'Test Email',
-        text: body || 'This is a test email',
+        from: data.from || warmup.email,
+        to: data.to,
+        subject: data.subject || "Warmup Email",
+        text: data.body || "Warmup content",
       });
 
-      console.log(`✅ Email sent successfully to ${to}`);
-      
+      warmup.stats.emailsSent += 1;
+      warmup.stats.lastActivity = new Date();
+      await warmup.save();
+
+      console.log(`✅ Warmup email sent to ${data.to}`);
+
       return {
+        warmup: true,
         success: true,
+        sentTo: data.to,
         messageId: result.messageId,
-        sentAt: result.sentAt,
       };
+    } catch (err) {
+      console.error("❌ Warmup job failed:", err.message);
+      throw err;
     }
-  } catch (error) {
-    console.error(`❌ Error processing email job ${job.id}:`, error.message);
-    
-    // Update warmup email stats on failure if warmupEmailId exists
-    if (warmupEmailId) {
-      try {
-        const warmupEmail = await EmailWarmup.findById(warmupEmailId);
-        if (warmupEmail) {
-          warmupEmail.stats.lastActivity = new Date();
-          await warmupEmail.save();
+  }
+
+  // ——————————————————————————————————————————
+  // 2️⃣ CAMPAIGN EMAIL PROCESSING
+  // ——————————————————————————————————————————
+  if (data.campaignId) {
+    try {
+      console.log(`📨 Campaign flow triggered for job ${job.id}`);
+      console.log(`   Campaign ID: ${data.campaignId}`);
+      console.log(`   Lead ID: ${data.leadId}`);
+      console.log(`   Step ID: ${data.stepId || 'N/A'}`);
+      console.log(`   Variant ID: ${data.variantId || 'N/A'}`);
+
+      // Fetch lead + campaign
+      const lead = await Lead.findById(data.leadId);
+      const campaign = await Campaign.findById(data.campaignId);
+
+      if (!lead) {
+        console.error(`   ❌ Lead not found: ${data.leadId}`);
+        throw new Error("Lead not found");
+      }
+      if (!campaign) {
+        console.error(`   ❌ Campaign not found: ${data.campaignId}`);
+        throw new Error("Campaign not found");
+      }
+
+      console.log(`   📧 Lead: ${lead.email}`);
+      console.log(`   📋 Campaign: ${campaign.name}`);
+      console.log(`   📍 Lead status: ${lead.status}`);
+      console.log(`   📍 Lead current_step: ${lead.current_step || 0}`);
+
+      // Skip leads that are not in "Not yet contacted" status
+      if (lead.status !== "Not yet contacted") {
+        console.log(`   ⚠️ Lead status is "${lead.status}", not "Not yet contacted" — skipping.`);
+        return { skipped: true, reason: `Lead status is ${lead.status}` };
+      }
+
+      // Skip bounced leads
+      if (lead.status === "bounced") {
+        console.log("   ⚠️ Lead bounced — skipping.");
+        return { skipped: true, reason: "Lead bounced" };
+      }
+
+      // Skip if lead already replied (this check is redundant now but kept for safety)
+      if (lead.status === "replied") {
+        console.log("   ⚠️ Lead already replied — skipping.");
+        return { skipped: true, reason: "Already replied" };
+      }
+
+      console.log(`   📨 Preparing to send email...`);
+      console.log(`      From: ${data.fromEmail || 'N/A'}`);
+      console.log(`      To: ${lead.email}`);
+      console.log(`      Subject: ${data.subject || 'N/A'}`);
+      console.log(`      Body Text: ${data.bodyText ? `${data.bodyText.substring(0, 50)}...` : 'MISSING'}`);
+      console.log(`      Body HTML: ${data.bodyHtml ? `${data.bodyHtml.substring(0, 50)}...` : 'N/A'}`);
+      console.log(`      Text only: ${data.sendTextOnly ? 'Yes' : 'No'}`);
+      console.log(`      Is first email: ${data.isFirstEmail ? 'Yes' : 'No'}`);
+
+      // SCHEDULE DELAY
+      await waitRandomDelay();
+
+      // SEND EMAIL
+      console.log(`   📤 Sending email...`);
+      
+      // Ensure text content exists - required by email service
+      // If bodyText is missing but bodyHtml exists, use a simple text version
+      let emailText = data.bodyText;
+      if (!emailText || emailText.trim() === "") {
+        if (data.bodyHtml) {
+          // Strip HTML tags for a basic text version
+          emailText = data.bodyHtml
+            .replace(/<[^>]*>/g, "") // Remove HTML tags
+            .replace(/&nbsp;/g, " ") // Replace &nbsp; with space
+            .replace(/&amp;/g, "&") // Replace &amp; with &
+            .replace(/&lt;/g, "<") // Replace &lt; with <
+            .replace(/&gt;/g, ">") // Replace &gt; with >
+            .replace(/&quot;/g, '"') // Replace &quot; with "
+            .trim();
         }
-      } catch (updateError) {
-        console.error('Error updating warmup email stats:', updateError);
+        // If still empty, use a default message
+        if (!emailText || emailText.trim() === "") {
+          emailText = data.bodyHtml || "Email content";
+        }
       }
+      
+      // Validate required fields before sending
+      if (!data.fromEmail) {
+        throw new Error("From email address is required");
+      }
+      if (!data.subject) {
+        throw new Error("Email subject is required");
+      }
+      
+      const res = await sendEmail({
+        from: data.fromEmail,
+        to: lead.email,
+        subject: data.subject,
+        text: emailText,
+        html: data.bodyHtml,
+      });
+
+      console.log(`   ✅ Email sent successfully`);
+      console.log(`      Message ID: ${res.messageId}`);
+      console.log(`      Response: ${res.response || 'N/A'}`);
+
+      // UPDATE LEAD - Mark as contacted after sending email
+      await Lead.findByIdAndUpdate(lead._id, {
+        $set: { status: "contacted", last_sent_at: new Date() },
+        $inc: { sent_count: 1 },
+      });
+      console.log(`   ✅ Lead updated: status -> "contacted", sent_count incremented`);
+
+      // UPDATE CAMPAIGN METRICS
+      // Handle null values: if metrics_sent is null, set it to 1, otherwise increment
+      const currentMetricsSent = campaign.metrics_sent;
+      if (currentMetricsSent === null || currentMetricsSent === undefined) {
+        // Initialize to 1 if null/undefined
+        await Campaign.findByIdAndUpdate(campaign._id, {
+          $set: { metrics_sent: 1 },
+        });
+      } else {
+        // Increment if it's already a number
+        await Campaign.findByIdAndUpdate(campaign._id, {
+          $inc: { metrics_sent: 1 },
+        });
+      }
+      console.log(`   ✅ Campaign metrics updated: metrics_sent incremented`);
+
+      console.log(`   📬 Campaign email successfully sent to ${lead.email}`);
+
+      return {
+        campaign: true,
+        success: true,
+        lead: lead.email,
+        campaign: campaign.name,
+        messageId: res.messageId,
+        sentAt: res.sentAt,
+      };
+    } catch (err) {
+      console.error(`   ❌ Campaign job failed: ${err.message}`);
+      console.error(`   Stack:`, err.stack);
+      throw err;
     }
-    
-    throw error;
   }
+
+  // ——————————————————————————————————————————
+  // 3️⃣ UNKNOWN JOB TYPE
+  // ——————————————————————————————————————————
+  console.log("⚠️ Unknown job type:", data);
+  return { success: false, error: "Unknown job type" };
 };
 
-// Create email worker
-export const emailWorker = new Worker('email', emailProcessor, {
-  connection,
-  concurrency: 5, // Process 5 jobs concurrently
-  limiter: {
-    max: 10, // Max 10 jobs
-    duration: 1000, // Per 1 second
-  },
+// -----------------------------
+// RUN WORKER
+// -----------------------------
+export const emailWorker = new Worker("email", processor, {
+  connection: redisConnection,
+  concurrency: 5,
 });
 
-console.log('✅ Email worker created and listening for jobs on queue: email');
-console.log(`   Redis: ${connectionInfo}`);
-console.log(`   Concurrency: 5 jobs`);
+console.log("🚀 Email Worker started...");
+console.log("👷 Listening on queue: email");
 
-// Worker event listeners
-emailWorker.on('waiting', (job) => {
-  console.log(`⏳ Job ${job.id} is waiting (will process in ${Math.round((job.opts.delay || 0) / 60000)} minutes)`);
+// -----------------------------
+// EVENT LOGGING
+// -----------------------------
+emailWorker.on("completed", (job, result) => {
+  console.log(`✅ Job ${job.id} completed:`, result);
 });
 
-emailWorker.on('active', (job) => {
-  console.log(`🔄 Job ${job.id} is now active - processing email to ${job.data.to}`);
+emailWorker.on("failed", (job, err) => {
+  console.error(`❌ Job ${job.id} failed:`, err.message);
 });
 
-emailWorker.on('completed', (job, result) => {
-  console.log(`✅ Email job ${job.id} completed successfully`);
-  console.log(`   Sent to: ${job.data.to}`);
-  console.log(`   Message ID: ${result?.messageId || 'N/A'}`);
+emailWorker.on("error", (err) => {
+  console.error("❌ Worker error:", err.message);
 });
 
-emailWorker.on('failed', (job, err) => {
-  console.error(`❌ Email job ${job.id} failed:`, err.message);
-  console.error(`   Recipient: ${job.data.to}`);
-  console.error(`   Error details:`, err);
-});
-
-emailWorker.on('error', (err) => {
-  console.error('❌ Email Worker Error:', err.message);
-  if (err.code === 'ECONNREFUSED') {
-    console.error('   Redis connection refused. Make sure Redis container is running.');
-    console.error(`   Attempted to connect to: ${connection.host}:${connection.port}`);
-    console.error('   Check: docker-compose ps (Redis should be running)');
-  }
-});
-
-// Graceful shutdown
-process.on('SIGTERM', async () => {
-  console.log('Closing email worker...');
+// -----------------------------
+// GRACEFUL SHUTDOWN
+// -----------------------------
+process.on("SIGINT", async () => {
+  console.log("🔻 Closing email worker...");
   await emailWorker.close();
   process.exit(0);
 });
-
-process.on('SIGINT', async () => {
-  console.log('Closing email worker...');
+process.on("SIGTERM", async () => {
+  console.log("🔻 Closing email worker...");
   await emailWorker.close();
   process.exit(0);
 });
 
 export default emailWorker;
-

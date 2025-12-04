@@ -142,23 +142,30 @@ export const getLeads = async (
     res: Response
 ) => {
     try {
-        const { status, provider } = req.query;
+        const { status, provider, campaign } = req.query;
         const user = req.user.id;
-        const campaign = req.query.campaign as string;
-        const filter: any = {};
+
+        if (!campaign) {
+            return res.status(400).json({
+                success: false,
+                message: "Campaign ID is required"
+            });
+        }
+
+        const filter: any = { campaign };
 
         if (status) filter.status = status;
         if (provider) filter.provider = provider;
-        if (campaign) filter.campaign = campaign;
         if (user) filter.user = user;
-        const leads = await Leads.find(filter)
-            .sort({ createdAt: -1 });
+
+        const leads = await Leads.find(filter).sort({ createdAt: -1 });
 
         res.status(200).json({
             success: true,
             count: leads.length,
             data: leads
         });
+
     } catch (error: any) {
         res.status(500).json({
             success: false,

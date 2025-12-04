@@ -30,13 +30,11 @@ const AccountConnect: React.FC = () => {
   };
 
   const handleGoogleConnect = () => {
-    setIsLoading("google");
-    window.location.href = `${import.meta.env.VITE_API_URL || "http://localhost:5000/api"}/auth/google`;
+    navigate("/dashboard/accounts/connect/google");
   };
 
   const handleMicrosoftConnect = () => {
-    setIsLoading("microsoft");
-    window.location.href = `${import.meta.env.VITE_API_URL || "http://localhost:5000/api"}/auth/outlook`;
+    navigate("/dashboard/accounts/connect/microsoft");
   };
 
   const handleCustomProvider = () => {

@@ -84,6 +84,7 @@ const processor = async (job) => {
         to: data.to,
         subject: data.subject || "Warmup Email",
         text: data.body || "Warmup content",
+        emailAccountId: warmup.emailAccountId ? warmup.emailAccountId.toString() : null,
       });
 
       warmup.stats.emailsSent += 1;
@@ -201,6 +202,7 @@ const processor = async (job) => {
         subject: data.subject,
         text: emailText,
         html: data.bodyHtml,
+        emailAccountId: data.emailAccountId || null,
       });
 
       console.log(`   ✅ Email sent successfully`);

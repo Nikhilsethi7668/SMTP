@@ -299,6 +299,7 @@ const scheduleStepForCampaign = async (campaign, schedule, step, variants) => {
 
       // sender rotation (round robin)
       let fromEmail = null;
+      let emailAccountId = null;
       if (
         Array.isArray(campaign.from_email) &&
         campaign.from_email.length > 0
@@ -311,6 +312,20 @@ const scheduleStepForCampaign = async (campaign, schedule, step, variants) => {
               : 0)) %
           campaign.from_email.length;
         fromEmail = campaign.from_email[idx];
+        
+        // Try to find EmailAccount for this email
+        try {
+          const EmailAccount = (await import("../models/EmailAccount.js")).default;
+          const emailAccount = await EmailAccount.findOne({
+            email: fromEmail,
+            userId: campaign.user_id,
+          });
+          if (emailAccount) {
+            emailAccountId = emailAccount._id.toString();
+          }
+        } catch (err) {
+          console.log(`   ⚠️ Could not find EmailAccount for ${fromEmail}:`, err.message);
+        }
       }
 
       const isFirstEmail = stepIndex === 0;
@@ -363,6 +378,7 @@ const scheduleStepForCampaign = async (campaign, schedule, step, variants) => {
         scheduleId: schedule?._id?.toString() || null,
 
         fromEmail,
+        emailAccountId, // Add emailAccountId for OAuth accounts
         toEmail: lead.email,
         subject,
         bodyText,
